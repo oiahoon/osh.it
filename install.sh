@@ -532,7 +532,7 @@ configure_shell() {
   
   if [[ "$DRY_RUN" == "true" ]]; then
     log_dry_run "Would add the following to $SHELL_CONFIG_FILE:"
-    echo -e "$config_block"
+    printf "%b\n" "$config_block"
     return 0
   fi
   
@@ -543,7 +543,7 @@ configure_shell() {
     echo "The installer can automatically add OSH.IT configuration to your $SHELL_CONFIG_FILE"
     echo
     echo "Configuration to be added:"
-    echo -e "${DIM}$config_block${NORMAL}"
+    printf "${DIM}%b${NORMAL}\n" "$config_block"
     
     printf "${YELLOW}Add OSH.IT configuration to $SHELL_CONFIG_FILE? [Y/n]: ${NORMAL}"
     local confirm
@@ -556,7 +556,7 @@ configure_shell() {
         echo "${BOLD}${BLUE}Manual Configuration Required:${NORMAL}"
         echo "Add the following to your $SHELL_CONFIG_FILE:"
         echo
-        echo -e "${CYAN}$config_block${NORMAL}"
+        printf "${CYAN}%b${NORMAL}\n" "$config_block"
         return 0
         ;;
     esac
@@ -575,7 +575,7 @@ configure_shell() {
   
   # Add configuration
   echo >> "$SHELL_CONFIG_FILE"
-  echo -e "$config_block" >> "$SHELL_CONFIG_FILE"
+  printf "%b\n" "$config_block" >> "$SHELL_CONFIG_FILE"
   
   log_success "OSH.IT configuration added to $SHELL_CONFIG_FILE"
   return 0

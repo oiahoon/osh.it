@@ -363,6 +363,16 @@ PLUGIN_DISCOVERY_METHOD=cached ./install.sh
 - Check plugin name in `oplugins` array
 - Verify plugin is in the selected category (stable/beta/experimental)
 
+**Configuration Bug Fix (July 2025):**
+If you see `-e # OSH.IT Configuration` in your `.zshrc`, run:
+```bash
+# Download and run the fix script
+curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/scripts/fix_zshrc.sh | zsh
+
+# Or if you have OSH.IT installed locally
+$OSH/scripts/fix_zshrc.sh
+```
+
 **JIRA integration not working:**
 - Verify `JIRATOKEN` is correctly base64 encoded
 - Check `JIRAURL` points to your JIRA instance
