@@ -441,6 +441,17 @@ curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/scripts/fix_zsh
 $OSH/scripts/fix_zshrc.sh
 ```
 
+**Taskman Auto-Start Fix (December 2024):**
+If taskman launches automatically when opening new shells, your `.zshrc` has malformed plugin configuration:
+```bash
+# Run the comprehensive fix
+$OSH/scripts/fix_zshrc.sh
+
+# Or plugin-specific fix
+$OSH/scripts/fix_zshrc_plugins.sh
+```
+See [Taskman Auto-Start Fix Guide](docs/TASKMAN_AUTOSTART_FIX.md) for details.
+
 **JIRA integration not working:**
 - Verify `JIRATOKEN` is correctly base64 encoded
 - Check `JIRAURL` points to your JIRA instance
