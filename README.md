@@ -65,11 +65,27 @@ ANTHROPIC_API_KEY         # Claude (optional)
 ### Installation
 
 ```bash
-# Fresh installation
+# Fresh installation with automatic network optimization
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"
 
 # Or if you prefer wget
 sh -c "$(wget -O- https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"
+
+# Use Gitee mirror for faster access in China
+OSH_MIRROR=gitee sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"
+```
+
+### Health Check & Diagnostics
+
+```bash
+# Run comprehensive health check
+osh doctor
+
+# Auto-fix common issues
+osh doctor --fix
+
+# Include performance test
+osh doctor --perf
 ```
 
 ### Upgrade

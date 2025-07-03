@@ -355,6 +355,19 @@ upgrade_myshell() {
   osh_upgrade
 }
 
+# OSH.IT doctor command
+osh_doctor() {
+  if [[ -f "$OSH/scripts/osh_doctor.sh" ]]; then
+    "$OSH/scripts/osh_doctor.sh" "$@"
+  else
+    osh_log "ERROR" "OSH.IT doctor script not found: $OSH/scripts/osh_doctor.sh"
+    return 1
+  fi
+}
+
+# Alias for convenience
+alias doctor="osh_doctor"
+
 # OSH information function
 osh_info() {
   echo "OSH.IT - A Lightweight Zsh Plugin Framework"
@@ -382,13 +395,21 @@ OSH.IT - A Lightweight Zsh Plugin Framework
 Usage:
   osh_info              Show OSH.IT information
   osh_welcome           Show OSH.IT welcome screen with logo
+  osh_doctor            Run health check and diagnostics
   osh_help              Show this help message
   upgrade_myshell       Upgrade OSH.IT to latest version
+
+Health & Diagnostics:
+  osh_doctor            Run comprehensive health check
+  osh_doctor --fix      Auto-fix common issues
+  osh_doctor --perf     Include performance test
+  doctor                Alias for osh_doctor
 
 Environment Variables:
   OSH                   OSH.IT installation directory (default: ~/.osh)
   OSH_CUSTOM           Custom plugins directory (default: ~/.osh-custom)
   OSH_DEBUG            Enable debug output (0 or 1)
+  OSH_MIRROR           Mirror source (github, gitee, custom)
   oplugins             Array of plugins to load
 
 Configuration:

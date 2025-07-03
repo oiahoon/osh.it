@@ -6,6 +6,181 @@
 
 set -e  # Exit on any error
 
+# Network connectivity and mirror support
+OSH_MIRROR="${OSH_MIRROR:-github}"
+OSH_NETWORK_TIMEOUT="${OSH_NETWORK_TIMEOUT:-10}"
+
+# Mirror configuration
+setup_mirror_source() {
+  case "${OSH_MIRROR}" in
+    "github")
+      OSH_REPO_BASE="https://raw.githubusercontent.com/oiahoon/osh.it/main"
+      ;;
+    "gitee")
+      OSH_REPO_BASE="https://gitee.com/oiahoon/osh.it/raw/main"
+      ;;
+    "custom")
+      OSH_REPO_BASE="${OSH_CUSTOM_REPO:-https://raw.githubusercontent.com/oiahoon/osh.it/main}"
+      ;;
+    *)
+      OSH_REPO_BASE="https://raw.githubusercontent.com/oiahoon/osh.it/main"
+      ;;
+  esac
+  
+  log_info "Using mirror: $OSH_MIRROR ($OSH_REPO_BASE)"
+}
+
+# Network connectivity check
+check_network_connectivity() {
+  log_info "🌐 Checking network connectivity..."
+  
+  local test_urls=(
+    "https://github.com"
+    "https://raw.githubusercontent.com"
+  )
+  
+  # Add Gitee for Chinese users
+  if [[ "${LANG:-}" =~ zh_CN ]] || [[ "${LC_ALL:-}" =~ zh_CN ]]; then
+    test_urls+=("https://gitee.com")
+  fi
+  
+  local connected=false
+  local fastest_mirror=""
+  local best_time=999
+  
+  for url in "${test_urls[@]}"; do
+    log_info "Testing connection to $url..."
+    
+    local start_time=$(date +%s)
+    if curl -fsSL --connect-timeout "$OSH_NETWORK_TIMEOUT" --max-time "$OSH_NETWORK_TIMEOUT" "$url" >/dev/null 2>&1; then
+      local end_time=$(date +%s)
+      local response_time=$((end_time - start_time))
+      
+      log_success "✅ Connected to $url (${response_time}s)"
+      connected=true
+      
+      # Track fastest mirror
+      if [[ $response_time -lt $best_time ]]; then
+        best_time=$response_time
+        if [[ "$url" =~ gitee ]]; then
+          fastest_mirror="gitee"
+        else
+          fastest_mirror="github"
+        fi
+      fi
+    else
+      log_warning "❌ Failed to connect to $url"
+    fi
+  done
+  
+  if [[ "$connected" == "false" ]]; then
+    log_error "❌ Network connectivity check failed"
+    echo
+    echo "${BOLD}${YELLOW}Network Troubleshooting:${NORMAL}"
+    echo "1. Check your internet connection"
+    echo "2. Verify DNS settings"
+    echo "3. Check firewall/proxy settings"
+    echo "4. Try using a different network"
+    echo "5. Use manual installation method"
+    echo
+    return 1
+  fi
+  
+  # Auto-select fastest mirror
+  if [[ -n "$fastest_mirror" ]] && [[ "$OSH_MIRROR" == "github" ]]; then
+    if [[ "$fastest_mirror" == "gitee" ]] && [[ $best_time -lt 3 ]]; then
+      log_info "🚀 Auto-selecting faster mirror: $fastest_mirror"
+      OSH_MIRROR="$fastest_mirror"
+    fi
+  fi
+  
+  return 0
+}
+
+# Dependency check with OS-specific guidance
+check_dependencies() {
+  log_info "🔍 Checking system dependencies..."
+  
+  local essential_deps=("curl" "git")
+  local recommended_deps=("zsh" "python3")
+  local missing_essential=()
+  local missing_recommended=()
+  
+  # Check essential dependencies
+  for dep in "${essential_deps[@]}"; do
+    if ! command -v "$dep" >/dev/null 2>&1; then
+      missing_essential+=("$dep")
+      log_error "❌ Missing essential dependency: $dep"
+    else
+      log_success "✅ Found: $dep"
+    fi
+  done
+  
+  # Check recommended dependencies
+  for dep in "${recommended_deps[@]}"; do
+    if ! command -v "$dep" >/dev/null 2>&1; then
+      missing_recommended+=("$dep")
+      log_warning "⚠️  Missing recommended dependency: $dep"
+    else
+      log_success "✅ Found: $dep"
+    fi
+  done
+  
+  # Provide installation guidance
+  if [[ ${#missing_essential[@]} -gt 0 ]] || [[ ${#missing_recommended[@]} -gt 0 ]]; then
+    echo
+    echo "${BOLD}${BLUE}📦 Dependency Installation Guide:${NORMAL}"
+    
+    # Detect OS and provide specific instructions
+    local os_type=""
+    if [[ "$OSTYPE" =~ darwin ]]; then
+      os_type="macOS"
+      echo "${BOLD}macOS (Homebrew):${NORMAL}"
+      [[ ${#missing_essential[@]} -gt 0 ]] && echo "  brew install ${missing_essential[*]}"
+      [[ ${#missing_recommended[@]} -gt 0 ]] && echo "  brew install ${missing_recommended[*]}"
+    elif [[ "$OSTYPE" =~ linux ]]; then
+      os_type="Linux"
+      echo "${BOLD}Ubuntu/Debian:${NORMAL}"
+      [[ ${#missing_essential[@]} -gt 0 ]] && echo "  sudo apt update && sudo apt install ${missing_essential[*]}"
+      [[ ${#missing_recommended[@]} -gt 0 ]] && echo "  sudo apt install ${missing_recommended[*]}"
+      echo
+      echo "${BOLD}CentOS/RHEL/Fedora:${NORMAL}"
+      [[ ${#missing_essential[@]} -gt 0 ]] && echo "  sudo yum install ${missing_essential[*]} # or dnf"
+      [[ ${#missing_recommended[@]} -gt 0 ]] && echo "  sudo yum install ${missing_recommended[*]}"
+    fi
+    echo
+  fi
+  
+  # Fail if essential dependencies are missing
+  if [[ ${#missing_essential[@]} -gt 0 ]]; then
+    log_error "Cannot continue without essential dependencies: ${missing_essential[*]}"
+    return 1
+  fi
+  
+  # Warn about recommended dependencies
+  if [[ ${#missing_recommended[@]} -gt 0 ]]; then
+    log_warning "Some recommended dependencies are missing: ${missing_recommended[*]}"
+    log_info "OSH.IT will work but some features may be limited"
+    
+    if [[ "$INTERACTIVE" == "true" ]]; then
+      printf "${YELLOW}Continue anyway? [y/N]: ${NORMAL}"
+      local confirm
+      read -r confirm
+      case "$confirm" in
+        [yY]|[yY][eE][sS])
+          log_info "Continuing with missing recommended dependencies"
+          ;;
+        *)
+          log_info "Installation cancelled. Please install missing dependencies first."
+          return 1
+          ;;
+      esac
+    fi
+  fi
+  
+  return 0
+}
+
 # Configuration
 OSH_REPO_BASE="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh.it/main}"
 OSH_DIR="${OSH_DIR:-$HOME/.osh}"
@@ -598,7 +773,7 @@ main() {
   
   # Show logo and welcome
   show_logo
-  echo "${BOLD}${GREEN}Welcome to OSH Installation!${NORMAL}"
+  echo "${BOLD}${GREEN}Welcome to OSH.IT Installation!${NORMAL}"
   echo
   
   if [[ "$DRY_RUN" == "true" ]]; then
@@ -606,6 +781,23 @@ main() {
     echo "${DIM}No changes will be made to your system${NORMAL}"
     echo
   fi
+  
+  # Setup mirror source
+  setup_mirror_source
+  
+  # Check network connectivity (skip in dry-run for faster testing)
+  if [[ "$DRY_RUN" != "true" ]]; then
+    if ! check_network_connectivity; then
+      exit 1
+    fi
+    echo
+  fi
+  
+  # Check system dependencies
+  if ! check_dependencies; then
+    exit 1
+  fi
+  echo
   
   # Show environment info
   echo "${BOLD}${BLUE}🔍 Environment Information${NORMAL}"
