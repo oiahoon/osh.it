@@ -450,6 +450,8 @@ ESSENTIAL_FILES=(
   "lib/common.zsh"
   "lib/display.sh"
   "lib/lazy_stubs.zsh"
+  "lib/vintage.zsh"
+  "lib/cache.zsh"
 )
 
 # Plugin files mapping - FIXED to match actual file structure
@@ -466,6 +468,11 @@ get_plugin_files() {
       ;;
     "taskman")
       echo "plugins/taskman/taskman.plugin.zsh"
+      echo "plugins/taskman/task_manager_modern.py"
+      echo "plugins/taskman/task_manager_vintage.py"
+      echo "plugins/taskman/task_cli.py"
+      echo "plugins/taskman/taskman_setup.py"
+      echo "plugins/taskman/dino_animation.py"
       ;;
     "acw")
       echo "plugins/acw/acw.plugin.zsh"
