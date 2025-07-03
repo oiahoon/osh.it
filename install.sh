@@ -316,50 +316,53 @@ show_logo() {
   echo
 }
 
-# Download function with progress
+# Download function with inline progress
 download_file() {
   local url="$1"
   local output="$2"
-  local filename=$(basename "$output")
-  
-  printf "Downloading %s... " "$filename"
   
   if command -v curl >/dev/null 2>&1; then
-    if curl -fsSL "$url" -o "$output" 2>/dev/null; then
-      printf "${GREEN}✓${NORMAL}\n"
-      return 0
-    else
-      printf "${RED}✗${NORMAL}\n"
-      return 1
-    fi
+    curl -fsSL "$url" -o "$output" 2>/dev/null
   elif command -v wget >/dev/null 2>&1; then
-    if wget -q "$url" -O "$output" 2>/dev/null; then
-      printf "${GREEN}✓${NORMAL}\n"
-      return 0
-    else
-      printf "${RED}✗${NORMAL}\n"
-      return 1
-    fi
+    wget -q "$url" -O "$output" 2>/dev/null
   else
-    printf "${RED}✗${NORMAL}\n"
-    log_error "Neither curl nor wget is available"
     return 1
   fi
 }
 
-# Progress bar function
-show_progress_bar() {
+# Progress bar function with file info
+show_progress_with_file() {
   local current=$1
   local total=$2
-  local width=40
+  local filename="$3"
+  local status="$4"  # "downloading", "success", "failed"
+  local width=30
   local percentage=$((current * 100 / total))
   local filled=$((current * width / total))
   
-  printf "\r${BLUE}["
+  # Clear the line and show progress
+  printf "\r\033[K"  # Clear entire line
+  
+  # Show progress bar
+  printf "${BLUE}["
   printf "%*s" $filled | tr ' ' '█'
   printf "%*s" $((width - filled)) | tr ' ' '░'
-  printf "] %d%% (%d/%d)${NORMAL}" $percentage $current $total
+  printf "] %3d%% (%d/%d)${NORMAL} " $percentage $current $total
   
+  # Show current file and status
+  case "$status" in
+    "downloading")
+      printf "Downloading %s..." "$filename"
+      ;;
+    "success")
+      printf "Downloaded %s ${GREEN}✓${NORMAL}" "$filename"
+      ;;
+    "failed")
+      printf "Failed %s ${RED}✗${NORMAL}" "$filename"
+      ;;
+  esac
+  
+  # If completed, add newline
   if [[ $current -eq $total ]]; then
     printf "\n"
   fi
@@ -763,20 +766,26 @@ install_osh() {
   
   for file in "${ESSENTIAL_FILES[@]}"; do
     current=$((current + 1))
+    local filename=$(basename "$file")
     
     if [[ "$DRY_RUN" == "true" ]]; then
       log_dry_run "[$current/$total_files] Would download: $file"
     else
-      show_progress_bar $current $total_files
-      printf "  "
+      # Show downloading status
+      show_progress_with_file $current $total_files "$filename" "downloading"
       
       local url="${OSH_REPO_BASE}/${file}"
       local output="${OSH_DIR}/${file}"
       
       mkdir -p "$(dirname "$output")"
       
-      if ! download_file "$url" "$output"; then
-        printf "\n"
+      # Download and update status
+      if download_file "$url" "$output"; then
+        show_progress_with_file $current $total_files "$filename" "success"
+        sleep 0.1  # Brief pause to show success status
+      else
+        show_progress_with_file $current $total_files "$filename" "failed"
+        sleep 0.5  # Longer pause to show error
         log_error "Failed to download $file"
         return 1
       fi
@@ -784,8 +793,8 @@ install_osh() {
   done
   
   if [[ "$DRY_RUN" != "true" ]]; then
-    printf "\n"
-    log_success "Core files downloaded successfully!"
+    echo
+    log_success "✅ Core files downloaded successfully!"
   fi
   
   # Download plugin files with progress
@@ -816,17 +825,29 @@ install_osh() {
         while read -r plugin_file; do
           if [[ -n "$plugin_file" ]]; then
             file_count=$((file_count + 1))
+            local filename=$(basename "$plugin_file")
             
             if [[ "$DRY_RUN" == "true" ]]; then
               log_dry_run "  [$file_count/$total_plugin_files] Would download: $plugin_file"
             else
-              printf "  [%d/%d] " "$file_count" "$total_plugin_files"
+              # Show downloading status
+              printf "  "
+              show_progress_with_file $file_count $total_plugin_files "$filename" "downloading"
+              
               local url="${OSH_REPO_BASE}/${plugin_file}"
               local output="${OSH_DIR}/${plugin_file}"
               
               mkdir -p "$(dirname "$output")"
               
-              if ! download_file "$url" "$output"; then
+              # Download and update status
+              if download_file "$url" "$output"; then
+                printf "  "
+                show_progress_with_file $file_count $total_plugin_files "$filename" "success"
+                sleep 0.1
+              else
+                printf "  "
+                show_progress_with_file $file_count $total_plugin_files "$filename" "failed"
+                sleep 0.3
                 log_warning "Failed to download $plugin_file (plugin: $plugin)"
               fi
             fi
@@ -834,7 +855,8 @@ install_osh() {
         done <<< "$plugin_files"
         
         if [[ "$DRY_RUN" != "true" ]]; then
-          log_success "  Plugin $plugin installed successfully!"
+          echo
+          log_success "  ✅ Plugin $plugin installed successfully!"
         fi
       else
         log_warning "Plugin '$plugin' not found or invalid"
@@ -843,7 +865,7 @@ install_osh() {
     
     if [[ "$DRY_RUN" != "true" ]]; then
       echo
-      log_success "All plugins downloaded successfully!"
+      log_success "✅ All plugins downloaded successfully!"
     fi
   fi
   

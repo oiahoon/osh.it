@@ -8,37 +8,63 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NORMAL='\033[0m'
 
-# Progress bar function
-show_progress_bar() {
+# Progress bar function with file info
+show_progress_with_file() {
   local current=$1
   local total=$2
-  local width=40
+  local filename="$3"
+  local status="$4"  # "downloading", "success", "failed"
+  local width=30
   local percentage=$((current * 100 / total))
   local filled=$((current * width / total))
   
-  printf "\r${BLUE}["
+  # Clear the line and show progress
+  printf "\r\033[K"  # Clear entire line
+  
+  # Show progress bar
+  printf "${BLUE}["
   printf "%*s" $filled | tr ' ' '█'
   printf "%*s" $((width - filled)) | tr ' ' '░'
-  printf "] %d%% (%d/%d)${NORMAL}" $percentage $current $total
+  printf "] %3d%% (%d/%d)${NORMAL} " $percentage $current $total
   
+  # Show current file and status
+  case "$status" in
+    "downloading")
+      printf "Downloading %s..." "$filename"
+      ;;
+    "success")
+      printf "Downloaded %s ${GREEN}✓${NORMAL}" "$filename"
+      ;;
+    "failed")
+      printf "Failed %s ${RED}✗${NORMAL}" "$filename"
+      ;;
+  esac
+  
+  # If completed, add newline
   if [[ $current -eq $total ]]; then
     printf "\n"
   fi
 }
 
-# Simulate file download with progress
-simulate_download() {
-  local filename="$1"
-  local delay="$2"
+# Simulate file download with inline progress
+simulate_download_with_progress() {
+  local current=$1
+  local total=$2
+  local filename="$3"
+  local delay="$4"
   
-  printf "Downloading %s... " "$filename"
+  # Show downloading
+  show_progress_with_file $current $total "$filename" "downloading"
   sleep "$delay"
   
-  if [[ $((RANDOM % 10)) -lt 8 ]]; then
-    printf "${GREEN}✓${NORMAL}\n"
+  # Show result
+  if [[ $((RANDOM % 10)) -lt 9 ]]; then
+    show_progress_with_file $current $total "$filename" "success"
+    sleep 0.1
     return 0
   else
-    printf "${RED}✗${NORMAL}\n"
+    show_progress_with_file $current $total "$filename" "failed"
+    sleep 0.3
     return 1
   fi
 }
@@ -55,13 +81,10 @@ demo_installation() {
   local total_core=${#core_files[@]}
   
   for i in $(seq 1 $total_core); do
-    show_progress_bar $i $total_core
-    printf "  "
-    simulate_download "${core_files[$((i-1))]}" 0.3
-    sleep 0.2
+    simulate_download_with_progress $i $total_core "${core_files[$((i-1))]}" 0.3
   done
   
-  printf "\n"
+  echo
   echo "${GREEN}✅ Core files downloaded successfully!${NORMAL}"
   echo
   
@@ -83,11 +106,11 @@ demo_installation() {
     
     for plugin_file in "${plugin_files[@]}"; do
       file_count=$((file_count + 1))
-      printf "  [%d/%d] " "$file_count" "$total_plugin_files"
-      simulate_download "$plugin_file" 0.2
-      sleep 0.1
+      printf "  "
+      simulate_download_with_progress $file_count $total_plugin_files "$plugin_file" 0.2
     done
     
+    echo
     echo "  ${GREEN}✅ Plugin $plugin installed successfully!${NORMAL}"
   done
   
@@ -126,13 +149,10 @@ demo_upgrade() {
   local total_files=${#files[@]}
   
   for i in $(seq 1 $total_files); do
-    show_progress_bar $i $total_files
-    printf "  "
-    simulate_download "${files[$((i-1))]}" 0.2
-    sleep 0.1
+    simulate_download_with_progress $i $total_files "${files[$((i-1))]}" 0.2
   done
   
-  printf "\n"
+  echo
   echo "${GREEN}✅ All files updated successfully!${NORMAL}"
   echo
   

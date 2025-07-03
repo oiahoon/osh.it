@@ -179,8 +179,10 @@ update_files() {
   
   for file in "${ESSENTIAL_FILES[@]}"; do
     current=$((current + 1))
-    show_progress_bar $current $total_files
-    printf "  "
+    local filename=$(basename "$file")
+    
+    # Show downloading status
+    show_progress_with_file $current $total_files "$filename" "downloading"
     
     local url="${OSH_REPO_BASE}/${file}"
     local output="${OSH_DIR}/${file}"
@@ -188,12 +190,18 @@ update_files() {
     # Create directory if it doesn't exist
     mkdir -p "$(dirname "$output")"
     
-    if ! download_file "$url" "$output"; then
+    # Download and update status
+    if download_file "$url" "$output"; then
+      show_progress_with_file $current $total_files "$filename" "success"
+      sleep 0.1  # Brief pause to show success
+    else
+      show_progress_with_file $current $total_files "$filename" "failed"
       failed_files+=("$file")
+      sleep 0.3  # Longer pause for errors
     fi
   done
   
-  printf "\n"
+  echo
   
   if [[ ${#failed_files[@]} -gt 0 ]]; then
     log_warning "⚠️  Some files failed to update:"
