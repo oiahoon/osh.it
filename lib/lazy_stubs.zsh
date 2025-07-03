@@ -6,6 +6,8 @@
 sysinfo() {
   # Load the actual plugin
   if osh_lazy_load "sysinfo"; then
+    # Undefine this stub function to avoid recursion
+    unfunction sysinfo 2>/dev/null || true
     # Call the real function
     sysinfo "$@"
   else
@@ -18,6 +20,8 @@ sysinfo() {
 weather() {
   # Load the actual plugin
   if osh_lazy_load "weather"; then
+    # Undefine this stub function to avoid recursion
+    unfunction weather 2>/dev/null || true
     # Call the real function
     weather "$@"
   else
@@ -30,6 +34,8 @@ weather() {
 tasks() {
   # Load the actual plugin
   if osh_lazy_load "taskman"; then
+    # Undefine this stub function to avoid recursion
+    unfunction tasks 2>/dev/null || true
     # Call the real function
     tasks "$@"
   else
@@ -41,6 +47,7 @@ tasks() {
 # ACW lazy stubs
 acw() {
   if osh_lazy_load "acw"; then
+    unfunction acw 2>/dev/null || true
     acw "$@"
   else
     echo "Failed to load acw plugin" >&2
@@ -50,6 +57,7 @@ acw() {
 
 ggco() {
   if osh_lazy_load "acw"; then
+    unfunction ggco 2>/dev/null || true
     ggco "$@"
   else
     echo "Failed to load acw plugin" >&2
@@ -59,6 +67,7 @@ ggco() {
 
 newb() {
   if osh_lazy_load "acw"; then
+    unfunction newb 2>/dev/null || true
     newb "$@"
   else
     echo "Failed to load acw plugin" >&2

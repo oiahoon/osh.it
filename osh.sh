@@ -253,6 +253,16 @@ osh_lazy_load() {
   if osh_load_plugin_immediate "$plugin"; then
     OSH_LOADED_PLUGINS+=("$plugin")
     osh_log "DEBUG" "Successfully lazy loaded: $plugin"
+    
+    # Remove the plugin from lazy plugins list to prevent re-loading
+    local new_lazy_plugins=()
+    for p in "${OSH_LAZY_PLUGINS[@]}"; do
+      if [[ "$p" != "$plugin" ]]; then
+        new_lazy_plugins+=("$p")
+      fi
+    done
+    OSH_LAZY_PLUGINS=("${new_lazy_plugins[@]}")
+    
     return 0
   else
     osh_log "ERROR" "Failed to lazy load: $plugin"
