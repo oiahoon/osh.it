@@ -36,18 +36,28 @@ show_header() {
 }
 
 check_issue() {
-  log_info "Checking for .zshrc configuration issue..."
+  log_info "Checking for .zshrc configuration issues..."
   
   if [[ ! -f "$ZSHRC_FILE" ]]; then
     log_error ".zshrc file not found: $ZSHRC_FILE"
     return 1
   fi
   
-  # Check if the bug exists
+  local issues_found=0
+  
+  # Check if the -e bug exists
   if grep -q "^-e # OSH.IT Configuration" "$ZSHRC_FILE"; then
     log_warning "Found '-e' bug in $ZSHRC_FILE"
-    return 0
-  else
+    issues_found=1
+  fi
+  
+  # Check for malformed oplugins configuration
+  if grep -A10 "oplugins=(" "$ZSHRC_FILE" | grep -q "^  [a-z]"; then
+    log_warning "Found malformed oplugins configuration in $ZSHRC_FILE"
+    issues_found=1
+  fi
+  
+  if [[ $issues_found -eq 0 ]]; then
     log_success "No '-e' bug found in $ZSHRC_FILE"
     return 1
   fi
@@ -65,29 +75,73 @@ fix_zshrc() {
     return 1
   fi
   
-  # Fix the issue by removing the problematic line and replacing it
-  local temp_file="/tmp/zshrc_fix_$$"
+  local fixes_applied=0
   
-  # Process the file line by line
-  local in_osh_block=false
-  local fixed=false
+  # Fix 1: Remove the '-e' line if it exists
+  if grep -q "^-e # OSH.IT Configuration" "$ZSHRC_FILE"; then
+    log_info "Fixing '-e' bug..."
+    local temp_file="/tmp/zshrc_fix_$$"
+    
+    # Process the file line by line
+    while IFS= read -r line; do
+      if [[ "$line" == "-e # OSH.IT Configuration - Added by installer" ]]; then
+        # Replace the buggy line with the correct one
+        echo "# OSH.IT Configuration - Added by installer"
+      else
+        echo "$line"
+      fi
+    done < "$ZSHRC_FILE" > "$temp_file"
+    
+    mv "$temp_file" "$ZSHRC_FILE"
+    log_success "Fixed '-e' bug"
+    fixes_applied=1
+  fi
   
-  while IFS= read -r line; do
-    if [[ "$line" == "-e # OSH.IT Configuration - Added by installer" ]]; then
-      # Replace the buggy line with the correct one
-      echo "# OSH.IT Configuration - Added by installer"
-      fixed=true
-    else
-      echo "$line"
+  # Fix 2: Fix malformed oplugins configuration
+  if grep -A10 "oplugins=(" "$ZSHRC_FILE" | grep -q "^  [a-z]"; then
+    log_info "Fixing malformed oplugins configuration..."
+    
+    # Extract plugin names
+    local plugins=$(grep -A10 "oplugins=(" "$ZSHRC_FILE" | grep -E "^  [a-z]|oplugins=\(" | sed 's/oplugins=(//' | sed 's/)//' | tr -d ' ' | grep -v '^$' | sort -u)
+    local initial_plugins=$(grep "oplugins=(" "$ZSHRC_FILE" | sed 's/.*oplugins=(//' | sed 's/).*//' | tr ' ' '\n' | grep -v '^$')
+    local all_plugins=$(echo -e "$initial_plugins\n$plugins" | sort -u | grep -v '^$' | tr '\n' ' ')
+    
+    # Create temporary file with corrected configuration
+    local temp_file="/tmp/zshrc_plugin_fix_$$"
+    
+    # Copy everything before OSH configuration
+    sed '/# OSH installation directory/,$d' "$ZSHRC_FILE" > "$temp_file"
+    
+    # Add corrected OSH configuration
+    cat >> "$temp_file" << EOF
+
+# OSH installation directory
+export OSH="\$HOME/.osh"
+
+# Plugin selection
+oplugins=($all_plugins)
+
+# Load OSH framework
+source \$OSH/osh.sh
+EOF
+    
+    # Add anything after OSH configuration (if any)
+    if grep -q "# === OSH Configuration End ===" "$ZSHRC_FILE"; then
+      sed -n '/# === OSH Configuration End ===/,$p' "$ZSHRC_FILE" | tail -n +2 >> "$temp_file"
     fi
-  done < "$ZSHRC_FILE" > "$temp_file"
+    
+    # Replace original file
+    mv "$temp_file" "$ZSHRC_FILE"
+    
+    log_success "Fixed oplugins configuration"
+    log_info "Corrected plugins: $all_plugins"
+    fixes_applied=1
+  fi
   
-  if [[ "$fixed" == "true" ]]; then
-    # Replace the original file
-    if mv "$temp_file" "$ZSHRC_FILE"; then
-      log_success "Fixed .zshrc configuration"
-      log_info "Backup saved as: $backup_file"
-      return 0
+  if [[ $fixes_applied -gt 0 ]]; then
+    log_success "All fixes applied successfully!"
+    log_info "Backup saved as: $backup_file"
+    return 0
     else
       log_error "Failed to replace .zshrc file"
       rm -f "$temp_file"
