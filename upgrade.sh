@@ -39,15 +39,54 @@ log_success() { printf "${GREEN}%s${NORMAL}\n" "$*"; }
 log_warning() { printf "${YELLOW}%s${NORMAL}\n" "$*"; }
 log_error() { printf "${RED}%s${NORMAL}\n" "$*" >&2; }
 
-# Download function
+# Download function with progress
 download_file() {
   local url="$1"
   local output="$2"
+  local filename=$(basename "$output")
+  
+  printf "Updating %s... " "$filename"
   
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$url" -o "$output"
+    if curl -fsSL "$url" -o "$output" 2>/dev/null; then
+      printf "${GREEN}✓${NORMAL}\n"
+      return 0
+    else
+      printf "${RED}✗${NORMAL}\n"
+      return 1
+    fi
   elif command -v wget >/dev/null 2>&1; then
-    wget -q "$url" -O "$output"
+    if wget -q "$url" -O "$output" 2>/dev/null; then
+      printf "${GREEN}✓${NORMAL}\n"
+      return 0
+    else
+      printf "${RED}✗${NORMAL}\n"
+      return 1
+    fi
+  else
+    printf "${RED}✗${NORMAL}\n"
+    log_error "Neither curl nor wget is available"
+    return 1
+  fi
+}
+
+# Progress bar function
+show_progress_bar() {
+  local current=$1
+  local total=$2
+  local width=40
+  local percentage=$((current * 100 / total))
+  local filled=$((current * width / total))
+  
+  printf "\r${BLUE}["
+  printf "%*s" $filled | tr ' ' '█'
+  printf "%*s" $((width - filled)) | tr ' ' '░'
+  printf "] %d%% (%d/%d)${NORMAL}" $percentage $current $total
+  
+  if [[ $current -eq $total ]]; then
+    printf "\n"
+  fi
+}
   else
     log_error "Neither curl nor wget is available"
     return 1
@@ -139,6 +178,32 @@ update_files() {
   local current=0
   
   for file in "${ESSENTIAL_FILES[@]}"; do
+    current=$((current + 1))
+    show_progress_bar $current $total_files
+    printf "  "
+    
+    local url="${OSH_REPO_BASE}/${file}"
+    local output="${OSH_DIR}/${file}"
+    
+    # Create directory if it doesn't exist
+    mkdir -p "$(dirname "$output")"
+    
+    if ! download_file "$url" "$output"; then
+      failed_files+=("$file")
+    fi
+  done
+  
+  printf "\n"
+  
+  if [[ ${#failed_files[@]} -gt 0 ]]; then
+    log_warning "⚠️  Some files failed to update:"
+    for file in "${failed_files[@]}"; do
+      log_warning "  - $file"
+    done
+    log_info "💡 You can try running the upgrade again"
+  else
+    log_success "✅ All files updated successfully!"
+  fi
     current=$((current + 1))
     printf "\r${BLUE}[%d/%d]${NORMAL} Updating %s..." "$current" "$total_files" "$file"
     

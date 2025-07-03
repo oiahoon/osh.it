@@ -316,18 +316,52 @@ show_logo() {
   echo
 }
 
-# Download function
+# Download function with progress
 download_file() {
   local url="$1"
   local output="$2"
+  local filename=$(basename "$output")
+  
+  printf "Downloading %s... " "$filename"
   
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$url" -o "$output" 2>/dev/null
+    if curl -fsSL "$url" -o "$output" 2>/dev/null; then
+      printf "${GREEN}✓${NORMAL}\n"
+      return 0
+    else
+      printf "${RED}✗${NORMAL}\n"
+      return 1
+    fi
   elif command -v wget >/dev/null 2>&1; then
-    wget -q "$url" -O "$output" 2>/dev/null
+    if wget -q "$url" -O "$output" 2>/dev/null; then
+      printf "${GREEN}✓${NORMAL}\n"
+      return 0
+    else
+      printf "${RED}✗${NORMAL}\n"
+      return 1
+    fi
   else
+    printf "${RED}✗${NORMAL}\n"
     log_error "Neither curl nor wget is available"
     return 1
+  fi
+}
+
+# Progress bar function
+show_progress_bar() {
+  local current=$1
+  local total=$2
+  local width=40
+  local percentage=$((current * 100 / total))
+  local filled=$((current * width / total))
+  
+  printf "\r${BLUE}["
+  printf "%*s" $filled | tr ' ' '█'
+  printf "%*s" $((width - filled)) | tr ' ' '░'
+  printf "] %d%% (%d/%d)${NORMAL}" $percentage $current $total
+  
+  if [[ $current -eq $total ]]; then
+    printf "\n"
   fi
 }
 
@@ -733,7 +767,8 @@ install_osh() {
     if [[ "$DRY_RUN" == "true" ]]; then
       log_dry_run "[$current/$total_files] Would download: $file"
     else
-      printf "${BLUE}[%d/%d]${NORMAL} " "$current" "$total_files"
+      show_progress_bar $current $total_files
+      printf "  "
       
       local url="${OSH_REPO_BASE}/${file}"
       local output="${OSH_DIR}/${file}"
@@ -741,11 +776,17 @@ install_osh() {
       mkdir -p "$(dirname "$output")"
       
       if ! download_file "$url" "$output"; then
+        printf "\n"
         log_error "Failed to download $file"
         return 1
       fi
     fi
   done
+  
+  if [[ "$DRY_RUN" != "true" ]]; then
+    printf "\n"
+    log_success "Core files downloaded successfully!"
+  fi
   
   # Download plugin files with progress
   if [[ ${#selected_plugins[@]} -gt 0 ]]; then
@@ -753,6 +794,7 @@ install_osh() {
     log_info "🔌 Downloading selected plugins..."
     
     local plugin_count=0
+    local total_plugins=${#selected_plugins[@]}
     
     for plugin in "${selected_plugins[@]}"; do
       # Skip empty plugin names
@@ -762,18 +804,23 @@ install_osh() {
       
       plugin_count=$((plugin_count + 1))
       echo
-      log_info "[$plugin_count/${#selected_plugins[@]}] Installing plugin: ${BOLD}$plugin${NORMAL}"
+      printf "${CYAN}[%d/%d]${NORMAL} Installing plugin: ${BOLD}%s${NORMAL}\n" "$plugin_count" "$total_plugins" "$plugin"
       
       local plugin_files
       plugin_files=$(get_plugin_files "$plugin" 2>/dev/null)
       
       if [[ $? -eq 0 && -n "$plugin_files" ]]; then
+        local file_count=0
+        local total_plugin_files=$(echo "$plugin_files" | wc -l | tr -d ' ')
+        
         while read -r plugin_file; do
           if [[ -n "$plugin_file" ]]; then
+            file_count=$((file_count + 1))
+            
             if [[ "$DRY_RUN" == "true" ]]; then
-              log_dry_run "  Would download: $plugin_file"
+              log_dry_run "  [$file_count/$total_plugin_files] Would download: $plugin_file"
             else
-              printf "  "
+              printf "  [%d/%d] " "$file_count" "$total_plugin_files"
               local url="${OSH_REPO_BASE}/${plugin_file}"
               local output="${OSH_DIR}/${plugin_file}"
               
@@ -785,10 +832,19 @@ install_osh() {
             fi
           fi
         done <<< "$plugin_files"
+        
+        if [[ "$DRY_RUN" != "true" ]]; then
+          log_success "  Plugin $plugin installed successfully!"
+        fi
       else
         log_warning "Plugin '$plugin' not found or invalid"
       fi
     done
+    
+    if [[ "$DRY_RUN" != "true" ]]; then
+      echo
+      log_success "All plugins downloaded successfully!"
+    fi
   fi
   
   # Set permissions
