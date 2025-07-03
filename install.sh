@@ -141,7 +141,130 @@ show_logo() {
   echo
 }
 
-# Essential files to download
+# Download function
+download_file() {
+  local url="$1"
+  local output="$2"
+  
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$url" -o "$output" 2>/dev/null
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$url" -O "$output" 2>/dev/null
+  else
+    log_error "Neither curl nor wget is available"
+    return 1
+  fi
+}
+
+# Interactive plugin selection
+interactive_plugin_selection() {
+  echo
+  log_info "🔌 Plugin Selection"
+  echo
+  echo "Available plugins:"
+  echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding"
+  echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art"
+  echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager"
+  echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)"
+  echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview"
+  echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message"
+  echo
+  echo "Installation presets:"
+  echo "  ${CYAN}preset:minimal${NORMAL}     - Basic functionality only"
+  echo "  ${CYAN}preset:recommended${NORMAL} - sysinfo, weather, taskman (default)"
+  echo "  ${CYAN}preset:developer${NORMAL}   - recommended + acw, fzf"
+  echo "  ${CYAN}preset:full${NORMAL}        - All stable plugins"
+  echo
+  echo "Selection options:"
+  echo "  • Enter numbers: ${YELLOW}1 2 3${NORMAL} (space-separated)"
+  echo "  • Use presets: ${YELLOW}preset:recommended${NORMAL}"
+  echo "  • Install all: ${YELLOW}all${NORMAL} or ${YELLOW}a${NORMAL}"
+  echo "  • Default: Press ${YELLOW}Enter${NORMAL} for recommended preset"
+  echo
+  
+  local selection
+  printf "${BLUE}Your choice: ${NORMAL}"
+  read -r selection
+  
+  # Handle empty input (default)
+  if [[ -z "$selection" ]]; then
+    selection="preset:recommended"
+  fi
+  
+  # Process selection
+  case "$selection" in
+    "preset:minimal")
+      echo ""
+      ;;
+    "preset:recommended")
+      echo "sysinfo weather taskman"
+      ;;
+    "preset:developer")
+      echo "sysinfo weather taskman acw fzf"
+      ;;
+    "preset:full")
+      echo "sysinfo weather taskman acw fzf"
+      ;;
+    "all"|"a")
+      echo "sysinfo weather taskman acw fzf greeting"
+      ;;
+    *)
+      # Convert numbers to plugin names
+      local plugins=""
+      for num in $selection; do
+        case "$num" in
+          1) plugins="$plugins sysinfo" ;;
+          2) plugins="$plugins weather" ;;
+          3) plugins="$plugins taskman" ;;
+          4) plugins="$plugins acw" ;;
+          5) plugins="$plugins fzf" ;;
+          6) plugins="$plugins greeting" ;;
+          *) log_warning "Unknown selection: $num" ;;
+        esac
+      done
+      echo "$plugins"
+      ;;
+  esac
+}
+
+# Show installation summary
+show_installation_summary() {
+  local selected_plugins=("$@")
+  
+  echo
+  log_info "📋 Installation Summary"
+  echo
+  echo "${BOLD}What will be installed:${NORMAL}"
+  echo "  • OSH.IT core framework"
+  echo "  • Essential libraries and utilities"
+  
+  if [[ ${#selected_plugins[@]} -gt 0 ]]; then
+    echo "  • Selected plugins: ${CYAN}${selected_plugins[*]}${NORMAL}"
+  else
+    echo "  • ${DIM}No plugins selected${NORMAL}"
+  fi
+  
+  echo
+  echo "${BOLD}Installation location:${NORMAL} $OSH_DIR"
+  echo "${BOLD}Shell configuration:${NORMAL} $SHELL_CONFIG_FILE"
+  echo
+  
+  if [[ "$INTERACTIVE" == "true" ]]; then
+    printf "${YELLOW}Continue with installation? [Y/n]: ${NORMAL}"
+    local confirm
+    read -r confirm
+    
+    case "$confirm" in
+      [nN]|[nN][oO])
+        log_info "Installation cancelled by user"
+        exit 0
+        ;;
+      *)
+        log_success "Installation confirmed!"
+        ;;
+    esac
+  fi
+}
 ESSENTIAL_FILES=(
   "osh.sh"
   "upgrade.sh"
