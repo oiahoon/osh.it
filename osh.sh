@@ -284,7 +284,7 @@ osh_load_plugins() {
   osh_log "INFO" "Processing plugins: ${oplugins[*]}"
 
   # Check for lazy loading preference
-  local lazy_loading="${OSH_LAZY_LOADING:-true}"
+  local lazy_loading="${OSH_LAZY_LOADING:-false}"
   
   for plugin in $oplugins; do
     # Check if plugin should be loaded immediately or lazily
@@ -292,13 +292,12 @@ osh_load_plugins() {
     
     # Always load essential plugins immediately
     case "$plugin" in
-      "greeting"|"proxy")
+      "greeting")
         load_immediately=true
         ;;
       *)
-        if [[ "$lazy_loading" != "true" ]]; then
-          load_immediately=true
-        fi
+        # Load all plugins immediately to avoid lazy loading issues
+        load_immediately=true
         ;;
     esac
     

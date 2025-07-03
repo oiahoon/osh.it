@@ -2,77 +2,55 @@
 # OSH Lazy Loading Function Stubs
 # Provides lightweight function definitions that load plugins on demand
 
-# Sysinfo lazy stub
-sysinfo() {
-  # Load the actual plugin
-  if osh_lazy_load "sysinfo"; then
-    # Undefine this stub function to avoid recursion
-    unfunction sysinfo 2>/dev/null || true
-    # Call the real function
-    sysinfo "$@"
+# Helper function to load plugin and replace stub
+_osh_load_and_call() {
+  local plugin="$1"
+  local func_name="$2"
+  shift 2
+  
+  # Load the plugin
+  if osh_lazy_load "$plugin"; then
+    # The plugin should now define the real function
+    # Check if the function exists and is not our stub
+    if declare -f "$func_name" >/dev/null && [[ "$(declare -f "$func_name")" != *"_osh_load_and_call"* ]]; then
+      # Call the real function
+      "$func_name" "$@"
+    else
+      echo "Plugin $plugin loaded but function $func_name not found" >&2
+      return 1
+    fi
   else
-    echo "Failed to load sysinfo plugin" >&2
+    echo "Failed to load $plugin plugin" >&2
     return 1
   fi
 }
 
-# Weather lazy stub
+# Sysinfo lazy stub
+sysinfo() {
+  _osh_load_and_call "sysinfo" "sysinfo" "$@"
+}
+
+# Weather lazy stub  
 weather() {
-  # Load the actual plugin
-  if osh_lazy_load "weather"; then
-    # Undefine this stub function to avoid recursion
-    unfunction weather 2>/dev/null || true
-    # Call the real function
-    weather "$@"
-  else
-    echo "Failed to load weather plugin" >&2
-    return 1
-  fi
+  _osh_load_and_call "weather" "weather" "$@"
 }
 
 # Tasks lazy stub
 tasks() {
-  # Load the actual plugin
-  if osh_lazy_load "taskman"; then
-    # Undefine this stub function to avoid recursion
-    unfunction tasks 2>/dev/null || true
-    # Call the real function
-    tasks "$@"
-  else
-    echo "Failed to load taskman plugin" >&2
-    return 1
-  fi
+  _osh_load_and_call "taskman" "tasks" "$@"
 }
 
 # ACW lazy stubs
 acw() {
-  if osh_lazy_load "acw"; then
-    unfunction acw 2>/dev/null || true
-    acw "$@"
-  else
-    echo "Failed to load acw plugin" >&2
-    return 1
-  fi
+  _osh_load_and_call "acw" "acw" "$@"
 }
 
 ggco() {
-  if osh_lazy_load "acw"; then
-    unfunction ggco 2>/dev/null || true
-    ggco "$@"
-  else
-    echo "Failed to load acw plugin" >&2
-    return 1
-  fi
+  _osh_load_and_call "acw" "ggco" "$@"
 }
 
 newb() {
-  if osh_lazy_load "acw"; then
-    unfunction newb 2>/dev/null || true
-    newb "$@"
-  else
-    echo "Failed to load acw plugin" >&2
-    return 1
-  fi
+  _osh_load_and_call "acw" "newb" "$@"
 }
 
 # Aliases
