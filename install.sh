@@ -333,32 +333,32 @@ download_file() {
 
 # Interactive plugin selection
 interactive_plugin_selection() {
-  echo
-  log_info "🔌 Plugin Selection"
-  echo
-  echo "Available plugins:"
-  echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding"
-  echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art"
-  echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager"
-  echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)"
-  echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview"
-  echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message"
-  echo
-  echo "Installation presets:"
-  echo "  ${CYAN}preset:minimal${NORMAL}     - Basic functionality only"
-  echo "  ${CYAN}preset:recommended${NORMAL} - sysinfo, weather, taskman (default)"
-  echo "  ${CYAN}preset:developer${NORMAL}   - recommended + acw, fzf"
-  echo "  ${CYAN}preset:full${NORMAL}        - All stable plugins"
-  echo
-  echo "Selection options:"
-  echo "  • Enter numbers: ${YELLOW}1 2 3${NORMAL} (space-separated)"
-  echo "  • Use presets: ${YELLOW}preset:recommended${NORMAL}"
-  echo "  • Install all: ${YELLOW}all${NORMAL} or ${YELLOW}a${NORMAL}"
-  echo "  • Default: Press ${YELLOW}Enter${NORMAL} for recommended preset"
-  echo
+  echo >&2
+  log_info "🔌 Plugin Selection" >&2
+  echo >&2
+  echo "Available plugins:" >&2
+  echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding" >&2
+  echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art" >&2
+  echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager" >&2
+  echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
+  echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview" >&2
+  echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message" >&2
+  echo >&2
+  echo "Installation presets:" >&2
+  echo "  ${CYAN}preset:minimal${NORMAL}     - sysinfo only" >&2
+  echo "  ${CYAN}preset:recommended${NORMAL} - sysinfo, weather, taskman (default)" >&2
+  echo "  ${CYAN}preset:developer${NORMAL}   - recommended + acw, fzf" >&2
+  echo "  ${CYAN}preset:full${NORMAL}        - All plugins including experimental" >&2
+  echo >&2
+  echo "Selection options:" >&2
+  echo "  • Enter numbers: ${YELLOW}1 2 3${NORMAL} (space-separated)" >&2
+  echo "  • Use presets: ${YELLOW}preset:recommended${NORMAL}" >&2
+  echo "  • Install all: ${YELLOW}all${NORMAL} or ${YELLOW}a${NORMAL}" >&2
+  echo "  • Default: Press ${YELLOW}Enter${NORMAL} for recommended preset" >&2
+  echo >&2
   
   local selection
-  printf "${BLUE}Your choice: ${NORMAL}"
+  printf "${BLUE}Your choice: ${NORMAL}" >&2
   read -r selection
   
   # Handle empty input (default)
@@ -369,7 +369,7 @@ interactive_plugin_selection() {
   # Process selection
   case "$selection" in
     "preset:minimal")
-      echo ""
+      echo "sysinfo"
       ;;
     "preset:recommended")
       echo "sysinfo weather taskman"
@@ -378,7 +378,7 @@ interactive_plugin_selection() {
       echo "sysinfo weather taskman acw fzf"
       ;;
     "preset:full")
-      echo "sysinfo weather taskman acw fzf"
+      echo "sysinfo weather taskman acw fzf greeting"
       ;;
     "all"|"a")
       echo "sysinfo weather taskman acw fzf greeting"
@@ -394,7 +394,7 @@ interactive_plugin_selection() {
           4) plugins="$plugins acw" ;;
           5) plugins="$plugins fzf" ;;
           6) plugins="$plugins greeting" ;;
-          *) log_warning "Unknown selection: $num" ;;
+          *) log_warning "Unknown selection: $num" >&2 ;;
         esac
       done
       echo "$plugins"
@@ -465,15 +465,16 @@ get_plugin_files() {
       echo "plugins/weather/completions/_weather"
       ;;
     "taskman")
-      # Only include files that actually exist
       echo "plugins/taskman/taskman.plugin.zsh"
-      # Skip taskman_ui.zsh and config/taskman.conf as they don't exist in remote repo
       ;;
     "acw")
       echo "plugins/acw/acw.plugin.zsh"
       ;;
     "fzf")
       echo "plugins/fzf/fzf.plugin.zsh"
+      ;;
+    "greeting")
+      echo "plugins/greeting/greeting.plugin.zsh"
       ;;
     *)
       log_error "Unknown plugin: $plugin" >&2
@@ -815,8 +816,12 @@ main() {
   elif [[ "$INTERACTIVE" == "true" ]]; then
     local plugin_selection
     plugin_selection=$(interactive_plugin_selection)
-    if [[ -n "$plugin_selection" ]]; then
-      read -ra selected_plugins <<< "$plugin_selection"
+    if [[ -n "$plugin_selection" ]] && [[ "$plugin_selection" != " " ]]; then
+      # Trim whitespace and split into array
+      plugin_selection=$(echo "$plugin_selection" | xargs)
+      if [[ -n "$plugin_selection" ]]; then
+        read -ra selected_plugins <<< "$plugin_selection"
+      fi
     fi
   else
     selected_plugins=(sysinfo weather taskman)
