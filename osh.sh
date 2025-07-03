@@ -50,6 +50,11 @@ if [[ -f "$OSH/lib/vintage.zsh" ]]; then
   source "$OSH/lib/vintage.zsh"
 fi
 
+# Load plugin management aliases
+if [[ -f "$OSH/lib/plugin_aliases.zsh" ]]; then
+  source "$OSH/lib/plugin_aliases.zsh"
+fi
+
 # Logging functions
 osh_log() {
   local level="$1"
