@@ -1,0 +1,162 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with OSH
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! 
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: 🐛 Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: "When I run X command, Y happens instead of Z..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-component
+    attributes:
+      label: 🏷️ Affected Component
+      description: Which part of OSH is affected by this bug?
+      options:
+        - Common Library (Shared utilities) - Often easier to fix
+        - Documentation - Usually quick to fix
+        - ACW Plugin (Git workflow automation)
+        - Proxy Plugin (Network proxy management)
+        - Taskman Plugin (Task management)
+        - FZF Plugin (Fuzzy finding)
+        - Core Framework (osh.sh, install.sh, etc.)
+        - Installation/Upgrade Process
+        - Unknown/Multiple Components
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: Detailed steps to reproduce the bug
+      placeholder: |
+        1. Run command `...`
+        2. Enter input `...`
+        3. Observe error `...`
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: ✅ Expected Behavior
+      description: What should happen instead?
+      placeholder: "The command should..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: ❌ Actual Behavior
+      description: What actually happens?
+      placeholder: "Instead, the command..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: 📋 Error Output
+      description: Copy and paste any error messages or relevant output
+      render: shell
+      placeholder: |
+        $ osh command
+        Error: Something went wrong
+        Stack trace...
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 🖥️ Environment
+      description: Information about your system
+      placeholder: |
+        - OS: macOS 13.0 / Ubuntu 22.04 / Windows 11
+        - Shell: zsh 5.9 / bash 5.1
+        - OSH Version: v1.0.0 (run `osh --version` if available)
+        - Terminal: iTerm2 / Terminal.app / Windows Terminal
+        - Git Version: 2.39.0
+      value: |
+        - OS: [Your operating system]
+        - Shell: [Your shell and version]
+        - OSH Version: [Run `git log --oneline -1` in OSH directory]
+        - Terminal: [Your terminal application]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: 📊 Frequency
+      description: How often does this bug occur?
+      options:
+        - Always (100% of the time)
+        - Often (75% of the time)
+        - Sometimes (50% of the time)
+        - Rarely (25% of the time)
+        - Once (happened only once)
+      default: 0
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 🚨 Severity
+      description: How severe is this bug?
+      options:
+        - Medium (Some functionality affected) - Most common
+        - High (Major functionality broken)
+        - Critical (OSH completely unusable)
+        - Low (Minor inconvenience)
+        - Cosmetic (Visual/text issues only)
+      default: 0
+    validations:
+      required: false
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: 🔧 Workaround
+      description: Have you found any workaround for this issue?
+      placeholder: "I can work around this by..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: bug-impact
+    attributes:
+      label: 💥 Impact Assessment
+      description: Check all that apply
+      options:
+        - label: This bug blocks my current workflow
+        - label: This affects multiple OSH features
+        - label: This could affect other users
+        - label: This might be a security issue
+        - label: This causes data loss or corruption
+        - label: This only affects my specific setup
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📎 Additional Context
+      description: Add any other context, screenshots, or files that might help
+      placeholder: "Any additional information that might be helpful..."
+    validations:
+      required: false

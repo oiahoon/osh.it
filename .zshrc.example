@@ -1,0 +1,246 @@
+#!/usr/bin/env zsh
+# OSH Configuration Example
+# Copy this file to ~/.zshrc and customize as needed
+
+# ============================================================================
+# OSH Configuration
+# ============================================================================
+
+# OSH installation directory
+export OSH="$HOME/.osh"
+
+# Custom plugins directory (optional)
+# export OSH_CUSTOM="$HOME/.osh-custom"
+
+# Enable debug mode (optional)
+# export OSH_DEBUG=1
+
+# Plugin selection - choose the plugins you want to load
+oplugins=(
+  acw        # Advanced Code Workflow (Git + JIRA integration)
+  proxy      # Network proxy management
+  fzf        # Fuzzy finder integration
+  taskman    # Terminal task manager
+)
+
+# Load OSH
+source $OSH/osh.sh
+
+# ============================================================================
+# Plugin Configuration
+# ============================================================================
+
+# ACW Plugin Configuration (for Git workflow automation)
+GITUSER="YourName"  # Your name for branch creation (no spaces)
+
+# JIRA Integration (for ACW plugin)
+# Generate token with: echo -n "username:password" | base64
+JIRATOKEN="dGhpc2lzbm90OnBhc3N3b3Jk=="  # Replace with your actual token
+JIRAURL="https://your-jira.com"          # Replace with your JIRA URL
+
+# FZF Configuration (if using fzf plugin)
+export FZF_DEFAULT_COMMAND='fd --type file'
+export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
+export FZF_ALT_C_COMMAND="fd -t d . "
+
+# Taskman Configuration (optional)
+# export TASKMAN_DATA_FILE="$HOME/my-tasks.json"
+
+# ============================================================================
+# Environment Variables
+# ============================================================================
+
+# Path configuration
+export PATH="$HOME/bin:/usr/local/bin:/usr/local/sbin:$PATH"
+
+# Editor preferences
+export EDITOR="vim"
+export VISUAL="$EDITOR"
+
+# Terminal configuration
+export TERM="xterm-256color"
+
+# Language and locale
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
+
+# History configuration
+export HISTSIZE=10000
+export SAVEHIST=10000
+export HISTFILE="$HOME/.zsh_history"
+
+# ============================================================================
+# Zsh Options
+# ============================================================================
+
+# History options
+setopt HIST_IGNORE_DUPS      # Don't record duplicate entries
+setopt HIST_IGNORE_ALL_DUPS  # Remove older duplicate entries
+setopt HIST_REDUCE_BLANKS    # Remove superfluous blanks
+setopt HIST_SAVE_NO_DUPS     # Don't save duplicate entries
+setopt SHARE_HISTORY         # Share history between sessions
+setopt APPEND_HISTORY        # Append to history file
+setopt INC_APPEND_HISTORY    # Write to history file immediately
+
+# Directory options
+setopt AUTO_CD               # Change directory without cd command
+setopt AUTO_PUSHD            # Push directories to stack automatically
+setopt PUSHD_IGNORE_DUPS     # Don't push duplicate directories
+
+# Completion options
+setopt AUTO_MENU             # Show completion menu on tab
+setopt COMPLETE_IN_WORD      # Complete from both ends of word
+setopt ALWAYS_TO_END         # Move cursor to end after completion
+
+# Correction options
+setopt CORRECT               # Correct commands
+# setopt CORRECT_ALL         # Correct all arguments (can be annoying)
+
+# ============================================================================
+# Aliases
+# ============================================================================
+
+# Basic aliases
+alias ls='ls -hF --color=auto'
+alias ll='ls -lhF --color=auto'
+alias la='ls -lahF --color=auto'
+alias l='ls -lAhF --color=auto'
+
+# Navigation aliases
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias cd..='cd ..'
+alias c='clear'
+alias e='exit'
+
+# Git aliases (if not using ACW plugin)
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias gd='git diff'
+alias gb='git branch'
+alias gco='git checkout'
+
+# Grep aliases
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# Safety aliases
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# System aliases
+alias df='df -h'
+alias du='du -h'
+alias free='free -h'
+
+# Network aliases
+alias ping='ping -c 5'
+alias ports='netstat -tulanp'
+
+# ============================================================================
+# Functions
+# ============================================================================
+
+# Create directory and cd into it
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# Extract various archive formats
+extract() {
+  if [ -f "$1" ]; then
+    case "$1" in
+      *.tar.bz2)   tar xjf "$1"     ;;
+      *.tar.gz)    tar xzf "$1"     ;;
+      *.bz2)       bunzip2 "$1"     ;;
+      *.rar)       unrar x "$1"     ;;
+      *.gz)        gunzip "$1"      ;;
+      *.tar)       tar xf "$1"      ;;
+      *.tbz2)      tar xjf "$1"     ;;
+      *.tgz)       tar xzf "$1"     ;;
+      *.zip)       unzip "$1"       ;;
+      *.Z)         uncompress "$1"  ;;
+      *.7z)        7z x "$1"        ;;
+      *)           echo "'$1' cannot be extracted via extract()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Find process by name
+psgrep() {
+  ps aux | grep -v grep | grep "$@" -i --color=auto
+}
+
+# Show disk usage of current directory
+usage() {
+  du -h --max-depth=1 | sort -hr
+}
+
+# ============================================================================
+# Prompt Configuration (Simple)
+# ============================================================================
+
+# Simple prompt - customize as needed
+# For more advanced prompts, consider using a theme framework
+autoload -U colors && colors
+PROMPT='%{$fg[blue]%}%n@%m%{$reset_color%}:%{$fg[green]%}%~%{$reset_color%}$ '
+
+# Right prompt with git branch (if in git repo)
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats '%b'
+RPROMPT='%{$fg[yellow]%}${vcs_info_msg_0_}%{$reset_color%}'
+
+# ============================================================================
+# Completion System
+# ============================================================================
+
+# Initialize completion system
+autoload -Uz compinit
+compinit
+
+# Completion options
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' rehash true
+
+# ============================================================================
+# Key Bindings
+# ============================================================================
+
+# Use emacs key bindings
+bindkey -e
+
+# History search
+bindkey '^R' history-incremental-search-backward
+bindkey '^S' history-incremental-search-forward
+
+# Word movement
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+
+# ============================================================================
+# Local Configuration
+# ============================================================================
+
+# Load local configuration if it exists
+if [[ -f "$HOME/.zshrc.local" ]]; then
+  source "$HOME/.zshrc.local"
+fi
+
+# ============================================================================
+# OSH Information
+# ============================================================================
+
+# Uncomment to show OSH info on shell startup
+# osh_info

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/oiahoon/osh/discussions
+    about: Ask questions and discuss OSH with the community
+  - name: 📖 Documentation
+    url: https://github.com/oiahoon/osh/wiki
+    about: Check the documentation and wiki for answers
+  - name: 🔍 Search Issues
+    url: https://github.com/oiahoon/osh/issues?q=is%3Aissue
+    about: Search existing issues before creating a new one

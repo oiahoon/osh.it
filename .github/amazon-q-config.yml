@@ -1,0 +1,87 @@
+# GitHub Amazon Q Developer Configuration for OSH Project
+# This file configures GitHub's built-in Amazon Q Developer integration
+
+name: OSH - Amazon Q Developer Integration
+description: AI-powered assistance for OSH development and issue resolution
+
+# GitHub Amazon Q Developer settings
+github_amazon_q:
+  # Enable automatic issue analysis
+  auto_analyze_issues: true
+  
+  # Enable code suggestions
+  code_suggestions: true
+  
+  # Enable documentation assistance
+  documentation_help: true
+  
+  # Project context
+  project_type: "shell_framework"
+  primary_language: "shell"
+  
+  # Focus areas for AI assistance
+  focus_areas:
+    - "plugin development"
+    - "performance optimization" 
+    - "user experience"
+    - "shell scripting best practices"
+  
+  # Allowed file patterns for modification
+  allowed_file_patterns:
+    - "*.zsh"
+    - "*.sh" 
+    - "*.py"
+    - "*.md"
+    - "lib/**/*"
+    - "plugins/**/*"
+    - "tools/**/*"
+    - "tests/**/*"
+  
+  # Restricted file patterns (never modify)
+  restricted_file_patterns:
+    - ".git/**/*"
+    - ".github/workflows/**/*"
+    - "*.key"
+    - "*.pem"
+    - "secrets/**/*"
+
+# Integration settings
+integration:
+  # Trigger patterns for Amazon Q activation
+  trigger_patterns:
+    - "/analyze"
+    - "/implement"
+    - "/generate"
+    - "👍"  # Thumbs up reaction
+  
+  # Required approvals before auto-implementation
+  required_approvals:
+    - maintainer_approval: true
+    - user_confirmation: true
+  
+  # Labels that Amazon Q can manage
+  manageable_labels:
+    - "auto-implement-approved"
+    - "ai-generated"
+    - "needs-review"
+    - "amazon-q-processed"
+    - "enhancement"
+    - "feature-request"
+    - "bug"
+
+# Quality controls
+quality_controls:
+  # Always create tests for generated code
+  require_tests: true
+  
+  # Always update documentation
+  require_documentation: true
+  
+  # Run validation before creating PR
+  validate_before_pr: true
+  
+  # Maximum files to modify in single PR
+  max_files_per_pr: 10
+
+# Note: No AWS credentials needed when using GitHub's native Amazon Q Developer
+# GitHub handles authentication and permissions automatically

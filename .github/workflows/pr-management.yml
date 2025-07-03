@@ -1,0 +1,181 @@
+name: Pull Request Management and Review
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created, edited]
+  pull_request_target:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to process'
+        required: false
+        type: string
+
+# Comprehensive permissions for PR operations
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: write
+  checks: write
+  discussions: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+
+jobs:
+  # Stage 1: PR开启时的自动分析
+  pr-analysis:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'ready_for_review')
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install requests
+    
+    - name: Analyze PR implementation
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_BODY: ${{ github.event.pull_request.body }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO_NAME: ${{ github.repository }}
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: |
+        echo "🔍 Analyzing PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+        mkdir -p tools/pr-management
+        cd tools/pr-management
+        python3 pr_analysis.py
+
+  # Stage 2: PR评论的智能回复
+  pr-comment-response:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_review_comment' && github.event.comment.user.login != 'github-actions[bot]'
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install requests
+    
+    - name: Process PR comment
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        COMMENT_BODY: ${{ github.event.comment.body }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO_NAME: ${{ github.repository }}
+        COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+      run: |
+        echo "💬 Processing PR comment from ${{ github.event.comment.user.login }}"
+        cd tools/pr-management
+        python3 pr_comment_handler.py
+
+  # Stage 3: PR合并后的处理
+  pr-merged:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install requests
+    
+    - name: Handle PR merge
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+        PR_BODY: ${{ github.event.pull_request.body }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO_NAME: ${{ github.repository }}
+        MERGED_BY: ${{ github.event.pull_request.merged_by.login }}
+      run: |
+        echo "🎉 PR #${{ github.event.pull_request.number }} merged by ${{ github.event.pull_request.merged_by.login }}"
+        cd tools/pr-management
+        python3 pr_merge_handler.py
+
+  # Stage 4: 代码质量检查
+  code-quality-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install requests
+    
+    - name: Run code quality checks
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO_NAME: ${{ github.repository }}
+      run: |
+        echo "🔍 Running code quality checks for PR #${{ github.event.pull_request.number }}"
+        # Add shell script linting, OSH plugin validation, etc.
+        cd tools/pr-management
+        python3 code_quality_checker.py

@@ -1,0 +1,128 @@
+name: ❓ Question
+description: Ask a question about OSH usage or functionality
+title: "[QUESTION] "
+labels: ["question", "needs-response"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about OSH? We're here to help! Please fill out this form to get the best assistance.
+        
+        **Note:** For bug reports, please use the Bug Report template instead.
+
+  - type: dropdown
+    id: question-category
+    attributes:
+      label: 🏷️ Question Category
+      description: What is your question about?
+      options:
+        - Installation and Setup
+        - Configuration
+        - Plugin Usage (ACW, Proxy, Taskman, FZF)
+        - Core Framework Features
+        - Troubleshooting
+        - Best Practices
+        - Customization
+        - Integration with Other Tools
+        - Contributing to OSH
+        - General Usage
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: ❓ Your Question
+      description: What would you like to know?
+      placeholder: "How do I...? / Why does...? / What is the best way to...?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 🔍 Context
+      description: Provide context about what you're trying to achieve
+      placeholder: |
+        - I'm trying to...
+        - My goal is to...
+        - I want to understand...
+        - I'm working on...
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-tried
+    attributes:
+      label: 🔄 What Have You Tried?
+      description: What have you already attempted?
+      placeholder: |
+        - I've read the documentation at...
+        - I tried running...
+        - I searched for...
+        - I looked at...
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 🖥️ Environment
+      description: Information about your setup (if relevant)
+      placeholder: |
+        - OS: macOS 13.0 / Ubuntu 22.04 / Windows 11
+        - Shell: zsh 5.9 / bash 5.1
+        - OSH Version: v1.0.0
+        - Terminal: iTerm2 / Terminal.app
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: 🎯 Expected Outcome
+      description: What result are you hoping to achieve?
+      placeholder: "I expect to be able to..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: ⏰ Urgency
+      description: How urgent is this question for you?
+      options:
+        - High (blocking current work)
+        - Medium (would help current project)
+        - Low (general curiosity/future planning)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: question-type
+    attributes:
+      label: 🎯 Question Type
+      description: Check all that apply
+      options:
+        - label: How-to question (need step-by-step guidance)
+        - label: Troubleshooting (something isn't working as expected)
+        - label: Best practices (looking for recommended approach)
+        - label: Feature clarification (understanding existing functionality)
+        - label: Configuration help (setting up or customizing OSH)
+        - label: Integration question (using OSH with other tools)
+        - label: Conceptual question (understanding OSH architecture/design)
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: 📎 Additional Information
+      description: Any other details that might help us answer your question
+      placeholder: |
+        - Relevant code snippets
+        - Error messages (if any)
+        - Links to documentation you've read
+        - Similar tools or workflows you're familiar with
+    validations:
+      required: false

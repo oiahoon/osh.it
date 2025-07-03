@@ -1,0 +1,151 @@
+name: 🚀 Feature Request
+description: Suggest a new feature or enhancement for OSH
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a new feature! 
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: 📝 Feature Description
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: "I would like OSH to support..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: 🏷️ Category
+      description: Which part of OSH does this feature relate to?
+      options:
+        - Common Library (Shared utilities) - Most likely for auto-implementation
+        - Documentation - High chance for auto-implementation  
+        - ACW Plugin (Git workflow automation)
+        - Proxy Plugin (Network proxy management)
+        - Taskman Plugin (Task management)
+        - FZF Plugin (Fuzzy finding)
+        - Core Framework (osh.sh, install.sh, etc.)
+        - New Plugin
+        - Other
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: 🎯 Use Case
+      description: Describe the specific use case or problem this feature would solve
+      placeholder: |
+        Example:
+        - As a developer, I want to...
+        - When working on multiple projects, I need to...
+        - Currently I have to manually...
+      value: |
+        - As a user, I want this feature to improve my workflow
+        - This would help me be more productive when using OSH
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: 💡 Proposed Solution
+      description: How do you envision this feature working?
+      placeholder: |
+        Example:
+        - Add a new command `osh feature-name`
+        - Extend existing function to support...
+        - Create new configuration option...
+      value: |
+        - Add new functionality that addresses the use case above
+        - Integrate with existing OSH components where appropriate
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: ✅ Acceptance Criteria
+      description: What specific requirements must be met for this feature to be considered complete?
+      placeholder: |
+        - [ ] Feature works with existing OSH installation
+        - [ ] Documentation is updated
+        - [ ] Tests are added
+        - [ ] Backward compatibility is maintained
+        - [ ] Configuration is optional/has sensible defaults
+      value: |
+        - [ ] Feature works with existing OSH installation
+        - [ ] Documentation is updated  
+        - [ ] Backward compatibility is maintained
+        - [ ] Feature has sensible defaults
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: 🔧 Estimated Complexity
+      description: How complex do you think this feature is to implement?
+      options:
+        - Low (Simple function/command addition) - Best for auto-implementation
+        - Medium (New functionality with some integration)
+        - High (Major feature requiring significant changes)
+        - Very High (Architectural changes or new plugin)
+      default: 0
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: 📋 Examples (Optional)
+      description: Provide examples of how this feature would be used
+      placeholder: |
+        ```bash
+        # Example command usage
+        osh new-feature --option value
+        
+        # Expected output
+        ✅ Feature executed successfully
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternatives Considered (Optional)
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: "I've tried using X, but it doesn't work because..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: implementation-readiness
+    attributes:
+      label: 🚀 Implementation Readiness (Optional)
+      description: Check all that apply to help us prioritize this feature
+      options:
+        - label: I have a clear understanding of the technical requirements
+        - label: I can provide additional technical details if needed
+        - label: I'm willing to test the implementation
+        - label: I can help with documentation
+        - label: This is blocking my current workflow
+        - label: This would benefit the broader OSH community
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📎 Additional Context (Optional)
+      description: Add any other context, screenshots, or examples that might help
+      placeholder: "Any additional information that might be helpful..."
+    validations:
+      required: false

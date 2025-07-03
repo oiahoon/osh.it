@@ -1,0 +1,167 @@
+name: 📚 Documentation
+description: Report documentation issues or suggest improvements
+title: "[DOCS] "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve OSH documentation! Please fill out this form to describe the documentation issue or improvement.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: 📋 Documentation Type
+      description: What type of documentation issue is this?
+      options:
+        - Missing Documentation (feature not documented)
+        - Incorrect Information (documentation is wrong)
+        - Unclear Instructions (confusing or ambiguous)
+        - Outdated Content (needs updating)
+        - Typo/Grammar (spelling or grammar errors)
+        - New Documentation (suggest new content)
+        - Formatting Issues (layout or presentation)
+        - Code Examples (missing or incorrect examples)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: doc-location
+    attributes:
+      label: 📍 Documentation Location
+      description: Where is the documentation issue located?
+      options:
+        - README.md (main project readme)
+        - Plugin Documentation (specific plugin docs)
+        - Installation Guide
+        - Configuration Guide
+        - API Documentation
+        - Code Comments
+        - Help Text (command line help)
+        - Wiki/GitHub Pages
+        - Other/Multiple Locations
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: 📝 Issue Description
+      description: Describe the documentation issue or improvement needed
+      placeholder: |
+        - The documentation for X feature is missing...
+        - The instructions for Y are unclear because...
+        - There's a typo in section Z...
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: 📄 Current Content
+      description: Copy the current documentation content that needs fixing (if applicable)
+      render: markdown
+      placeholder: |
+        Current documentation says:
+        ```
+        [paste current content here]
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: suggested-content
+    attributes:
+      label: ✏️ Suggested Content
+      description: Provide your suggested improvement or correction
+      render: markdown
+      placeholder: |
+        Suggested improvement:
+        ```
+        [paste suggested content here]
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: missing-information
+    attributes:
+      label: ❓ Missing Information
+      description: What specific information is missing or needs to be added?
+      placeholder: |
+        - How to configure X feature
+        - Examples of Y usage
+        - Troubleshooting for Z issue
+        - Prerequisites for installation
+    validations:
+      required: false
+
+  - type: dropdown
+    id: user-level
+    attributes:
+      label: 👤 Target User Level
+      description: What level of user would benefit from this documentation?
+      options:
+        - Beginner (new to OSH)
+        - Intermediate (familiar with OSH basics)
+        - Advanced (power users and developers)
+        - All Users
+        - Maintainers/Contributors
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: 🎯 Use Case
+      description: When would someone need this documentation?
+      placeholder: |
+        - When setting up OSH for the first time
+        - When configuring advanced features
+        - When troubleshooting issues
+        - When contributing to the project
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: doc-improvements
+    attributes:
+      label: 📈 Suggested Improvements
+      description: Check all that apply
+      options:
+        - label: Add code examples
+        - label: Include screenshots or diagrams
+        - label: Add troubleshooting section
+        - label: Improve formatting and structure
+        - label: Add cross-references to related topics
+        - label: Include common use cases
+        - label: Add FAQ section
+        - label: Improve search/navigation
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Priority
+      description: How important is this documentation improvement?
+      options:
+        - Critical (blocks user adoption)
+        - High (causes frequent confusion)
+        - Medium (would improve user experience)
+        - Low (minor improvement)
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📎 Additional Context
+      description: Add any other context, links, or examples
+      placeholder: |
+        - Links to related documentation
+        - Screenshots of confusing sections
+        - Examples of good documentation from other projects
+        - User feedback or questions that prompted this request
+    validations:
+      required: false

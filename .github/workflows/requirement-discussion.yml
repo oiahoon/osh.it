@@ -1,0 +1,172 @@
+name: Secure Requirement Analysis and Multi-turn Discussion
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to analyze'
+        required: false
+        type: string
+
+# Add comprehensive permissions for AI assistant operations
+permissions:
+  contents: write          # Read and write repository contents
+  issues: write           # Create, edit, and comment on issues
+  pull-requests: write    # Create and manage pull requests
+  actions: write          # Manage GitHub Actions workflows
+  checks: write           # Create and update check runs
+  discussions: write      # Participate in discussions
+  repository-projects: write  # Manage project boards
+  security-events: write  # Handle security events
+  statuses: write         # Update commit statuses
+
+jobs:
+  # Stage 0: Security Evaluation (First Priority)
+  security-evaluation:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened' && !contains(github.event.issue.labels.*.name, 'discussing-requirements') && !contains(github.event.issue.labels.*.name, 'ready-for-implementation')
+    
+    # Explicit permissions for this job
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+      discussions: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install requests
+    
+    - name: Run DeepSeek requirement analysis
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        ISSUE_TITLE: ${{ github.event.issue.title }}
+        ISSUE_BODY: ${{ github.event.issue.body }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
+        REPO_NAME: ${{ github.repository }}
+      run: |
+        echo "🧠 Starting DeepSeek requirement analysis for Issue #${{ github.event.issue.number }}"
+        cd tools/requirement-discussion
+        python3 workflow_stage1_analysis.py
+
+  # Stage 2: 多轮澄清讨论
+  multi-turn-clarification:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issue_comment' && github.event.comment.user.login != 'github-actions[bot]' && contains(github.event.issue.labels.*.name, 'discussing-requirements') && !contains(github.event.issue.labels.*.name, 'ready-for-implementation')
+    
+    # Explicit permissions for this job
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+      discussions: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: pip install requests
+    
+    - name: Process clarification response
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        ISSUE_TITLE: ${{ github.event.issue.title }}
+        ISSUE_BODY: ${{ github.event.issue.body }}
+        COMMENT_BODY: ${{ github.event.comment.body }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
+        REPO_NAME: ${{ github.repository }}
+      run: |
+        echo "💬 Processing user clarification response for Issue #${{ github.event.issue.number }}"
+        cd tools/requirement-discussion
+        python3 workflow_stage2_clarification.py
+
+  # Stage 3: 用户确认和Amazon Q触发
+  user-approval-trigger:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issue_comment' && github.event.comment.user.login != 'github-actions[bot]' && contains(github.event.issue.labels.*.name, 'ready-for-implementation')
+    
+    # Explicit permissions for this job
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+      discussions: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Check approval and trigger Amazon Q
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COMMENT_BODY: ${{ github.event.comment.body }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
+        REPO_NAME: ${{ github.repository }}
+      run: |
+        echo "🔍 Checking for user approval in Issue #${{ github.event.issue.number }}"
+        cd tools/requirement-discussion
+        python3 workflow_stage3_approval.py
+
+  # Stage 4: Amazon Q监控
+  amazon-q-monitor:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'Amazon Q development agent'
+    
+    # Explicit permissions for this job
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: write
+      checks: write
+      discussions: write
+      repository-projects: write
+      security-events: write
+      statuses: write
+    
+    steps:
+    - name: Log Amazon Q activation
+      run: |
+        echo "🤖 Amazon Q development agent activated for Issue #${{ github.event.issue.number }}"
+        echo "Triggered by: ${{ github.event.sender.login }}"
+        echo "Amazon Q Developer will now start implementing the feature"

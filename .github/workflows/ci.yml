@@ -1,0 +1,40 @@
+name: OSH CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Zsh
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zsh
+        
+    - name: Test OSH installation
+      run: |
+        export OSH=$PWD
+        export oplugins=(proxy)
+        zsh -c 'source ./osh.sh && echo "✅ OSH loaded successfully"'
+        
+    - name: Test plugin loading
+      run: |
+        export OSH=$PWD
+        export OSH_LAZY_LOADING=true
+        export oplugins=(sysinfo weather taskman proxy)
+        zsh -c 'source ./osh.sh && echo "✅ All plugins loaded"'
+        
+    - name: Test function availability
+      run: |
+        export OSH=$PWD
+        export OSH_LAZY_LOADING=true
+        export oplugins=(sysinfo weather taskman proxy)
+        zsh -c 'source ./osh.sh && echo "Testing functions..." && type sysinfo && echo "sysinfo: OK" && type tasks && echo "tasks: OK" && type weather && echo "weather: OK" && type proxyctl && echo "proxyctl: OK" && echo "✅ All functions available"'

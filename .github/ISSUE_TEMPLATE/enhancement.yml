@@ -1,0 +1,175 @@
+name: ⚡ Enhancement
+description: Suggest an improvement to existing OSH functionality
+title: "[ENHANCEMENT] "
+labels: ["enhancement", "improvement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! 
+        
+        **💡 Quick Tip:** You can use default values for optional fields and update them later. Our analyzer will automatically re-analyze when you update the issue.
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: 📋 Current Behavior
+      description: Describe how the feature currently works
+      placeholder: "Currently, when I use X feature, it..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: ⚡ Proposed Improvement
+      description: Describe how you'd like the feature to work instead
+      placeholder: "I would like X feature to..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: enhancement-category
+    attributes:
+      label: 🏷️ Category
+      description: Which part of OSH would this enhancement affect?
+      options:
+        - User Experience (UX/UI) - Often good for auto-implementation
+        - Common Library (Shared utilities) - Good for auto-implementation
+        - Documentation - Excellent for auto-implementation
+        - Error Handling - Good for auto-implementation
+        - Configuration - Good for auto-implementation
+        - ACW Plugin (Git workflow automation)
+        - Proxy Plugin (Network proxy management)
+        - Taskman Plugin (Task management)
+        - FZF Plugin (Fuzzy finding)
+        - Core Framework (osh.sh, install.sh, etc.)
+        - Performance
+        - Other
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: 🎯 Benefits
+      description: What benefits would this improvement provide?
+      placeholder: |
+        - Improved user experience because...
+        - Better performance by...
+        - Easier configuration through...
+        - More reliable operation via...
+      value: |
+        - Improved user experience
+        - Better functionality
+        - Enhanced usability
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: 📖 Use Cases
+      description: Provide specific scenarios where this improvement would be helpful
+      placeholder: |
+        1. When working with large repositories...
+        2. For users who frequently switch between...
+        3. In team environments where...
+      value: |
+        1. This improvement would help in common usage scenarios
+        2. It addresses current limitations users face
+    validations:
+      required: true
+
+  - type: dropdown
+    id: backward-compatibility
+    attributes:
+      label: 🔄 Backward Compatibility
+      description: Would this enhancement affect existing functionality?
+      options:
+        - Fully backward compatible (no breaking changes) - Best for auto-implementation
+        - Mostly compatible (minor configuration changes needed)
+        - Some breaking changes (migration path available)
+        - Major breaking changes (significant user impact)
+        - Not sure
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-ideas
+    attributes:
+      label: 💡 Implementation Ideas
+      description: Do you have ideas about how this could be implemented?
+      placeholder: |
+        - Add new configuration option...
+        - Modify existing function to...
+        - Create new helper function...
+        - Update command interface to...
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: 📋 Examples
+      description: Show examples of the improved behavior
+      placeholder: |
+        # Current behavior
+        $ osh current-command
+        Current output...
+        
+        # Proposed behavior
+        $ osh enhanced-command
+        Enhanced output with improvements...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 📊 Priority
+      description: How important is this enhancement to you?
+      options:
+        - Critical (blocking current workflow)
+        - High (would significantly improve workflow)
+        - Medium (nice to have improvement)
+        - Low (minor convenience)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: enhancement-scope
+    attributes:
+      label: 🎯 Enhancement Scope
+      description: Check all that apply
+      options:
+        - label: This affects core OSH functionality
+        - label: This is specific to one plugin
+        - label: This improves user experience
+        - label: This enhances performance
+        - label: This improves error handling
+        - label: This adds configuration flexibility
+        - label: This would benefit most OSH users
+        - label: This addresses a common pain point
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 🔄 Alternative Solutions
+      description: Have you considered other ways to achieve the same goal?
+      placeholder: "I've also considered..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📎 Additional Context
+      description: Add any other context, mockups, or examples
+      placeholder: "Any additional information that might be helpful..."
+    validations:
+      required: false

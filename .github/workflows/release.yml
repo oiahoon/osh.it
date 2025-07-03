@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Get version
+      id: version
+      run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: OSH ${{ steps.version.outputs.version }}
+        body: |
+          ## OSH ${{ steps.version.outputs.version }}
+          
+          ### Installation
+          ```bash
+          sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh/master/install.sh)"
+          ```
+          
+          ### Upgrade
+          ```bash
+          upgrade_myshell
+          ```
+          
+          See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
+        draft: false
+        prerelease: false

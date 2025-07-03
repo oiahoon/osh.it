@@ -1,0 +1,151 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-07-03T09:00:00Z",
+  "manifest_url": "https://raw.githubusercontent.com/oiahoon/osh/master/PLUGIN_MANIFEST.json",
+  "categories": {
+    "stable": {
+      "description": "Stable plugins recommended for all users",
+      "plugins": [
+        {
+          "name": "sysinfo",
+          "version": "1.1.0",
+          "description": "System information display with OSH branding",
+          "files": [
+            "plugins/sysinfo/sysinfo.plugin.zsh"
+          ],
+          "dependencies": [],
+          "tags": [
+            "system",
+            "info",
+            "display"
+          ]
+        },
+        {
+          "name": "weather",
+          "version": "1.3.0",
+          "description": "Beautiful weather forecast with ASCII art",
+          "files": [
+            "plugins/weather/weather.plugin.zsh",
+            "plugins/weather/completions/_weather"
+          ],
+          "dependencies": [
+            "curl"
+          ],
+          "tags": [
+            "weather",
+            "forecast",
+            "utility"
+          ]
+        },
+        {
+          "name": "taskman",
+          "version": "2.0.0",
+          "description": "Advanced terminal task manager with productivity features",
+          "files": [
+            "plugins/taskman/taskman.plugin.zsh"
+          ],
+          "dependencies": [
+            "python3"
+          ],
+          "tags": [
+            "productivity",
+            "tasks",
+            "management"
+          ]
+        }
+      ]
+    },
+    "beta": {
+      "description": "Beta plugins for advanced users",
+      "plugins": [
+        {
+          "name": "acw",
+          "version": "0.9.0",
+          "description": "Advanced Code Workflow - Git + JIRA integration",
+          "files": [
+            "plugins/acw/acw.plugin.zsh"
+          ],
+          "dependencies": [
+            "git",
+            "curl"
+          ],
+          "tags": [
+            "git",
+            "jira",
+            "workflow",
+            "development"
+          ]
+        },
+        {
+          "name": "fzf",
+          "version": "0.8.0",
+          "description": "Enhanced fuzzy finder with preview capabilities",
+          "files": [
+            "plugins/fzf/fzf.plugin.zsh"
+          ],
+          "dependencies": [
+            "fzf"
+          ],
+          "tags": [
+            "search",
+            "fuzzy",
+            "finder"
+          ]
+        }
+      ]
+    },
+    "experimental": {
+      "description": "Experimental plugins (use with caution)",
+      "plugins": [
+        {
+          "name": "greeting",
+          "version": "0.5.0",
+          "description": "Friendly welcome message for OSH users",
+          "files": [
+            "plugins/greeting/greeting.plugin.zsh"
+          ],
+          "dependencies": [],
+          "tags": [
+            "greeting",
+            "welcome",
+            "ui"
+          ]
+        }
+      ]
+    }
+  },
+  "presets": {
+    "minimal": [
+      "sysinfo"
+    ],
+    "recommended": [
+      "sysinfo",
+      "weather",
+      "taskman"
+    ],
+    "developer": [
+      "sysinfo",
+      "weather",
+      "taskman",
+      "acw",
+      "fzf"
+    ],
+    "full": [
+      "sysinfo",
+      "weather",
+      "taskman",
+      "acw",
+      "fzf",
+      "greeting"
+    ]
+  },
+  "compatibility": {
+    "osh_version": ">=1.0.0",
+    "zsh_version": ">=5.0",
+    "platforms": [
+      "macos",
+      "linux",
+      "wsl"
+    ]
+  }
+}
