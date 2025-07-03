@@ -7,7 +7,7 @@
 set -e  # Exit on any error
 
 # Configuration
-OSH_REPO_BASE="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh/master}"
+OSH_REPO_BASE="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh.it/main}"
 OSH_DIR="${OSH_DIR:-$HOME/.osh}"
 OSH_BACKUP_SUFFIX="${OSH_BACKUP_SUFFIX:-pre-osh}"
 
@@ -117,9 +117,9 @@ vintage_color() {
   fi
 }
 
-# Beautiful OSH ASCII Logo with environment-aware colors
+# Beautiful OSH.IT ASCII Logo with environment-aware colors
 show_logo() {
-  local logo_width=50
+  local logo_width=60
   local padding=$(( (TERM_WIDTH - logo_width) / 2 ))
   local pad_str=""
   
@@ -129,15 +129,15 @@ show_logo() {
   fi
   
   echo
-  echo "${pad_str}$(vintage_color 124 '        ██████╗ ███████╗██╗  ██╗')"
-  echo "${pad_str}$(vintage_color 130 '       ██╔═══██╗██╔════╝██║  ██║')"
-  echo "${pad_str}$(vintage_color 136 '       ██║   ██║███████╗███████║')"
-  echo "${pad_str}$(vintage_color 100 '       ██║   ██║╚════██║██╔══██║')"
-  echo "${pad_str}$(vintage_color 64 '       ╚██████╔╝███████║██║  ██║')"
-  echo "${pad_str}$(vintage_color 66 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝')"
+  echo "${pad_str}$(vintage_color 124 '        ██████╗ ███████╗██╗  ██╗   ██╗████████╗')"
+  echo "${pad_str}$(vintage_color 130 '       ██╔═══██╗██╔════╝██║  ██║   ██║╚══██╔══╝')"
+  echo "${pad_str}$(vintage_color 136 '       ██║   ██║███████╗███████║   ██║   ██║   ')"
+  echo "${pad_str}$(vintage_color 100 '       ██║   ██║╚════██║██╔══██║   ██║   ██║   ')"
+  echo "${pad_str}$(vintage_color 64 '       ╚██████╔╝███████║██║  ██║██╗██║   ██║   ')"
+  echo "${pad_str}$(vintage_color 66 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝   ╚═╝   ')"
   echo
-  echo "${pad_str}${BOLD}${CYAN}    A Modern Zsh Framework${NORMAL}"
-  echo "${pad_str}${DIM}    Lightweight Alternative to Oh My Zsh${NORMAL}"
+  echo "${pad_str}${BOLD}${CYAN}      A Modern Zsh Framework${NORMAL}"
+  echo "${pad_str}${DIM}      Lightweight Alternative to Oh My Zsh${NORMAL}"
   echo
 }
 
@@ -372,7 +372,7 @@ ${BOLD}AVAILABLE PLUGINS:${NORMAL}
   • acw      - Git + JIRA workflow automation
   • fzf      - Enhanced fuzzy finder
 
-For more information, visit: https://github.com/oiahoon/osh
+For more information, visit: https://github.com/oiahoon/osh.it
 EOF
 }
 

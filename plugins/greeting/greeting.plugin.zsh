@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-# OSH Greeting Plugin
-# A simple greeting function for OSH users
+# OSH.IT Greeting Plugin
+# A simple greeting function for OSH.IT users
 
 # Load vintage design system
 if [[ -z "${OSH_VINTAGE_LOADED:-}" ]] && [[ -f "${OSH}/lib/vintage.zsh" ]]; then
@@ -22,7 +22,7 @@ osh_greet() {
         greeting_time="Good evening"
     fi
     
-    osh_vintage_brand "🚀 OSH Framework"
+    osh_vintage_brand "🚀 OSH.IT Framework"
     osh_vintage_info "$greeting_time, $user_name!"
     osh_vintage_success "Ready to boost your productivity? 💪"
     

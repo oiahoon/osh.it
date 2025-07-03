@@ -219,27 +219,27 @@ _get_memory_info() {
   fi
 }
 
-# OSH ASCII Logo with vintage gradient colors
+# OSH.IT ASCII Logo with vintage gradient colors
 _get_logo_lines() {
   # Using vintage/retro colors for a softer, more muted effect
   printf "%s\n" \
     "" \
     "" \
-    "$(_vintage_1 '        ██████╗ ███████╗██╗  ██╗')" \
-    "$(_vintage_2 '       ██╔═══██╗██╔════╝██║  ██║')" \
-    "$(_vintage_4 '       ██║   ██║███████╗███████║')" \
-    "$(_vintage_6 '       ██║   ██║╚════██║██╔══██║')" \
-    "$(_vintage_8 '       ╚██████╔╝███████║██║  ██║')" \
-    "$(_vintage_10 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝')" \
+    "$(_vintage_1 '        ██████╗ ███████╗██╗  ██╗   ██╗████████╗')" \
+    "$(_vintage_2 '       ██╔═══██╗██╔════╝██║  ██║   ██║╚══██╔══╝')" \
+    "$(_vintage_4 '       ██║   ██║███████╗███████║   ██║   ██║   ')" \
+    "$(_vintage_6 '       ██║   ██║╚════██║██╔══██║   ██║   ██║   ')" \
+    "$(_vintage_8 '       ╚██████╔╝███████║██║  ██║██╗██║   ██║   ')" \
+    "$(_vintage_10 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝   ╚═╝   ')" \
     "" \
-    "$(_vintage_12 '     ╔════════════════════════════════╗')" \
-    "$(_vintage_13 '     ║    Lightweight Zsh Framework   ║')" \
-    "$(_vintage_14 '     ║      Fast • Simple • Cool      ║')" \
-    "$(_vintage_15 '     ╚════════════════════════════════╝')" \
+    "$(_vintage_12 '     ╔════════════════════════════════════════╗')" \
+    "$(_vintage_13 '     ║      Lightweight Zsh Framework         ║')" \
+    "$(_vintage_14 '     ║        Fast • Simple • Cool            ║')" \
+    "$(_vintage_15 '     ╚════════════════════════════════════════╝')" \
     "" \
-    "$(_vintage_3 '       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄')" \
-    "$(_vintage_3 '      ▐ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ▌')" \
-    "$(_vintage_3 '       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀')" \
+    "$(_vintage_3 '       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄')" \
+    "$(_vintage_3 '      ▐ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ▌')" \
+    "$(_vintage_3 '       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀')" \
     "" \
     "" \
     "" \
@@ -275,7 +275,7 @@ _get_info_lines() {
     "$(_info_label 'GPU: ')$(_info_value "$(_get_gpu_info)")" \
     "$(_info_label 'Memory: ')$(_info_value "$(_get_memory_info)")" \
     "" \
-    "$(_info_accent 'OSH Framework:')" \
+    "$(_info_accent 'OSH.IT Framework:')" \
     "$(_info_label 'Version: ')$(_info_value "$(cat ${OSH}/VERSION 2>/dev/null || echo 'Development')")" \
     "$(_info_label 'Location: ')$(_info_value "${OSH}")" \
     "$(_info_label 'Plugins: ')$(_info_value "$(find "${OSH}/plugins" -name "*.plugin.zsh" 2>/dev/null | wc -l | tr -d ' ') installed")" \
@@ -401,7 +401,7 @@ _sysinfo_main() {
         echo "Usage: sysinfo [options]"
         echo ""
         echo "Options:"
-        echo "  --no-logo    Hide the OSH logo"
+        echo "  --no-logo    Hide the OSH.IT logo"
         echo "  --debug      Show debug information"
         echo "  -h, --help   Show this help message"
         return 0

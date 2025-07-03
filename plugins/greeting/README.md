@@ -1,6 +1,6 @@
-# OSH Greeting Plugin
+# OSH.IT Greeting Plugin
 
-A simple greeting plugin that provides a friendly welcome message for OSH users.
+A simple greeting plugin that provides a friendly welcome message for OSH.IT users.
 
 ## Features
 
@@ -17,7 +17,7 @@ osh_greet
 
 ## Installation
 
-1. The plugin is already created in your OSH plugins directory
+1. The plugin is already created in your OSH.IT plugins directory
 2. Add `greeting` to your `oplugins` array in `~/.zshrc`:
 
 ```bash
@@ -32,7 +32,7 @@ source ~/.zshrc
 ## Example Output
 
 ```
-🚀 OSH Framework
+🚀 OSH.IT Framework
 Good morning, john!
 Ready to boost your productivity? 💪
 📁 Current directory: /Users/john/projects

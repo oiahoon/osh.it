@@ -1,12 +1,12 @@
 #!/usr/bin/env zsh
-# OSH - A Lightweight Zsh Plugin Framework
+# OSH.IT - A Lightweight Zsh Plugin Framework
 # Version: 1.0.0
 # Author: oiahoon
 # License: MIT
 
 # Ensure we're running in Zsh
 if [[ -z "$ZSH_VERSION" ]]; then
-  echo "Error: OSH requires Zsh. Please install Zsh and try again."
+  echo "Error: OSH.IT requires Zsh. Please install Zsh and try again."
   return 1
 fi
 
@@ -339,7 +339,7 @@ osh_upgrade() {
   env OSH="$OSH" sh "$OSH/upgrade.sh"
 }
 
-# Show OSH welcome information with beautiful logo
+# Show OSH.IT welcome information with beautiful logo
 osh_welcome() {
   if [[ -f "$OSH/lib/display.sh" ]]; then
     source "$OSH/lib/display.sh"
@@ -357,7 +357,7 @@ upgrade_myshell() {
 
 # OSH information function
 osh_info() {
-  echo "OSH - A Lightweight Zsh Plugin Framework"
+  echo "OSH.IT - A Lightweight Zsh Plugin Framework"
   echo "Version: $OSH_VERSION"
   echo "Zsh Version: $ZSH_VERSION"
   echo "OSH Directory: $OSH"
@@ -377,16 +377,16 @@ osh_info() {
 # Help function
 osh_help() {
   cat << 'EOF'
-OSH - A Lightweight Zsh Plugin Framework
+OSH.IT - A Lightweight Zsh Plugin Framework
 
 Usage:
-  osh_info              Show OSH information
-  osh_welcome           Show OSH welcome screen with logo
+  osh_info              Show OSH.IT information
+  osh_welcome           Show OSH.IT welcome screen with logo
   osh_help              Show this help message
-  upgrade_myshell       Upgrade OSH to latest version
+  upgrade_myshell       Upgrade OSH.IT to latest version
 
 Environment Variables:
-  OSH                   OSH installation directory (default: ~/.osh)
+  OSH                   OSH.IT installation directory (default: ~/.osh)
   OSH_CUSTOM           Custom plugins directory (default: ~/.osh-custom)
   OSH_DEBUG            Enable debug output (0 or 1)
   oplugins             Array of plugins to load
@@ -397,7 +397,7 @@ Configuration:
     oplugins=(plugin1 plugin2 plugin3)
     source $OSH/osh.sh
 
-For more information, visit: https://github.com/oiahoon/osh
+For more information, visit: https://github.com/oiahoon/osh.it
 EOF
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OSH Display Library
+# OSH.IT Display Library
 # Beautiful logo and information display functions
 
 # Vintage/Retro gradient colors - softer and more muted
@@ -33,26 +33,26 @@ _get_display_length() {
   echo ${#clean_text}
 }
 
-# OSH ASCII Logo with vintage gradient colors
+# OSH.IT ASCII Logo with vintage gradient colors
 _get_osh_logo_lines() {
   printf "%s\n" \
     "" \
     "" \
-    "$(_vintage_1 '        ██████╗ ███████╗██╗  ██╗')" \
-    "$(_vintage_2 '       ██╔═══██╗██╔════╝██║  ██║')" \
-    "$(_vintage_4 '       ██║   ██║███████╗███████║')" \
-    "$(_vintage_6 '       ██║   ██║╚════██║██╔══██║')" \
-    "$(_vintage_8 '       ╚██████╔╝███████║██║  ██║')" \
-    "$(_vintage_10 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝')" \
+    "$(_vintage_1 '        ██████╗ ███████╗██╗  ██╗   ██╗████████╗')" \
+    "$(_vintage_2 '       ██╔═══██╗██╔════╝██║  ██║   ██║╚══██╔══╝')" \
+    "$(_vintage_4 '       ██║   ██║███████╗███████║   ██║   ██║   ')" \
+    "$(_vintage_6 '       ██║   ██║╚════██║██╔══██║   ██║   ██║   ')" \
+    "$(_vintage_8 '       ╚██████╔╝███████║██║  ██║██╗██║   ██║   ')" \
+    "$(_vintage_10 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝   ╚═╝   ')" \
     "" \
-    "$(_vintage_12 '     ╔════════════════════════════════╗')" \
-    "$(_vintage_13 '     ║    Lightweight Zsh Framework   ║')" \
-    "$(_vintage_14 '     ║      Fast • Simple • Cool      ║')" \
-    "$(_vintage_15 '     ╚════════════════════════════════╝')" \
+    "$(_vintage_12 '     ╔════════════════════════════════════════╗')" \
+    "$(_vintage_13 '     ║      Lightweight Zsh Framework         ║')" \
+    "$(_vintage_14 '     ║        Fast • Simple • Cool            ║')" \
+    "$(_vintage_15 '     ╚════════════════════════════════════════╝')" \
     "" \
-    "$(_vintage_3 '       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄')" \
-    "$(_vintage_3 '      ▐ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ▌')" \
-    "$(_vintage_3 '       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀')" \
+    "$(_vintage_3 '       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄')" \
+    "$(_vintage_3 '      ▐ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ▌')" \
+    "$(_vintage_3 '       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀')" \
     "" \
     "" \
     "" \
@@ -89,8 +89,8 @@ _get_osh_info_lines() {
   fi
   
   printf "%s\n" \
-    "$(_info_accent 'OSH Framework Information')" \
-    "$(_info_accent '=========================')" \
+    "$(_info_accent 'OSH.IT Framework Information')" \
+    "$(_info_accent '=============================')" \
     "$(_info_label 'Version: ')$(_info_value "$version")" \
     "$(_info_label 'Location: ')$(_info_value "$osh_dir")" \
     "$(_info_label 'Plugins: ')$(_info_value "$plugin_count installed")" \
@@ -98,7 +98,7 @@ _get_osh_info_lines() {
     "" \
     "$(_info_accent 'Repository Information')" \
     "$(_info_accent '======================')" \
-    "$(_info_label 'GitHub: ')$(_info_value 'https://github.com/oiahoon/osh')" \
+    "$(_info_label 'GitHub: ')$(_info_value 'https://github.com/oiahoon/osh.it')" \
     "$(_info_label 'License: ')$(_info_value 'MIT License')" \
     "$(_info_label 'Author: ')$(_info_value 'oiahoon')" \
     "" \
@@ -106,12 +106,12 @@ _get_osh_info_lines() {
     "$(_info_accent '==============')" \
     "$(_info_label 'sysinfo: ')$(_info_value 'Show system information')" \
     "$(_info_label 'osh_help: ')$(_info_value 'Show help and commands')" \
-    "$(_info_label 'osh_info: ')$(_info_value 'Show OSH information')" \
+    "$(_info_label 'osh_info: ')$(_info_value 'Show OSH.IT information')" \
     "" \
     ""
 }
 
-# Display OSH logo and info side by side
+# Display OSH.IT logo and info side by side
 show_osh_welcome() {
   local logo_lines=()
   local info_lines=()
@@ -187,7 +187,7 @@ show_osh_welcome() {
 # Show installation success message
 show_install_success() {
   printf "\n"
-  printf "%s\n" "$(_info_success "🎉 OSH Installation Complete!")"
+  printf "%s\n" "$(_info_success "🎉 OSH.IT Installation Complete!")"
   printf "\n"
   show_osh_welcome
   printf "\n"
@@ -201,12 +201,12 @@ show_install_success() {
 # Show upgrade success message
 show_upgrade_success() {
   printf "\n"
-  printf "%s\n" "$(_info_success "🚀 OSH Upgrade Complete!")"
+  printf "%s\n" "$(_info_success "🚀 OSH.IT Upgrade Complete!")"
   printf "\n"
   show_osh_welcome
   printf "\n"
   printf "%s\n" "$(_info_accent "What's New:")"
-  printf "%s%s\n" "$(_info_label "• ")" "$(_info_value "Check changelog: https://github.com/oiahoon/osh/releases")"
+  printf "%s%s\n" "$(_info_label "• ")" "$(_info_value "Check changelog: https://github.com/oiahoon/osh.it/releases")"
   printf "%s%s\n" "$(_info_label "• ")" "$(_info_value "View commits: git log --oneline -10")"
   printf "\n"
   printf "%s\n" "$(_info_accent "Next Steps:")"

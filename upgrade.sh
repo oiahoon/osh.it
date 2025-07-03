@@ -7,7 +7,7 @@
 set -e  # Exit on any error
 
 # Configuration
-OSH_REPO_BASE="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh/master}"
+OSH_REPO_BASE="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh.it/main}"
 OSH_DIR="${OSH:-$HOME/.osh}"
 
 # Color definitions
@@ -81,7 +81,7 @@ check_installation() {
   if [[ ! -d "$OSH_DIR" ]]; then
     log_error "OSH is not installed at $OSH_DIR"
     log_info "Please run the installation script first:"
-    log_info "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh/master/install.sh)\""
+    log_info "sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)\""
     exit 1
   fi
   

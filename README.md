@@ -1,11 +1,11 @@
-# OSH - A Lightweight Zsh Plugin Framework
+# OSH.IT - A Lightweight Zsh Plugin Framework
 
 <div align="center">
 
-![OSH Logo](https://img.shields.io/badge/OSH-Zsh%20Framework-blue?style=for-the-badge)
-[![GitHub Stars](https://img.shields.io/github/stars/oiahoon/osh?style=for-the-badge)](https://github.com/oiahoon/osh)
-[![License](https://img.shields.io/github/license/oiahoon/osh?style=for-the-badge)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/oiahoon/osh?style=for-the-badge)](https://github.com/oiahoon/osh/commits)
+![OSH.IT Logo](https://img.shields.io/badge/OSH.IT-Zsh%20Framework-blue?style=for-the-badge)
+[![GitHub Stars](https://img.shields.io/github/stars/oiahoon/osh.it?style=for-the-badge)](https://github.com/oiahoon/osh.it)
+[![License](https://img.shields.io/github/license/oiahoon/osh.it?style=for-the-badge)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/oiahoon/osh.it?style=for-the-badge)](https://github.com/oiahoon/osh.it/commits)
 
 *A fast, lightweight, and extensible Zsh plugin framework designed for developers who want power without bloat.*
 
@@ -66,10 +66,10 @@ ANTHROPIC_API_KEY         # Claude (optional)
 
 ```bash
 # Fresh installation
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh/master/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"
 
 # Or if you prefer wget
-sh -c "$(wget -O- https://raw.githubusercontent.com/oiahoon/osh/master/install.sh)"
+sh -c "$(wget -O- https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"
 ```
 
 ### Upgrade
@@ -426,9 +426,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/oiahoon/osh/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/oiahoon/osh/discussions)
-- 📖 **Documentation**: [Wiki](https://github.com/oiahoon/osh/wiki)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/oiahoon/osh.it/issues)
+- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/oiahoon/osh.it/discussions)
+- 📖 **Documentation**: [Wiki](https://github.com/oiahoon/osh.it/wiki)
 - 🔌 **Plugin Development**: See Plugin Development section above
 
 ## 🔄 Version History
@@ -453,7 +453,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**[⭐ Star this repo](https://github.com/oiahoon/osh) if you find it useful!**
+**[⭐ Star this repo](https://github.com/oiahoon/osh.it) if you find it useful!**
 
 Made with ❤️ by [oiahoon](https://github.com/oiahoon)
 
