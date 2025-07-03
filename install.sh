@@ -644,6 +644,7 @@ configure_shell() {
   local config_block=""
   config_block+="# OSH.IT Configuration - Added by installer\n"
   config_block+="export OSH=\"\$HOME/.osh\"\n"
+  config_block+="export PATH=\"\$OSH/bin:\$PATH\"\n"
   
   if [[ ${#selected_plugins[@]} -gt 0 ]]; then
     config_block+="oplugins=(${selected_plugins[*]})\n"
