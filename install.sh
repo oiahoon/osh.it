@@ -318,6 +318,94 @@ get_plugin_description() {
   esac
 }
 
+# Configure shell integration
+configure_shell() {
+  local selected_plugins=("$@")
+  
+  if [[ "$SKIP_SHELL_CONFIG" == "true" ]]; then
+    log_info "Skipping shell configuration as requested"
+    return 0
+  fi
+  
+  if [[ "$CURRENT_SHELL" != "zsh" ]]; then
+    log_warning "OSH.IT is optimized for Zsh. Current shell: $CURRENT_SHELL"
+    return 0
+  fi
+  
+  echo
+  log_info "🔧 Configuring shell integration..."
+  
+  # Check if OSH is already configured
+  if [[ -f "$SHELL_CONFIG_FILE" ]] && grep -q "source.*osh.sh" "$SHELL_CONFIG_FILE"; then
+    log_info "OSH.IT is already configured in $SHELL_CONFIG_FILE"
+    return 0
+  fi
+  
+  # Prepare configuration
+  local config_block=""
+  config_block+="# OSH.IT Configuration - Added by installer\n"
+  config_block+="export OSH=\"\$HOME/.osh\"\n"
+  
+  if [[ ${#selected_plugins[@]} -gt 0 ]]; then
+    config_block+="oplugins=(${selected_plugins[*]})\n"
+  else
+    config_block+="oplugins=()\n"
+  fi
+  
+  config_block+="source \$OSH/osh.sh\n"
+  config_block+="# End OSH.IT Configuration\n"
+  
+  if [[ "$DRY_RUN" == "true" ]]; then
+    log_dry_run "Would add the following to $SHELL_CONFIG_FILE:"
+    echo -e "$config_block"
+    return 0
+  fi
+  
+  # Ask for confirmation in interactive mode
+  if [[ "$INTERACTIVE" == "true" ]]; then
+    echo
+    echo "${BOLD}Shell Configuration:${NORMAL}"
+    echo "The installer can automatically add OSH.IT configuration to your $SHELL_CONFIG_FILE"
+    echo
+    echo "Configuration to be added:"
+    echo -e "${DIM}$config_block${NORMAL}"
+    
+    printf "${YELLOW}Add OSH.IT configuration to $SHELL_CONFIG_FILE? [Y/n]: ${NORMAL}"
+    local confirm
+    read -r confirm
+    
+    case "$confirm" in
+      [nN]|[nN][oO])
+        log_info "Skipping automatic shell configuration"
+        echo
+        echo "${BOLD}${BLUE}Manual Configuration Required:${NORMAL}"
+        echo "Add the following to your $SHELL_CONFIG_FILE:"
+        echo
+        echo -e "${CYAN}$config_block${NORMAL}"
+        return 0
+        ;;
+    esac
+  fi
+  
+  # Create backup if file exists
+  if [[ -f "$SHELL_CONFIG_FILE" ]]; then
+    local backup_file="${SHELL_CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    if cp "$SHELL_CONFIG_FILE" "$backup_file"; then
+      log_success "Created backup: $backup_file"
+    else
+      log_error "Failed to create backup of $SHELL_CONFIG_FILE"
+      return 1
+    fi
+  fi
+  
+  # Add configuration
+  echo >> "$SHELL_CONFIG_FILE"
+  echo -e "$config_block" >> "$SHELL_CONFIG_FILE"
+  
+  log_success "OSH.IT configuration added to $SHELL_CONFIG_FILE"
+  return 0
+}
+
 # Main installation function with progress tracking
 install_osh() {
   local selected_plugins=("$@")
@@ -418,6 +506,9 @@ install_osh() {
   
   echo
   log_success "OSH installation completed successfully!"
+  
+  # Configure shell integration
+  configure_shell "${selected_plugins[@]}"
 }
 
 # Parse command line arguments
@@ -470,7 +561,7 @@ ${BOLD}USAGE:${NORMAL}
 ${BOLD}OPTIONS:${NORMAL}
   --dry-run              Preview installation without making changes
   --yes                  Non-interactive installation with defaults
-  --skip-shell-config    Skip shell configuration file modification
+  --skip-shell-config    Skip automatic shell configuration
   --plugins PLUGINS      Comma-separated list of plugins to install
   --help                 Show this help message
 
