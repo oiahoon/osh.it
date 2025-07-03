@@ -91,51 +91,102 @@ osh doctor --perf
 ### Upgrade
 
 ```bash
+# Modern way (recommended)
+osh upgrade
+
+# Legacy way (still works)
 upgrade_myshell
 ```
 
-## 📦 Plugin Management System
-
-OSH features a professional plugin management system with categorized releases and intelligent discovery.
-
-### 🏷️ Plugin Categories
-
-#### **Stable Plugins** (Recommended for all users)
-- **sysinfo** - System information display with OSH branding
-- **weather** - Beautiful weather forecast with ASCII art
-- **taskman** - Advanced terminal task manager with productivity features
-
-#### **Beta Plugins** (For advanced users)
-- **acw** - Advanced Code Workflow with Git + JIRA integration
-- **fzf** - Enhanced fuzzy finder with preview capabilities
-
-#### **Experimental Plugins** (Use with caution)
-- **greeting** - Friendly welcome message for OSH users
-
-### 🎯 Installation Presets
+### Quick Start After Installation
 
 ```bash
-# Minimal installation (basic functionality)
-./install.sh --plugins "preset:minimal"
+# Check installation status
+osh status
 
-# Recommended installation (default)
-./install.sh --plugins "preset:recommended"
+# View available plugins
+osh plugin list
 
-# Developer installation (includes beta plugins)
-./install.sh --plugins "preset:developer"
+# Add your first plugin
+osh plugin add weather
 
-# Full installation (all stable plugins)
-./install.sh --plugins "preset:full"
+# Reload to activate changes
+osh reload
 ```
 
-### 📋 Plugin Selection Options
+## 🔌 Plugin Management
 
-During interactive installation, you can:
+OSH.IT provides a modern, user-friendly command-line interface for managing plugins after installation.
 
-- **Select by numbers**: `1 2 3 4` (space-separated)
-- **Use presets**: `preset:recommended`, `preset:developer`
-- **Install all**: `all` or `a`
-- **Default choice**: Press Enter for recommended preset
+### 🎯 Quick Commands
+
+```bash
+# View available plugins
+osh plugin list
+
+# View currently installed plugins  
+osh plugins
+
+# Add a plugin
+osh plugin add weather
+
+# Remove a plugin
+osh plugin remove taskman
+
+# Get plugin information
+osh plugin info weather
+
+# Install plugin presets
+osh preset recommended    # sysinfo weather taskman
+osh preset developer      # recommended + acw fzf
+osh preset minimal        # sysinfo only
+osh preset full          # all plugins
+
+# System management
+osh status               # Show OSH.IT status
+osh reload               # Reload configuration
+osh upgrade              # Upgrade OSH.IT
+```
+
+### 📋 Available Plugins
+
+#### 🟢 **Stable Plugins** (Recommended)
+- **sysinfo** - System information display with OSH branding
+- **weather** - Beautiful weather forecast with ASCII art  
+- **taskman** - Advanced terminal task manager
+
+#### 🟡 **Beta Plugins** (Advanced users)
+- **acw** - Advanced Code Workflow (Git + JIRA integration)
+- **fzf** - Enhanced fuzzy finder with preview
+
+#### 🔴 **Experimental Plugins** (Use with caution)
+- **greeting** - Friendly welcome message
+
+### 💡 Plugin Management Examples
+
+```bash
+# Start with recommended plugins
+osh preset recommended
+
+# Add development tools
+osh plugin add acw
+osh plugin add fzf
+
+# Check what's installed
+osh plugins
+
+# Get help
+osh help
+```
+
+### 🔄 Legacy Commands (Backward Compatibility)
+
+For users familiar with the old syntax, these commands still work:
+```bash
+osh-plugin-add weather      # Same as: osh plugin add weather
+osh-plugins-list           # Same as: osh plugin list  
+osh-preset-developer       # Same as: osh preset developer
+```
 
 ## 🔧 Built-in Plugins
 
@@ -358,10 +409,27 @@ PLUGIN_DISCOVERY_METHOD=cached ./install.sh
 ```bash
 [myshell] plugin 'myplugin' not found
 ```
+- Check available plugins: `osh plugin list`
+- Verify plugin is installed: `osh plugins`
 - Ensure plugin directory exists: `$OSH/plugins/myplugin/`
 - Verify plugin file exists: `myplugin.plugin.zsh`
 - Check plugin name in `oplugins` array
-- Verify plugin is in the selected category (stable/beta/experimental)
+
+**Plugin management issues:**
+```bash
+# Check OSH.IT status
+osh status
+
+# Verify plugin installation
+osh plugins
+
+# Reinstall a plugin
+osh plugin remove weather
+osh plugin add weather
+
+# Reload configuration
+osh reload
+```
 
 **Configuration Bug Fix (July 2025):**
 If you see `-e # OSH.IT Configuration` in your `.zshrc`, run:
@@ -379,21 +447,37 @@ $OSH/scripts/fix_zshrc.sh
 - Ensure you have API access permissions
 
 **Slow shell startup:**
-- Reduce number of plugins in `oplugins`
-- Check for plugin conflicts
+- Check current plugins: `osh plugins`
+- Reduce number of plugins: `osh plugin remove <name>`
 - Use `time zsh -i -c exit` to measure startup time
 
 **Plugin installation fails:**
 - Check internet connection
-- Verify plugin exists in manifest
-- Try different discovery method: `PLUGIN_DISCOVERY_METHOD=local ./install.sh`
+- Verify plugin exists: `osh plugin list`
+- Check OSH.IT status: `osh status`
 
 ### Debug Mode
 
 ```bash
 # Enable debug output
 export OSH_DEBUG=1
-source $OSH/osh.sh
+osh reload
+```
+
+### Quick Diagnostics
+
+```bash
+# Run comprehensive diagnostics
+osh status
+
+# Check plugin status
+osh plugins
+
+# Verify installation
+ls $OSH/plugins/
+
+# Test configuration
+grep "oplugins=" ~/.zshrc
 ```
 
 ### Plugin Manifest Issues
@@ -459,7 +543,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔄 Version History
 
-### v1.3.0 (Latest)
+### v1.4.0 (Latest)
+- ✅ **Modern CLI Interface**: New `osh` command with subcommand structure
+- ✅ **Enhanced Plugin Management**: `osh plugin add/remove/list/info` commands
+- ✅ **Improved User Experience**: Modern command style following industry standards
+- ✅ **Backward Compatibility**: Legacy commands still supported
+- ✅ **Better Documentation**: Updated guides with new command examples
+- ✅ **System Integration**: `osh` command available in PATH after installation
+
+### v1.3.0
 - ✅ **Plugin Manifest System**: Professional plugin management with categories
 - ✅ **Installation Presets**: Minimal, recommended, developer, and full presets
 - ✅ **Smart Plugin Discovery**: Multiple discovery methods with fallback

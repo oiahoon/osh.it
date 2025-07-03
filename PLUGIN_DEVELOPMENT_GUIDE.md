@@ -115,9 +115,13 @@ Brief description of what your plugin does.
 
 ## Installation
 
-This plugin is included in OSH. Enable it by adding to your `.zshrc`:
+This plugin is included in OSH. Enable it using the modern plugin management system:
 
 ```bash
+# Add plugin using modern CLI
+osh plugin add myplugin
+
+# Or add to configuration manually
 oplugins=(myplugin)
 ```
 
@@ -147,7 +151,22 @@ export MYPLUGIN_CONFIG_DIR="$HOME/.config/myplugin"
 MIT License
 ```
 
-### Phase 2: Testing
+### Phase 2: Testing & Development
+
+#### Local Testing
+
+```bash
+# Test plugin locally
+osh plugin add myplugin
+osh reload
+
+# Check plugin status
+osh plugins
+osh plugin info myplugin
+
+# Remove for testing
+osh plugin remove myplugin
+```
 
 #### 1. Local Testing
 ```bash
