@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "last_updated": "2025-07-03T09:00:00Z",
-  "manifest_url": "https://raw.githubusercontent.com/oiahoon/osh/master/PLUGIN_MANIFEST.json",
+  "manifest_url": "https://raw.githubusercontent.com/oiahoon/osh.it/main/PLUGIN_MANIFEST.json",
   "categories": {
     "stable": {
       "description": "Stable plugins recommended for all users",
