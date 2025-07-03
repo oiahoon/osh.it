@@ -495,6 +495,73 @@ get_plugin_description() {
 }
 
 # Configure shell integration
+# Helper function to update plugin configuration in existing .zshrc
+_update_plugin_configuration() {
+  local selected_plugins=("$@")
+  
+  if [[ ! -f "$SHELL_CONFIG_FILE" ]]; then
+    log_error "Shell configuration file not found: $SHELL_CONFIG_FILE"
+    return 1
+  fi
+  
+  # Create backup
+  local backup_file="${SHELL_CONFIG_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+  if cp "$SHELL_CONFIG_FILE" "$backup_file"; then
+    log_success "Created backup: $backup_file"
+  else
+    log_error "Failed to create backup of $SHELL_CONFIG_FILE"
+    return 1
+  fi
+  
+  # Create temporary file for processing
+  local temp_file="/tmp/osh_update_$$"
+  local new_plugins_line="oplugins=(${selected_plugins[*]})"
+  local updated=false
+  
+  # Process the file line by line
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^oplugins= ]]; then
+      # Replace the oplugins line
+      echo "$new_plugins_line"
+      updated=true
+    else
+      echo "$line"
+    fi
+  done < "$SHELL_CONFIG_FILE" > "$temp_file"
+  
+  # If no oplugins line was found, add it after the export OSH line
+  if [[ "$updated" == "false" ]]; then
+    # Create a new temp file with the plugin line added
+    local temp_file2="/tmp/osh_update2_$$"
+    while IFS= read -r line; do
+      echo "$line"
+      if [[ "$line" =~ ^export\ OSH= ]]; then
+        echo "$new_plugins_line"
+        updated=true
+      fi
+    done < "$temp_file" > "$temp_file2"
+    mv "$temp_file2" "$temp_file"
+  fi
+  
+  if [[ "$updated" == "true" ]]; then
+    # Replace the original file
+    if mv "$temp_file" "$SHELL_CONFIG_FILE"; then
+      log_success "Updated plugin configuration in $SHELL_CONFIG_FILE"
+      log_info "New plugins: ${selected_plugins[*]}"
+    else
+      log_error "Failed to update $SHELL_CONFIG_FILE"
+      rm -f "$temp_file"
+      return 1
+    fi
+  else
+    log_warning "Could not find appropriate location to add plugin configuration"
+    rm -f "$temp_file"
+    return 1
+  fi
+  
+  return 0
+}
+
 configure_shell() {
   local selected_plugins=("$@")
   
@@ -514,6 +581,55 @@ configure_shell() {
   # Check if OSH is already configured
   if [[ -f "$SHELL_CONFIG_FILE" ]] && grep -q "source.*osh.sh" "$SHELL_CONFIG_FILE"; then
     log_info "OSH.IT is already configured in $SHELL_CONFIG_FILE"
+    
+    # Check if we need to update plugin configuration
+    if [[ ${#selected_plugins[@]} -gt 0 ]]; then
+      log_info "Checking if plugin configuration needs updating..."
+      
+      # Check if oplugins line exists and matches current selection
+      local current_plugins_line=""
+      if grep -q "^oplugins=" "$SHELL_CONFIG_FILE"; then
+        current_plugins_line=$(grep "^oplugins=" "$SHELL_CONFIG_FILE" | head -1)
+        log_info "Current plugins line: $current_plugins_line"
+        
+        local expected_line="oplugins=(${selected_plugins[*]})"
+        log_info "Expected plugins line: $expected_line"
+        
+        if [[ "$current_plugins_line" == "$expected_line" ]]; then
+          log_info "Plugin configuration is already up to date"
+          return 0
+        else
+          log_info "Plugin configuration needs updating"
+        fi
+      else
+        log_info "No oplugins configuration found, will add it"
+      fi
+      
+      # Update plugin configuration
+      if [[ "$INTERACTIVE" == "true" ]]; then
+        echo
+        printf "${YELLOW}Update plugin configuration to: ${selected_plugins[*]}? [Y/n]: ${NORMAL}"
+        local confirm
+        read -r confirm
+        
+        case "$confirm" in
+          [nN]|[nN][oO])
+            log_info "Skipping plugin configuration update"
+            return 0
+            ;;
+        esac
+      fi
+      
+      # Update the oplugins line
+      if [[ "$DRY_RUN" == "true" ]]; then
+        log_dry_run "Would update plugin configuration to: oplugins=(${selected_plugins[*]})"
+      else
+        _update_plugin_configuration "${selected_plugins[@]}"
+      fi
+    else
+      log_info "No plugins selected, keeping existing configuration"
+    fi
+    
     return 0
   fi
   
