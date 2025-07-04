@@ -479,17 +479,17 @@ osh_info() {
   echo "Configured Plugins:"
   if [[ -n "$oplugins" ]]; then
     for plugin in $oplugins; do
-      local status="immediate"
+      local plugin_status="immediate"
       if [[ "${OSH_LAZY_LOADING:-true}" == "true" ]] && declare -f osh_lazy_is_enabled >/dev/null; then
         if osh_lazy_is_enabled "$plugin"; then
           if [[ -n "${OSH_LAZY_LOADED[$plugin]}" ]]; then
-            status="lazy-loaded"
+            plugin_status="lazy-loaded"
           else
-            status="lazy-pending"
+            plugin_status="lazy-pending"
           fi
         fi
       fi
-      echo "  - $plugin [$status]"
+      echo "  - $plugin [$plugin_status]"
     done
   else
     echo "  (none)"
