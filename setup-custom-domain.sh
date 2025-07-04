@@ -1,0 +1,55 @@
+#!/bin/bash
+
+echo "🌐 OSH.IT 自定义域名配置助手"
+echo "================================"
+echo ""
+
+DOMAIN="osh.it.miaowu.org"
+
+echo "📋 配置域名: $DOMAIN"
+echo ""
+
+echo "🔧 步骤1: DNS配置"
+echo "请在你的DNS提供商处添加以下记录："
+echo ""
+echo "方法1 - CNAME记录（推荐）:"
+echo "类型: CNAME"
+echo "名称: osh.it"
+echo "值: oiahoon.github.io"
+echo "TTL: 3600"
+echo ""
+echo "方法2 - A记录（备选）:"
+echo "类型: A, 名称: osh.it, 值: 185.199.108.153"
+echo "类型: A, 名称: osh.it, 值: 185.199.109.153"
+echo "类型: A, 名称: osh.it, 值: 185.199.110.153"
+echo "类型: A, 名称: osh.it, 值: 185.199.111.153"
+echo ""
+
+echo "🔧 步骤2: GitHub Pages配置"
+echo "1. 访问: https://github.com/oiahoon/osh.it/settings/pages"
+echo "2. 在Custom domain字段输入: $DOMAIN"
+echo "3. 勾选'Enforce HTTPS'"
+echo "4. 点击Save保存"
+echo ""
+
+echo "🧪 步骤3: 验证配置"
+echo "等待DNS传播后（通常几分钟），运行以下命令验证："
+echo ""
+echo "# 检查DNS解析"
+echo "nslookup $DOMAIN"
+echo ""
+echo "# 检查网站访问"
+echo "curl -I https://$DOMAIN"
+echo ""
+
+echo "⏰ 预计生效时间:"
+echo "- DNS传播: 几分钟到几小时"
+echo "- SSL证书生成: 几分钟"
+echo ""
+
+echo "✅ CNAME文件已创建"
+echo "✅ 网站配置已更新"
+echo "✅ 准备提交更改"
+
+echo ""
+echo "🚀 下一步: 提交并推送更改到GitHub"

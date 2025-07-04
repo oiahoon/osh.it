@@ -3,8 +3,8 @@
 # Site settings
 title: "OSH.IT - A Lightweight Zsh Plugin Framework"
 description: "Lightning fast Zsh framework with 92% performance improvement through advanced lazy loading. Smart plugin system for developers."
-url: "https://oiahoon.github.io"
-baseurl: "/osh.it"
+url: "https://osh.it.miaowu.org"
+baseurl: ""
 
 # Build settings
 markdown: kramdown

@@ -84,17 +84,17 @@ const generateMetaTags = () => {
   return `
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://oiahoon.github.io/osh.it/">
+  <meta property="og:url" content="https://osh.it.miaowu.org/">
   <meta property="og:title" content="OSH.IT - A Lightweight Zsh Plugin Framework">
   <meta property="og:description" content="Lightning fast Zsh framework with 92% performance improvement through advanced lazy loading. Smart plugin system for developers.">
-  <meta property="og:image" content="https://oiahoon.github.io/osh.it/og-image.png">
+  <meta property="og:image" content="https://osh.it.miaowu.org/og-image.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://oiahoon.github.io/osh.it/">
+  <meta property="twitter:url" content="https://osh.it.miaowu.org/">
   <meta property="twitter:title" content="OSH.IT - A Lightweight Zsh Plugin Framework">
   <meta property="twitter:description" content="Lightning fast Zsh framework with 92% performance improvement through advanced lazy loading. Smart plugin system for developers.">
-  <meta property="twitter:image" content="https://oiahoon.github.io/osh.it/og-image.png">
+  <meta property="twitter:image" content="https://osh.it.miaowu.org/og-image.png">
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -103,7 +103,7 @@ const generateMetaTags = () => {
     "@type": "SoftwareApplication",
     "name": "OSH.IT",
     "description": "A lightweight Zsh plugin framework with advanced lazy loading and 92% performance improvement",
-    "url": "https://oiahoon.github.io/osh.it/",
+    "url": "https://osh.it.miaowu.org/",
     "downloadUrl": "https://github.com/oiahoon/osh.it",
     "version": "${version}",
     "operatingSystem": "Linux, macOS",
@@ -158,7 +158,7 @@ const generateSitemap = () => {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://oiahoon.github.io/osh.it/</loc>
+    <loc>https://osh.it.miaowu.org/</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>

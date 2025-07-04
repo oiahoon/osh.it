@@ -1,6 +1,6 @@
 {
-  "generated": "2025-07-04T02:19:07.852Z",
-  "version": "1.1.0",
+  "generated": "2025-07-04T03:01:59.426Z",
+  "version": "1.4.0",
   "metrics": {
     "lazy_loading_improvement": "92%",
     "startup_time_traditional": "138ms",
