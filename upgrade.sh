@@ -100,19 +100,24 @@ declare -a ESSENTIAL_FILES=(
   "VERSION"
   "LICENSE"
   ".zshrc.example"
+  "bin/osh"
+  "scripts/osh_cli.sh"
+  "scripts/osh_doctor.sh"
+  "scripts/osh_plugin_manager.sh"
+  "scripts/fix_installation.sh"
+  "scripts/fix_permissions.sh"
+  "scripts/fix_alias_conflicts.sh"
   "lib/colors.zsh"
   "lib/common.zsh"
   "lib/display.sh"
+  "lib/lazy_loader.zsh"
   "lib/lazy_stubs.zsh"
-  "plugins/proxy/proxy.plugin.zsh"
-  "plugins/sysinfo/sysinfo.plugin.zsh"
-  "plugins/weather/weather.plugin.zsh"
-  "plugins/taskman/taskman.plugin.zsh"
-  "plugins/taskman/taskman_ui.zsh"
-  "plugins/acw/acw.plugin.zsh"
-  "plugins/fzf/fzf.plugin.zsh"
-  "plugins/weather/completions/_weather"
-  "plugins/taskman/config/taskman.conf"
+  "lib/vintage.zsh"
+  "lib/cache.zsh"
+  "lib/plugin_manager.zsh"
+  "lib/plugin_aliases.zsh"
+  "lib/osh_config.zsh"
+  "lib/config_manager.zsh"
 )
 
 # Check if OSH is installed
@@ -244,9 +249,10 @@ fix_permissions() {
   
   chmod +x "$OSH_DIR/osh.sh" 2>/dev/null || true
   chmod +x "$OSH_DIR/upgrade.sh" 2>/dev/null || true
+  chmod +x "$OSH_DIR/bin/osh" 2>/dev/null || true
+  chmod +x "$OSH_DIR/scripts/"*.sh 2>/dev/null || true
   
   find "$OSH_DIR" -name "*.zsh" -exec chmod 644 {} \; 2>/dev/null || true
-  find "$OSH_DIR" -name "*.sh" -exec chmod 644 {} \; 2>/dev/null || true
   
   log_success "✅ Permissions fixed"
 }

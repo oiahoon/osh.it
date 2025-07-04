@@ -483,12 +483,24 @@ ESSENTIAL_FILES=(
   "VERSION"
   "LICENSE"
   ".zshrc.example"
+  "bin/osh"
+  "scripts/osh_cli.sh"
+  "scripts/osh_doctor.sh"
+  "scripts/osh_plugin_manager.sh"
+  "scripts/fix_installation.sh"
+  "scripts/fix_permissions.sh"
+  "scripts/fix_alias_conflicts.sh"
   "lib/colors.zsh"
   "lib/common.zsh"
   "lib/display.sh"
+  "lib/lazy_loader.zsh"
   "lib/lazy_stubs.zsh"
   "lib/vintage.zsh"
   "lib/cache.zsh"
+  "lib/plugin_manager.zsh"
+  "lib/plugin_aliases.zsh"
+  "lib/osh_config.zsh"
+  "lib/config_manager.zsh"
 )
 
 # Plugin files mapping - FIXED to match actual file structure
@@ -875,8 +887,9 @@ install_osh() {
   if [[ "$DRY_RUN" != "true" ]]; then
     chmod +x "$OSH_DIR/osh.sh" 2>/dev/null || true
     chmod +x "$OSH_DIR/upgrade.sh" 2>/dev/null || true
+    chmod +x "$OSH_DIR/bin/osh" 2>/dev/null || true
+    chmod +x "$OSH_DIR/scripts/"*.sh 2>/dev/null || true
     find "$OSH_DIR" -name "*.zsh" -exec chmod 644 {} \; 2>/dev/null || true
-    find "$OSH_DIR" -name "*.sh" -exec chmod 644 {} \; 2>/dev/null || true
     log_success "File permissions configured"
   else
     log_dry_run "Would set executable permissions on scripts"

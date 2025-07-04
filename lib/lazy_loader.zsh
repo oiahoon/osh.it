@@ -52,9 +52,15 @@ osh_lazy_register_alias() {
     return 1
   fi
   
+  # Check if alias already exists to avoid conflicts
+  if alias "$alias_name" >/dev/null 2>&1; then
+    _osh_lazy_log "DEBUG" "Alias '$alias_name' already exists, skipping lazy registration"
+    return 0
+  fi
+  
   OSH_LAZY_ALIASES[$alias_name]="$plugin:${target_func:-$alias_name}"
   
-  # Create alias stub
+  # Create alias stub only if it doesn't exist
   eval "alias $alias_name='_osh_lazy_alias_stub $alias_name'"
   
   _osh_lazy_log "DEBUG" "Registered alias '$alias_name' -> '$plugin:${target_func:-$alias_name}'"
@@ -64,6 +70,12 @@ osh_lazy_register_alias() {
 _osh_create_lazy_stub() {
   local plugin="$1"
   local func_name="$2"
+  
+  # Check if function already exists to avoid conflicts
+  if declare -f "$func_name" >/dev/null 2>&1; then
+    _osh_lazy_log "DEBUG" "Function '$func_name' already exists, skipping lazy stub creation"
+    return 0
+  fi
   
   # Create the stub function with unique name to avoid conflicts
   eval "
@@ -182,28 +194,59 @@ _osh_lazy_load_plugin() {
 
 # Initialize lazy loading for common plugins
 osh_lazy_init_defaults() {
-  # Weather plugin
-  osh_lazy_register "weather" "weather" "forecast"
-  osh_lazy_register_alias "wtr" "weather" "weather"
-  osh_lazy_register_alias "forecast" "weather" "weather"
+  # Only initialize lazy loading for plugins that are NOT in the current oplugins array
+  # This prevents conflicts with plugins that are loaded immediately
   
-  # Sysinfo plugin
-  osh_lazy_register "sysinfo" "sysinfo" "oshinfo" "neofetch-osh"
-  osh_lazy_register_alias "oshinfo" "sysinfo" "sysinfo"
-  osh_lazy_register_alias "neofetch-osh" "sysinfo" "sysinfo"
+  local -a current_plugins
+  if [[ -n "${oplugins[@]}" ]]; then
+    current_plugins=("${oplugins[@]}")
+  fi
   
-  # Taskman plugin
-  osh_lazy_register "taskman" "tasks" "taskman"
-  osh_lazy_register_alias "tm" "taskman" "tasks"
-  osh_lazy_register_alias "taskman" "taskman" "tasks"
+  # Helper function to check if plugin is in current plugins list
+  _is_plugin_active() {
+    local plugin="$1"
+    for active_plugin in "${current_plugins[@]}"; do
+      if [[ "$active_plugin" == "$plugin" ]]; then
+        return 0
+      fi
+    done
+    return 1
+  }
   
-  # ACW plugin
-  osh_lazy_register "acw" "acw" "ggco" "newb"
+  # Weather plugin - only if not actively loaded
+  if ! _is_plugin_active "weather"; then
+    osh_lazy_register "weather" "weather"
+    osh_lazy_register_alias "wtr" "weather" "weather"
+    osh_lazy_register_alias "forecast" "weather" "weather"
+  fi
   
-  # FZF plugin
-  osh_lazy_register "fzf" "pp" "fcommit"
+  # Sysinfo plugin - only if not actively loaded
+  if ! _is_plugin_active "sysinfo"; then
+    osh_lazy_register "sysinfo" "sysinfo"
+    osh_lazy_register_alias "oshinfo" "sysinfo" "sysinfo"
+    osh_lazy_register_alias "neofetch-osh" "sysinfo" "sysinfo"
+  fi
   
-  _osh_lazy_log "DEBUG" "Default lazy loading configuration initialized"
+  # Taskman plugin - only if not actively loaded
+  if ! _is_plugin_active "taskman"; then
+    osh_lazy_register "taskman" "tasks"
+    osh_lazy_register_alias "tm" "taskman" "tasks"
+    osh_lazy_register_alias "taskman" "taskman" "tasks"
+    osh_lazy_register_alias "task" "taskman" "tasks"
+    osh_lazy_register_alias "todo" "taskman" "tasks"
+  fi
+  
+  # ACW plugin - only if not actively loaded
+  if ! _is_plugin_active "acw"; then
+    osh_lazy_register "acw" "acw" "ggco" "newb"
+  fi
+  
+  # FZF plugin - only if not actively loaded
+  if ! _is_plugin_active "fzf"; then
+    osh_lazy_register "fzf" "pp" "fcommit"
+  fi
+  
+  _osh_lazy_log "DEBUG" "Default lazy loading configuration initialized (skipped active plugins: ${current_plugins[*]})"
 }
 
 # Check if lazy loading is enabled for a plugin

@@ -63,19 +63,35 @@ osh_log() {
 
   case "$level" in
     "ERROR")
-      osh_vintage_error "$message" >&2
+      if command -v osh_vintage_error >/dev/null 2>&1; then
+        osh_vintage_error "$message" >&2
+      else
+        echo "ERROR: $message" >&2
+      fi
       ;;
     "WARN")
-      osh_vintage_warning "$message" >&2
+      if command -v osh_vintage_warning >/dev/null 2>&1; then
+        osh_vintage_warning "$message" >&2
+      else
+        echo "WARNING: $message" >&2
+      fi
       ;;
     "INFO")
       if [[ "$OSH_DEBUG" == "1" ]]; then
-        osh_vintage_info "$message"
+        if command -v osh_vintage_info >/dev/null 2>&1; then
+          osh_vintage_info "$message"
+        else
+          echo "INFO: $message"
+        fi
       fi
       ;;
     "DEBUG")
       if [[ "$OSH_DEBUG" == "1" ]]; then
-        osh_vintage_info "[DEBUG] $message"
+        if command -v osh_vintage_info >/dev/null 2>&1; then
+          osh_vintage_info "[DEBUG] $message"
+        else
+          echo "DEBUG: $message"
+        fi
       fi
       ;;
   esac

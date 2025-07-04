@@ -461,6 +461,38 @@ osh doctor --perf
 
 ### Common Issues
 
+**Installation Issues (lazy_loader.zsh not found, osh command not found):**
+```bash
+# Quick fix for existing installations
+bash <(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/scripts/fix_installation.sh)
+
+# Or re-install with the latest version
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"
+
+# Or run diagnostics to identify missing files
+osh doctor --fix
+```
+See [Installation Fix Guide](INSTALLATION_FIX_GUIDE.md) for detailed solutions.
+
+**Permission Issues (Permission denied, cannot execute):**
+```bash
+# Quick permission fix
+bash <(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/scripts/fix_permissions.sh)
+
+# Or manual fix
+chmod +x ~/.osh/bin/osh ~/.osh/scripts/*.sh
+```
+See [Permission Fix Guide](PERMISSION_FIX_GUIDE.md) for detailed solutions.
+
+**Alias Conflict Issues (defining function based on alias, parse error):**
+```bash
+# Quick alias conflict fix
+bash <(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/scripts/fix_alias_conflicts.sh)
+
+# Or update lazy loader manually
+curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/lib/lazy_loader.zsh -o ~/.osh/lib/lazy_loader.zsh
+```
+
 **OSH commands not working (osh status, osh plugin add, etc.):**
 ```bash
 # Run diagnostics to identify the issue
