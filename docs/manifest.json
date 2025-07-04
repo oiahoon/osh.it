@@ -1,0 +1,16 @@
+{
+  "name": "OSH.IT - Zsh Plugin Framework",
+  "short_name": "OSH.IT",
+  "description": "A lightweight Zsh plugin framework with advanced lazy loading",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#667eea",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
