@@ -23,16 +23,14 @@
   --osh-warning: #ffff00;            /* Bright yellow - Warnings */
   --osh-error: #ff0000;              /* Bright red - Errors */
   
-  /* Logo Gradient (vintage progression) */
-  --logo-gradient: linear-gradient(135deg, 
-    var(--osh-vintage-red) 0%,
-    var(--osh-vintage-orange) 15%,
-    var(--osh-vintage-yellow) 30%,
-    var(--osh-vintage-olive) 45%,
-    var(--osh-vintage-green) 60%,
-    var(--osh-vintage-teal) 75%,
-    var(--osh-vintage-blue) 85%,
-    var(--osh-vintage-purple) 100%
+  /* Logo Gradient (matching sysinfo vintage progression) */
+  --logo-gradient: linear-gradient(180deg, 
+    #af0000 0%,     /* _vintage_1 - Dark red */
+    #af5f00 20%,    /* _vintage_2 - Dark orange */
+    #afaf00 40%,    /* _vintage_4 - Olive yellow */
+    #5f8700 60%,    /* _vintage_6 - Forest green */
+    #5f8787 80%,    /* _vintage_8 - Dark teal */
+    #5f87af 100%    /* _vintage_10 - Muted blue */
   );
   
   /* Accent Colors (updated to match shell) */
@@ -165,12 +163,10 @@ body {
 
 #logo-text {
   font-size: var(--font-size-sm);
-  background: var(--logo-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   font-weight: 700;
   line-height: 1.2;
+  font-family: var(--font-mono);
+  text-align: center;
   animation: vintage-glow 3s ease-in-out infinite alternate;
 }
 

@@ -1,30 +1,47 @@
 // OSH.IT Website Interactive Features
 
 document.addEventListener('DOMContentLoaded', function() {
-    // ASCII Logo Animation (matching shell logo exactly)
+    // OSH.IT Logo (matching sysinfo vintage gradient)
     const logoText = `
-
         ██████╗ ███████╗██╗  ██╗   ██╗████████╗
        ██╔═══██╗██╔════╝██║  ██║   ██║╚══██╔══╝
        ██║   ██║███████╗███████║   ██║   ██║   
        ██║   ██║╚════██║██╔══██║   ██║   ██║   
        ╚██████╔╝███████║██║  ██║██╗██║   ██║   
         ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝   ╚═╝   
-
-     ╔════════════════════════════════════════╗
-     ║      Lightweight Zsh Framework         ║
-     ║        Fast • Simple • Cool            ║
-     ╚════════════════════════════════════════╝
-
-       ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-      ▐ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ▌
-       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-
     `;
     
+    // OSH.IT Logo with line-by-line vintage gradient (matching sysinfo)
     const logoElement = document.getElementById('logo-text');
     if (logoElement) {
-        logoElement.textContent = logoText;
+        // Split logo into lines and apply vintage colors
+        const logoLines = [
+            '        ██████╗ ███████╗██╗  ██╗   ██╗████████╗',
+            '       ██╔═══██╗██╔════╝██║  ██║   ██║╚══██╔══╝',
+            '       ██║   ██║███████╗███████║   ██║   ██║   ',
+            '       ██║   ██║╚════██║██╔══██║   ██║   ██║   ',
+            '       ╚██████╔╝███████║██║  ██║██╗██║   ██║   ',
+            '        ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝   ╚═╝   '
+        ];
+        
+        // Vintage colors matching sysinfo (ANSI codes to RGB)
+        const vintageColors = [
+            '#af0000',  // _vintage_1 - Dark red
+            '#af5f00',  // _vintage_2 - Dark orange  
+            '#afaf00',  // _vintage_4 - Olive yellow
+            '#5f8700',  // _vintage_6 - Forest green
+            '#5f8787',  // _vintage_8 - Dark teal
+            '#5f87af'   // _vintage_10 - Muted blue
+        ];
+        
+        // Create HTML with colored lines
+        let logoHTML = '';
+        logoLines.forEach((line, index) => {
+            const color = vintageColors[index];
+            logoHTML += `<span style="color: ${color}; display: block;">${line}</span>`;
+        });
+        
+        logoElement.innerHTML = logoHTML;
     }
 
     // Copy to Clipboard Functionality
