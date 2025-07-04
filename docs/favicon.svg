@@ -1,13 +1,24 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="6" fill="url(#gradient)"/>
+  <rect width="32" height="32" rx="6" fill="url(#vintage-gradient)"/>
+  
+  <!-- Terminal window elements -->
   <path d="M8 12h16v2H8v-2zm0 4h12v2H8v-2zm0 4h8v2H8v-2z" fill="white" opacity="0.9"/>
-  <circle cx="6" cy="6" r="2" fill="#ff5f57"/>
-  <circle cx="12" cy="6" r="2" fill="#ffbd2e"/>
-  <circle cx="18" cy="6" r="2" fill="#28ca42"/>
+  
+  <!-- Terminal buttons with vintage colors -->
+  <circle cx="6" cy="6" r="2" fill="#af0000"/>  <!-- vintage red -->
+  <circle cx="12" cy="6" r="2" fill="#af5f00"/> <!-- vintage orange -->
+  <circle cx="18" cy="6" r="2" fill="#5f8700"/> <!-- vintage green -->
+  
+  <!-- OSH.IT brand mark -->
+  <text x="16" y="26" text-anchor="middle" fill="white" font-family="monospace" font-size="8" font-weight="bold">OSH</text>
+  
   <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea"/>
-      <stop offset="100%" style="stop-color:#764ba2"/>
+    <linearGradient id="vintage-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#af0000"/>   <!-- vintage red -->
+      <stop offset="25%" style="stop-color:#af5f00"/>  <!-- vintage orange -->
+      <stop offset="50%" style="stop-color:#5f8700"/>  <!-- vintage green -->
+      <stop offset="75%" style="stop-color:#5f8787"/>  <!-- vintage teal -->
+      <stop offset="100%" style="stop-color:#875faf"/> <!-- vintage purple -->
     </linearGradient>
   </defs>
 </svg>

@@ -1,4 +1,4 @@
-/* OSH.IT Retro Terminal Theme */
+/* OSH.IT Retro Terminal Theme - Updated with Shell Color Palette */
 :root {
   /* Terminal Colors */
   --terminal-bg: #0d1117;
@@ -6,23 +6,52 @@
   --terminal-border: #30363d;
   --terminal-header: #21262d;
   
-  /* Accent Colors */
-  --accent-green: #7c3aed;
-  --accent-blue: #2563eb;
-  --accent-purple: #7c3aed;
-  --accent-orange: #f59e0b;
-  --accent-red: #ef4444;
+  /* OSH.IT Vintage Color Palette (matching shell colors) */
+  --osh-vintage-red: #af0000;        /* 124 - Dark red */
+  --osh-vintage-orange: #af5f00;     /* 130 - Dark orange */
+  --osh-vintage-yellow: #af8700;     /* 136 - Muted yellow-orange */
+  --osh-vintage-olive: #afaf00;      /* 142 - Olive yellow */
+  --osh-vintage-green: #5f8700;      /* 64 - Forest green */
+  --osh-vintage-teal: #5f8787;       /* 66 - Dark teal */
+  --osh-vintage-blue: #5f87af;       /* 68 - Muted blue */
+  --osh-vintage-purple: #875faf;     /* 97 - Muted purple */
+  --osh-vintage-magenta: #875f5f;    /* 95 - Dark magenta */
+  
+  /* UI Element Colors (matching shell) */
+  --osh-accent: #00ffff;             /* Bright cyan - UI accents */
+  --osh-success: #00ff00;            /* Bright green - Success */
+  --osh-warning: #ffff00;            /* Bright yellow - Warnings */
+  --osh-error: #ff0000;              /* Bright red - Errors */
+  
+  /* Logo Gradient (vintage progression) */
+  --logo-gradient: linear-gradient(135deg, 
+    var(--osh-vintage-red) 0%,
+    var(--osh-vintage-orange) 15%,
+    var(--osh-vintage-yellow) 30%,
+    var(--osh-vintage-olive) 45%,
+    var(--osh-vintage-green) 60%,
+    var(--osh-vintage-teal) 75%,
+    var(--osh-vintage-blue) 85%,
+    var(--osh-vintage-purple) 100%
+  );
+  
+  /* Accent Colors (updated to match shell) */
+  --accent-green: var(--osh-vintage-green);
+  --accent-blue: var(--osh-vintage-blue);
+  --accent-purple: var(--osh-vintage-purple);
+  --accent-orange: var(--osh-vintage-orange);
+  --accent-red: var(--osh-vintage-red);
   
   /* Status Colors */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  --success: var(--osh-success);
+  --warning: var(--osh-warning);
+  --error: var(--osh-error);
+  --info: var(--osh-accent);
   
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-success: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-accent: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  /* Gradients (updated with vintage colors) */
+  --gradient-primary: linear-gradient(135deg, var(--osh-vintage-blue) 0%, var(--osh-vintage-purple) 100%);
+  --gradient-success: linear-gradient(135deg, var(--osh-vintage-green) 0%, var(--osh-vintage-teal) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--osh-vintage-orange) 0%, var(--osh-vintage-red) 100%);
   
   /* Typography */
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
@@ -136,12 +165,22 @@ body {
 
 #logo-text {
   font-size: var(--font-size-sm);
-  background: var(--gradient-primary);
+  background: var(--logo-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 700;
   line-height: 1.2;
+  animation: vintage-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes vintage-glow {
+  0% {
+    filter: brightness(1) saturate(1);
+  }
+  100% {
+    filter: brightness(1.1) saturate(1.2);
+  }
 }
 
 /* Terminal Prompt */
@@ -181,6 +220,16 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: vintage-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes vintage-pulse {
+  0% {
+    filter: brightness(1);
+  }
+  100% {
+    filter: brightness(1.15);
+  }
 }
 
 /* Navigation */
