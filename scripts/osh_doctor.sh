@@ -1,543 +1,344 @@
-#!/usr/bin/env zsh
-# OSH.IT Doctor - Health Check and Diagnostic Tool
-# Version: 1.0.0
-# Author: OSH.IT Team
+#!/usr/bin/env bash
+# OSH.IT Doctor - Diagnostic and Fix Tool
+# Helps users diagnose and fix common OSH.IT issues
 
 set -e
 
-# Configuration
-OSH_DOCTOR_VERSION="1.0.0"
-OSH="${OSH:-$HOME/.osh}"
-
 # Colors
-if [[ -t 1 ]] && command -v tput >/dev/null 2>&1; then
-  RED="$(tput setaf 1)"
-  GREEN="$(tput setaf 2)"
-  YELLOW="$(tput setaf 3)"
-  BLUE="$(tput setaf 4)"
-  MAGENTA="$(tput setaf 5)"
-  CYAN="$(tput setaf 6)"
-  BOLD="$(tput bold)"
-  DIM="$(tput dim)"
-  NORMAL="$(tput sgr0)"
-else
-  RED="" GREEN="" YELLOW="" BLUE="" MAGENTA="" CYAN=""
-  BOLD="" DIM="" NORMAL=""
-fi
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 
-# Logging functions
-log_info() { printf "${BLUE}ℹ️  %s${NORMAL}\n" "$*"; }
-log_success() { printf "${GREEN}✅ %s${NORMAL}\n" "$*"; }
-log_warning() { printf "${YELLOW}⚠️  %s${NORMAL}\n" "$*"; }
-log_error() { printf "${RED}❌ %s${NORMAL}\n" "$*"; }
-log_check() { printf "${CYAN}🔍 %s${NORMAL}" "$*"; }
+# Configuration
+OSH_DIR="${OSH:-$HOME/.osh}"
+ZSHRC_FILE="$HOME/.zshrc"
 
-# Health check results
-HEALTH_SCORE=0
-TOTAL_CHECKS=0
-ISSUES_FOUND=()
-WARNINGS_FOUND=()
+# Helper functions
+log_info() { echo -e "${BLUE}ℹ️  $*${NC}"; }
+log_success() { echo -e "${GREEN}✅ $*${NC}"; }
+log_warning() { echo -e "${YELLOW}⚠️  $*${NC}"; }
+log_error() { echo -e "${RED}❌ $*${NC}"; }
+log_fix() { echo -e "${CYAN}🔧 $*${NC}"; }
 
-# Increment health score
-add_check() {
-  TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-}
-
-add_success() {
-  HEALTH_SCORE=$((HEALTH_SCORE + 1))
-}
-
-# Check lazy loading system
-check_lazy_loading() {
-  add_check
-  log_check "Checking lazy loading system... "
-  
-  local lazy_enabled="${OSH_LAZY_LOADING:-true}"
-  
-  if [[ "$lazy_enabled" == "true" ]]; then
-    if [[ -f "$OSH/lib/lazy_loader.zsh" ]]; then
-      printf "${GREEN}✓${NORMAL}\n"
-      add_success
-      log_info "  Lazy loading system: Available"
-      
-      # Test if lazy loading functions are accessible
-      if source "$OSH/lib/lazy_loader.zsh" 2>/dev/null; then
-        if declare -f osh_lazy_register >/dev/null; then
-          log_info "  Lazy loading functions: Working"
-        else
-          log_warning "  Lazy loading functions: Not properly loaded"
-          add_warning "Lazy loading functions not accessible"
-        fi
-      else
-        log_warning "  Lazy loading system: Failed to load"
-        add_warning "Failed to source lazy_loader.zsh"
-      fi
-      
-      # Check if test script exists
-      if [[ -f "$OSH/scripts/test_lazy_loading.sh" ]]; then
-        log_info "  Lazy loading tests: Available"
-      else
-        log_warning "  Lazy loading tests: Not found"
-      fi
-      
+# Check functions
+check_osh_installation() {
+    echo -e "${CYAN}🔍 Checking OSH.IT Installation...${NC}"
+    echo ""
+    
+    if [[ -d "$OSH_DIR" ]]; then
+        log_success "OSH.IT directory found: $OSH_DIR"
     else
-      printf "${RED}✗${NORMAL}\n"
-      add_issue "Lazy loading enabled but lazy_loader.zsh not found"
-      log_error "  Lazy loading system file missing: $OSH/lib/lazy_loader.zsh"
+        log_error "OSH.IT directory not found: $OSH_DIR"
+        log_fix "Run the installation script: curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh | sh"
+        return 1
     fi
-  else
-    printf "${YELLOW}⚠${NORMAL}\n"
-    log_warning "  Lazy loading is disabled (OSH_LAZY_LOADING=false)"
-    log_info "  To enable: export OSH_LAZY_LOADING=true"
-  fi
+    
+    if [[ -f "$OSH_DIR/osh.sh" ]]; then
+        log_success "Main OSH.IT script found"
+    else
+        log_error "Main OSH.IT script missing: $OSH_DIR/osh.sh"
+        return 1
+    fi
+    
+    if [[ -f "$OSH_DIR/bin/osh" ]]; then
+        log_success "OSH command found"
+    else
+        log_error "OSH command missing: $OSH_DIR/bin/osh"
+        return 1
+    fi
+    
+    return 0
 }
 
-add_issue() {
-  ISSUES_FOUND+=("$1")
+check_path_configuration() {
+    echo -e "${CYAN}🔍 Checking PATH Configuration...${NC}"
+    echo ""
+    
+    if echo "$PATH" | grep -q "$OSH_DIR/bin"; then
+        log_success "OSH.IT bin directory is in PATH"
+    else
+        log_error "OSH.IT bin directory not in PATH"
+        log_fix "Add this to your ~/.zshrc:"
+        echo -e "${YELLOW}  export PATH=\"\$OSH/bin:\$PATH\"${NC}"
+        return 1
+    fi
+    
+    if command -v osh >/dev/null 2>&1; then
+        log_success "osh command is available"
+    else
+        log_error "osh command not found in PATH"
+        log_fix "Restart your terminal or run: source ~/.zshrc"
+        return 1
+    fi
+    
+    return 0
 }
 
-add_warning() {
-  WARNINGS_FOUND+=("$1")
+check_shell_configuration() {
+    echo -e "${CYAN}🔍 Checking Shell Configuration...${NC}"
+    echo ""
+    
+    if [[ -f "$ZSHRC_FILE" ]]; then
+        log_success "Found ~/.zshrc"
+    else
+        log_error "~/.zshrc not found"
+        log_fix "Create ~/.zshrc file"
+        return 1
+    fi
+    
+    if grep -q "export OSH=" "$ZSHRC_FILE"; then
+        log_success "OSH environment variable configured"
+    else
+        log_error "OSH environment variable not configured"
+        log_fix "Add this to your ~/.zshrc:"
+        echo -e "${YELLOW}  export OSH=\"\$HOME/.osh\"${NC}"
+        return 1
+    fi
+    
+    if grep -q "source.*osh.sh" "$ZSHRC_FILE"; then
+        log_success "OSH.IT is sourced in ~/.zshrc"
+    else
+        log_error "OSH.IT not sourced in ~/.zshrc"
+        log_fix "Add this to your ~/.zshrc:"
+        echo -e "${YELLOW}  source \$OSH/osh.sh${NC}"
+        return 1
+    fi
+    
+    return 0
 }
 
-# Show OSH.IT Doctor header
-show_header() {
-  echo
-  echo "${BOLD}${CYAN}╔══════════════════════════════════════════════════════════════╗${NORMAL}"
-  echo "${BOLD}${CYAN}║                     OSH.IT Doctor v$OSH_DOCTOR_VERSION                     ║${NORMAL}"
-  echo "${BOLD}${CYAN}║              Health Check & Diagnostic Tool                  ║${NORMAL}"
-  echo "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════╝${NORMAL}"
-  echo
-}
-
-# Check OSH.IT installation
-check_installation() {
-  log_check "Checking OSH.IT installation... "
-  add_check
-  
-  if [[ ! -d "$OSH" ]]; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "OSH.IT directory not found: $OSH"
-    return 1
-  fi
-  
-  if [[ ! -f "$OSH/osh.sh" ]]; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "Core OSH.IT file missing: $OSH/osh.sh"
-    return 1
-  fi
-  
-  echo "${GREEN}OK${NORMAL}"
-  add_success
-  return 0
-}
-
-# Check Zsh installation and version
-check_zsh() {
-  log_check "Checking Zsh installation... "
-  add_check
-  
-  if ! command -v zsh >/dev/null 2>&1; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "Zsh is not installed"
-    return 1
-  fi
-  
-  local zsh_version="${ZSH_VERSION:-unknown}"
-  echo "${GREEN}OK${NORMAL} (version: $zsh_version)"
-  add_success
-  
-  # Check if Zsh is the default shell
-  if [[ "$SHELL" != *"zsh" ]]; then
-    add_warning "Zsh is not your default shell (current: $SHELL)"
-  fi
-  
-  return 0
-}
-
-# Check shell configuration
-check_shell_config() {
-  log_check "Checking shell configuration... "
-  add_check
-  
-  local config_file="$HOME/.zshrc"
-  
-  if [[ ! -f "$config_file" ]]; then
-    echo "${YELLOW}WARNING${NORMAL}"
-    add_warning "Shell configuration file not found: $config_file"
-    return 1
-  fi
-  
-  if ! grep -q "source.*osh.sh" "$config_file"; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "OSH.IT not configured in $config_file"
-    return 1
-  fi
-  
-  echo "${GREEN}OK${NORMAL}"
-  add_success
-  return 0
-}
-
-# Check plugins
 check_plugins() {
-  log_check "Checking plugins... "
-  add_check
-  
-  local plugin_dir="$OSH/plugins"
-  
-  if [[ ! -d "$plugin_dir" ]]; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "Plugin directory not found: $plugin_dir"
-    return 1
-  fi
-  
-  local plugin_count=$(find "$plugin_dir" -name "*.plugin.zsh" 2>/dev/null | wc -l | tr -d ' ')
-  
-  if [[ $plugin_count -eq 0 ]]; then
-    echo "${YELLOW}WARNING${NORMAL}"
-    add_warning "No plugins found"
-    return 1
-  fi
-  
-  echo "${GREEN}OK${NORMAL} ($plugin_count plugins found)"
-  add_success
-  
-  # Check if plugins are properly loaded
-  if [[ -n "${oplugins:-}" ]]; then
-    log_info "Active plugins: ${oplugins[*]}"
-  else
-    add_warning "No plugins are currently active"
-  fi
-  
-  return 0
-}
-
-# Check lazy loading system
-check_lazy_loading() {
-  add_check
-  log_check "Checking lazy loading system... "
-  
-  local lazy_enabled="${OSH_LAZY_LOADING:-true}"
-  
-  if [[ "$lazy_enabled" == "true" ]]; then
-    if [[ -f "$OSH/lib/lazy_loader.zsh" ]]; then
-      printf "${GREEN}✓${NORMAL}\n"
-      add_success
-      log_info "  Lazy loading system: Available"
-      
-      # Test if lazy loading functions are accessible
-      if source "$OSH/lib/lazy_loader.zsh" 2>/dev/null; then
-        if declare -f osh_lazy_register >/dev/null; then
-          log_info "  Lazy loading functions: Working"
+    echo -e "${CYAN}🔍 Checking Plugin Configuration...${NC}"
+    echo ""
+    
+    if grep -q "oplugins=" "$ZSHRC_FILE"; then
+        local plugins=$(grep "oplugins=" "$ZSHRC_FILE" | head -1 | sed 's/oplugins=(\(.*\))/\1/' | tr -d '()')
+        log_success "Plugin configuration found"
+        
+        if [[ -n "$plugins" ]]; then
+            echo "  Configured plugins: $plugins"
+            
+            # Check if plugin files exist
+            for plugin in $plugins; do
+                if [[ -d "$OSH_DIR/plugins/$plugin" ]]; then
+                    log_success "Plugin files found: $plugin"
+                else
+                    log_error "Plugin files missing: $plugin"
+                    log_fix "Run: osh plugin add $plugin"
+                fi
+            done
         else
-          log_warning "  Lazy loading functions: Not properly loaded"
-          add_warning "Lazy loading functions not accessible"
+            log_warning "No plugins configured"
+            log_fix "Add plugins with: osh plugin add <name>"
         fi
-      else
-        log_warning "  Lazy loading system: Failed to load"
-        add_warning "Failed to source lazy_loader.zsh"
-      fi
-      
-      # Check if test script exists
-      if [[ -f "$OSH/scripts/test_lazy_loading.sh" ]]; then
-        log_info "  Lazy loading tests: Available"
-        log_info "  Run: $OSH/scripts/test_lazy_loading.sh"
-      else
-        log_warning "  Lazy loading tests: Not found"
-      fi
-      
     else
-      printf "${RED}✗${NORMAL}\n"
-      add_issue "Lazy loading enabled but lazy_loader.zsh not found"
-      log_error "  Lazy loading system file missing: $OSH/lib/lazy_loader.zsh"
+        log_error "Plugin configuration not found"
+        log_fix "Add this to your ~/.zshrc:"
+        echo -e "${YELLOW}  oplugins=(sysinfo weather taskman)${NC}"
+        return 1
     fi
-  else
-    printf "${YELLOW}⚠${NORMAL}\n"
-    log_warning "  Lazy loading is disabled (OSH_LAZY_LOADING=false)"
-    log_info "  To enable: export OSH_LAZY_LOADING=true"
-  fi
+    
+    return 0
 }
 
-# Check dependencies
-check_dependencies() {
-  log_check "Checking system dependencies... "
-  add_check
-  
-  local deps=("curl" "git")
-  local missing_deps=()
-  
-  for dep in "${deps[@]}"; do
-    if ! command -v "$dep" >/dev/null 2>&1; then
-      missing_deps+=("$dep")
+check_permissions() {
+    echo -e "${CYAN}🔍 Checking File Permissions...${NC}"
+    echo ""
+    
+    if [[ -x "$OSH_DIR/bin/osh" ]]; then
+        log_success "OSH command is executable"
+    else
+        log_error "OSH command is not executable"
+        log_fix "Run: chmod +x $OSH_DIR/bin/osh"
+        return 1
     fi
-  done
-  
-  if [[ ${#missing_deps[@]} -gt 0 ]]; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "Missing dependencies: ${missing_deps[*]}"
-    return 1
-  fi
-  
-  echo "${GREEN}OK${NORMAL}"
-  add_success
-  return 0
+    
+    if [[ -r "$OSH_DIR/osh.sh" ]]; then
+        log_success "Main OSH script is readable"
+    else
+        log_error "Main OSH script is not readable"
+        return 1
+    fi
+    
+    return 0
 }
 
-# Check network connectivity
-check_network() {
-  log_check "Checking network connectivity... "
-  add_check
-  
-  if ! curl -fsSL --connect-timeout 5 --max-time 10 "https://github.com" >/dev/null 2>&1; then
-    echo "${RED}FAILED${NORMAL}"
-    add_issue "Cannot connect to GitHub"
-    return 1
-  fi
-  
-  echo "${GREEN}OK${NORMAL}"
-  add_success
-  return 0
+# Fix functions
+fix_path_configuration() {
+    log_fix "Fixing PATH configuration..."
+    
+    if ! grep -q "export PATH.*OSH/bin" "$ZSHRC_FILE"; then
+        echo 'export PATH="$OSH/bin:$PATH"' >> "$ZSHRC_FILE"
+        log_success "Added OSH bin directory to PATH"
+    fi
+}
+
+fix_permissions() {
+    log_fix "Fixing file permissions..."
+    
+    chmod +x "$OSH_DIR/bin/osh" 2>/dev/null || true
+    chmod +x "$OSH_DIR/scripts/"*.sh 2>/dev/null || true
+    
+    log_success "Fixed file permissions"
+}
+
+# Main diagnostic function
+run_diagnostics() {
+    local fix_mode="$1"
+    local issues=0
+    
+    echo -e "${CYAN}🏥 OSH.IT Doctor - Diagnostic Report${NC}"
+    echo "=================================="
+    echo ""
+    
+    # Run checks
+    check_osh_installation || ((issues++))
+    echo ""
+    
+    check_path_configuration || ((issues++))
+    echo ""
+    
+    check_shell_configuration || ((issues++))
+    echo ""
+    
+    check_plugins || ((issues++))
+    echo ""
+    
+    check_permissions || ((issues++))
+    echo ""
+    
+    # Summary
+    echo -e "${CYAN}📋 Diagnostic Summary${NC}"
+    echo "===================="
+    
+    if [[ $issues -eq 0 ]]; then
+        log_success "All checks passed! OSH.IT is properly configured."
+        echo ""
+        echo -e "${GREEN}🎉 Your OSH.IT installation is healthy!${NC}"
+        echo ""
+        echo "Try these commands:"
+        echo -e "  ${CYAN}osh status${NC}        # Check status"
+        echo -e "  ${CYAN}osh plugin list${NC}   # List plugins"
+        echo -e "  ${CYAN}osh help${NC}          # Show help"
+    else
+        log_error "Found $issues issue(s) that need attention."
+        echo ""
+        
+        if [[ "$fix_mode" == "--fix" ]]; then
+            echo -e "${CYAN}🔧 Attempting to fix issues...${NC}"
+            echo ""
+            
+            fix_path_configuration
+            fix_permissions
+            
+            echo ""
+            log_success "Applied fixes. Please restart your terminal or run:"
+            echo -e "${CYAN}  source ~/.zshrc${NC}"
+        else
+            echo -e "${YELLOW}💡 To automatically fix some issues, run:${NC}"
+            echo -e "${CYAN}  osh doctor --fix${NC}"
+            echo ""
+            echo -e "${YELLOW}💡 Or manually follow the fix suggestions above.${NC}"
+        fi
+    fi
+    
+    echo ""
 }
 
 # Performance test
-performance_test() {
-  log_info "🚀 Running performance test..."
-  
-  local start_time=$(date +%s%N)
-  
-  # Source OSH.IT to measure startup time
-  if [[ -f "$OSH/osh.sh" ]]; then
-    source "$OSH/osh.sh" >/dev/null 2>&1
-  fi
-  
-  local end_time=$(date +%s%N)
-  local startup_time=$(( (end_time - start_time) / 1000000 ))
-  
-  log_info "Startup time: ${startup_time}ms"
-  
-  if [[ $startup_time -lt 100 ]]; then
-    log_success "Excellent performance (< 100ms)"
-  elif [[ $startup_time -lt 500 ]]; then
-    log_success "Good performance (< 500ms)"
-  elif [[ $startup_time -lt 1000 ]]; then
-    log_warning "Moderate performance (< 1s)"
-  else
-    add_warning "Slow startup time: ${startup_time}ms"
-  fi
-}
-
-# Auto-fix common issues
-auto_fix() {
-  log_info "🔧 Attempting to fix common issues..."
-  
-  local fixed_count=0
-  
-  # Fix missing shell configuration
-  if grep -q "OSH.IT not configured" <<< "${ISSUES_FOUND[*]}"; then
-    log_info "Fixing shell configuration..."
+run_performance_test() {
+    echo -e "${CYAN}⚡ OSH.IT Performance Test${NC}"
+    echo "========================="
+    echo ""
     
-    local config_file="$HOME/.zshrc"
-    if [[ -f "$config_file" ]] && ! grep -q "source.*osh.sh" "$config_file"; then
-      echo "" >> "$config_file"
-      echo "# OSH.IT Configuration - Added by osh doctor" >> "$config_file"
-      echo "export OSH=\"$OSH\"" >> "$config_file"
-      echo "source \$OSH/osh.sh" >> "$config_file"
-      
-      log_success "Added OSH.IT configuration to $config_file"
-      fixed_count=$((fixed_count + 1))
+    log_info "Testing shell startup time..."
+    
+    # Test with OSH.IT
+    local start_time=$(date +%s%N)
+    zsh -i -c 'exit' 2>/dev/null || true
+    local end_time=$(date +%s%N)
+    local osh_time=$(( (end_time - start_time) / 1000000 ))
+    
+    echo "Shell startup time: ${osh_time}ms"
+    
+    if [[ $osh_time -lt 500 ]]; then
+        log_success "Excellent performance (< 500ms)"
+    elif [[ $osh_time -lt 1000 ]]; then
+        log_success "Good performance (< 1s)"
+    elif [[ $osh_time -lt 2000 ]]; then
+        log_warning "Acceptable performance (< 2s)"
+    else
+        log_error "Slow performance (> 2s)"
+        log_fix "Consider reducing the number of plugins"
     fi
-  fi
-  
-  # Fix file permissions
-  if [[ -f "$OSH/osh.sh" ]]; then
-    chmod +x "$OSH/osh.sh" 2>/dev/null
-    chmod +x "$OSH/upgrade.sh" 2>/dev/null
-    find "$OSH" -name "*.sh" -exec chmod +x {} \; 2>/dev/null
-    log_success "Fixed file permissions"
-    fixed_count=$((fixed_count + 1))
-  fi
-  
-  if [[ $fixed_count -gt 0 ]]; then
-    log_success "Fixed $fixed_count issues"
-    log_info "Please restart your terminal or run: source ~/.zshrc"
-  else
-    log_info "No auto-fixable issues found"
-  fi
+    
+    echo ""
 }
 
-# Show health report
-show_report() {
-  echo
-  echo "${BOLD}${CYAN}╔══════════════════════════════════════════════════════════════╗${NORMAL}"
-  echo "${BOLD}${CYAN}║                        Health Report                         ║${NORMAL}"
-  echo "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════╝${NORMAL}"
-  echo
-  
-  # Calculate health percentage
-  local health_percentage=0
-  if [[ $TOTAL_CHECKS -gt 0 ]]; then
-    health_percentage=$(( (HEALTH_SCORE * 100) / TOTAL_CHECKS ))
-  fi
-  
-  # Show overall health
-  echo "${BOLD}Overall Health: "
-  if [[ $health_percentage -ge 90 ]]; then
-    echo "${GREEN}$health_percentage% - Excellent! 🎉${NORMAL}"
-  elif [[ $health_percentage -ge 70 ]]; then
-    echo "${YELLOW}$health_percentage% - Good 👍${NORMAL}"
-  elif [[ $health_percentage -ge 50 ]]; then
-    echo "${YELLOW}$health_percentage% - Needs Attention ⚠️${NORMAL}"
-  else
-    echo "${RED}$health_percentage% - Critical Issues ❌${NORMAL}"
-  fi
-  echo
-  
-  # Show detailed results
-  echo "${BOLD}Check Results:${NORMAL}"
-  echo "  ✅ Passed: $HEALTH_SCORE/$TOTAL_CHECKS"
-  echo "  ❌ Issues: ${#ISSUES_FOUND[@]}"
-  echo "  ⚠️  Warnings: ${#WARNINGS_FOUND[@]}"
-  echo
-  
-  # Show issues
-  if [[ ${#ISSUES_FOUND[@]} -gt 0 ]]; then
-    echo "${BOLD}${RED}Issues Found:${NORMAL}"
-    for issue in "${ISSUES_FOUND[@]}"; do
-      echo "  ❌ $issue"
-    done
-    echo
-  fi
-  
-  # Show warnings
-  if [[ ${#WARNINGS_FOUND[@]} -gt 0 ]]; then
-    echo "${BOLD}${YELLOW}Warnings:${NORMAL}"
-    for warning in "${WARNINGS_FOUND[@]}"; do
-      echo "  ⚠️  $warning"
-    done
-    echo
-  fi
-  
-  # Show recommendations
-  if [[ ${#ISSUES_FOUND[@]} -gt 0 ]] || [[ ${#WARNINGS_FOUND[@]} -gt 0 ]]; then
-    echo "${BOLD}${BLUE}Recommendations:${NORMAL}"
-    echo "  1. Run: ${CYAN}osh doctor --fix${NORMAL} to auto-fix common issues"
-    echo "  2. Check the OSH.IT documentation: ${CYAN}https://github.com/oiahoon/osh.it${NORMAL}"
-    echo "  3. Update OSH.IT: ${CYAN}upgrade_myshell${NORMAL}"
-    echo
-  fi
-}
-
-# Show help
+# Help function
 show_help() {
-  cat << EOF
-${BOLD}OSH.IT Doctor v$OSH_DOCTOR_VERSION${NORMAL}
+    cat << 'EOF'
+OSH.IT Doctor - Diagnostic and Fix Tool
 
-${BOLD}USAGE:${NORMAL}
-  osh doctor [OPTIONS]
+USAGE:
+    osh doctor [options]
 
-${BOLD}OPTIONS:${NORMAL}
-  --fix, -f         Attempt to auto-fix common issues
-  --perf, -p        Run performance test
-  --verbose, -v     Show detailed output
-  --help, -h        Show this help message
+OPTIONS:
+    --fix       Automatically fix common issues
+    --perf      Run performance test
+    --help      Show this help message
 
-${BOLD}EXAMPLES:${NORMAL}
-  osh doctor                # Run health check
-  osh doctor --fix          # Run health check and auto-fix issues
-  osh doctor --perf         # Include performance test
-  osh doctor --verbose      # Show detailed information
+EXAMPLES:
+    osh doctor          # Run diagnostics
+    osh doctor --fix    # Run diagnostics and fix issues
+    osh doctor --perf   # Include performance test
 
-${BOLD}HEALTH CHECKS:${NORMAL}
-  • OSH.IT installation integrity
-  • Zsh installation and configuration
-  • Shell configuration
-  • Plugin system
-  • System dependencies
-  • Network connectivity
+The doctor will check:
+- OSH.IT installation
+- PATH configuration
+- Shell configuration
+- Plugin setup
+- File permissions
 
-For more information, visit: https://github.com/oiahoon/osh.it
 EOF
 }
 
 # Main function
 main() {
-  local auto_fix=false
-  local run_perf=false
-  local verbose=false
-  
-  # Parse arguments
-  while [[ $# -gt 0 ]]; do
-    case $1 in
-      --fix|-f)
-        auto_fix=true
-        shift
-        ;;
-      --perf|-p)
-        run_perf=true
-        shift
-        ;;
-      --verbose|-v)
-        verbose=true
-        shift
-        ;;
-      --help|-h)
-        show_help
-        exit 0
-        ;;
-      *)
-        log_error "Unknown option: $1"
-        echo "Use --help for usage information."
-        exit 1
-        ;;
-    esac
-  done
-  
-  show_header
-  
-  # Run health checks
-  log_info "Running OSH.IT health checks..."
-  echo
-  
-  check_installation
-  check_zsh
-  check_shell_config
-  check_plugins
-  check_lazy_loading
-  check_dependencies
-  check_network
-  
-  echo
-  
-  # Run performance test if requested
-  if [[ "$run_perf" == "true" ]]; then
-    performance_test
-    echo
-  fi
-  
-  # Auto-fix if requested
-  if [[ "$auto_fix" == "true" ]]; then
-    auto_fix
-    echo
-  fi
-  
-  # Show final report
-  show_report
-  
-  # Exit with appropriate code
-  if [[ ${#ISSUES_FOUND[@]} -gt 0 ]]; then
-    exit 1
-  else
-    exit 0
-  fi
+    local fix_mode=""
+    local perf_test=""
+    
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --fix)
+                fix_mode="--fix"
+                shift
+                ;;
+            --perf)
+                perf_test="--perf"
+                shift
+                ;;
+            --help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+    
+    run_diagnostics "$fix_mode"
+    
+    if [[ "$perf_test" == "--perf" ]]; then
+        run_performance_test
+    fi
 }
 
-# Export function for global access
-osh_doctor() {
-  "$OSH/scripts/osh_doctor.sh" "$@"
-}
-
-# Run main function if script is executed directly
-if [[ "${BASH_SOURCE[0]:-$0}" == "${0}" ]] || [[ "${(%):-%x}" == "${0}" ]]; then
-  main "$@"
-fi
+# Run main function
+main "$@"

@@ -328,8 +328,10 @@ cmd_preset() {
 cmd_reload() {
     log_info "Reloading OSH.IT configuration..."
     if [[ -f ~/.zshrc ]]; then
-        source ~/.zshrc
-        log_success "Configuration reloaded!"
+        log_success "To reload configuration, please run:"
+        echo -e "${CYAN}  source ~/.zshrc${NC}"
+        echo ""
+        log_info "Or restart your terminal for changes to take effect"
     else
         log_error "Could not find ~/.zshrc"
     fi
@@ -341,6 +343,15 @@ cmd_upgrade() {
         bash "$OSH_DIR/upgrade.sh"
     else
         log_error "Upgrade script not found"
+    fi
+}
+
+cmd_doctor() {
+    if [[ -f "$OSH_DIR/scripts/osh_doctor.sh" ]]; then
+        bash "$OSH_DIR/scripts/osh_doctor.sh" "$@"
+    else
+        log_error "Doctor script not found"
+        log_info "Please reinstall OSH.IT to get the latest version"
     fi
 }
 
@@ -368,6 +379,7 @@ COMMANDS:
       status                 Show OSH.IT status
       reload                 Reload configuration
       upgrade                Upgrade OSH.IT
+      doctor                 Run diagnostics and fix issues
       help                   Show this help message
 
 EXAMPLES:
@@ -406,6 +418,9 @@ main() {
             ;;
         "upgrade")
             cmd_upgrade
+            ;;
+        "doctor")
+            cmd_doctor "$@"
             ;;
         "help"|"--help"|"-h"|"")
             cmd_help

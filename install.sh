@@ -1052,7 +1052,9 @@ main() {
     echo "${BOLD}${BLUE}📋 Next Steps:${NORMAL}"
     echo "  1. Restart your terminal or run: ${CYAN}source $SHELL_CONFIG_FILE${NORMAL}"
     if [[ "$CURRENT_SHELL" == "zsh" ]]; then
-      echo "  2. Try these OSH features:"
+      echo "  2. Try these OSH commands:"
+      echo "     ${CYAN}osh status${NORMAL}           # Check OSH.IT status"
+      echo "     ${CYAN}osh plugin list${NORMAL}      # List available plugins"
       if [[ " ${selected_plugins[*]} " =~ " weather " ]]; then
         echo "     ${CYAN}weather${NORMAL}              # Beautiful weather display"
       fi
@@ -1063,7 +1065,10 @@ main() {
         echo "     ${CYAN}tm${NORMAL}                  # Advanced task manager"
       fi
 
-      echo "  3. Update OSH: ${CYAN}upgrade_myshell${NORMAL}"
+      echo "  3. Manage OSH:"
+      echo "     ${CYAN}osh plugin add <name>${NORMAL} # Add a plugin"
+      echo "     ${CYAN}osh upgrade${NORMAL}          # Update OSH.IT"
+      echo "     ${CYAN}osh help${NORMAL}             # Show all commands"
     else
       echo "  2. For best experience, consider switching to Zsh:"
       echo "     ${CYAN}chsh -s \$(which zsh)${NORMAL}"

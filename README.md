@@ -446,7 +446,31 @@ PLUGIN_DISCOVERY_METHOD=cached ./install.sh
 
 ## 🔧 Troubleshooting
 
+### Quick Diagnostics
+
+```bash
+# Run comprehensive diagnostics
+osh doctor
+
+# Auto-fix common issues
+osh doctor --fix
+
+# Include performance test
+osh doctor --perf
+```
+
 ### Common Issues
+
+**OSH commands not working (osh status, osh plugin add, etc.):**
+```bash
+# Run diagnostics to identify the issue
+osh doctor
+
+# Most common causes:
+# 1. PATH not configured - restart terminal or run: source ~/.zshrc
+# 2. OSH.IT not properly installed - run the installer again
+# 3. File permissions - run: osh doctor --fix
+```
 
 **Plugin not found error:**
 ```bash
