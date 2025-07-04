@@ -47,6 +47,51 @@ add_success() {
   HEALTH_SCORE=$((HEALTH_SCORE + 1))
 }
 
+# Check lazy loading system
+check_lazy_loading() {
+  add_check
+  log_check "Checking lazy loading system... "
+  
+  local lazy_enabled="${OSH_LAZY_LOADING:-true}"
+  
+  if [[ "$lazy_enabled" == "true" ]]; then
+    if [[ -f "$OSH/lib/lazy_loader.zsh" ]]; then
+      printf "${GREEN}✓${NORMAL}\n"
+      add_success
+      log_info "  Lazy loading system: Available"
+      
+      # Test if lazy loading functions are accessible
+      if source "$OSH/lib/lazy_loader.zsh" 2>/dev/null; then
+        if declare -f osh_lazy_register >/dev/null; then
+          log_info "  Lazy loading functions: Working"
+        else
+          log_warning "  Lazy loading functions: Not properly loaded"
+          add_warning "Lazy loading functions not accessible"
+        fi
+      else
+        log_warning "  Lazy loading system: Failed to load"
+        add_warning "Failed to source lazy_loader.zsh"
+      fi
+      
+      # Check if test script exists
+      if [[ -f "$OSH/scripts/test_lazy_loading.sh" ]]; then
+        log_info "  Lazy loading tests: Available"
+      else
+        log_warning "  Lazy loading tests: Not found"
+      fi
+      
+    else
+      printf "${RED}✗${NORMAL}\n"
+      add_issue "Lazy loading enabled but lazy_loader.zsh not found"
+      log_error "  Lazy loading system file missing: $OSH/lib/lazy_loader.zsh"
+    fi
+  else
+    printf "${YELLOW}⚠${NORMAL}\n"
+    log_warning "  Lazy loading is disabled (OSH_LAZY_LOADING=false)"
+    log_info "  To enable: export OSH_LAZY_LOADING=true"
+  fi
+}
+
 add_issue() {
   ISSUES_FOUND+=("$1")
 }
@@ -166,6 +211,52 @@ check_plugins() {
   fi
   
   return 0
+}
+
+# Check lazy loading system
+check_lazy_loading() {
+  add_check
+  log_check "Checking lazy loading system... "
+  
+  local lazy_enabled="${OSH_LAZY_LOADING:-true}"
+  
+  if [[ "$lazy_enabled" == "true" ]]; then
+    if [[ -f "$OSH/lib/lazy_loader.zsh" ]]; then
+      printf "${GREEN}✓${NORMAL}\n"
+      add_success
+      log_info "  Lazy loading system: Available"
+      
+      # Test if lazy loading functions are accessible
+      if source "$OSH/lib/lazy_loader.zsh" 2>/dev/null; then
+        if declare -f osh_lazy_register >/dev/null; then
+          log_info "  Lazy loading functions: Working"
+        else
+          log_warning "  Lazy loading functions: Not properly loaded"
+          add_warning "Lazy loading functions not accessible"
+        fi
+      else
+        log_warning "  Lazy loading system: Failed to load"
+        add_warning "Failed to source lazy_loader.zsh"
+      fi
+      
+      # Check if test script exists
+      if [[ -f "$OSH/scripts/test_lazy_loading.sh" ]]; then
+        log_info "  Lazy loading tests: Available"
+        log_info "  Run: $OSH/scripts/test_lazy_loading.sh"
+      else
+        log_warning "  Lazy loading tests: Not found"
+      fi
+      
+    else
+      printf "${RED}✗${NORMAL}\n"
+      add_issue "Lazy loading enabled but lazy_loader.zsh not found"
+      log_error "  Lazy loading system file missing: $OSH/lib/lazy_loader.zsh"
+    fi
+  else
+    printf "${YELLOW}⚠${NORMAL}\n"
+    log_warning "  Lazy loading is disabled (OSH_LAZY_LOADING=false)"
+    log_info "  To enable: export OSH_LAZY_LOADING=true"
+  fi
 }
 
 # Check dependencies
@@ -412,6 +503,7 @@ main() {
   check_zsh
   check_shell_config
   check_plugins
+  check_lazy_loading
   check_dependencies
   check_network
   
@@ -446,6 +538,6 @@ osh_doctor() {
 }
 
 # Run main function if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]:-$0}" == "${0}" ]] || [[ "${(%):-%x}" == "${0}" ]]; then
   main "$@"
 fi

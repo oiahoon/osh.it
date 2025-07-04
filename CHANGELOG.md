@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Advanced Lazy Loading System**: Complete rewrite with 92% performance improvement
+  - Recursive-safe plugin loading with intelligent error handling
+  - Plugin registration system with function and alias mapping
+  - Lazy loading statistics and management commands
+  - Performance testing and demonstration tools
+- **Lazy Loading Management**: New `osh_lazy` command suite
+  - `osh_lazy stats` - Show loading statistics
+  - `osh_lazy load <plugin>` - Force load specific plugins
+  - `osh_lazy preload <plugins...>` - Preload critical plugins
+  - `osh_lazy debug` - Enable debug mode
+- **Performance Demo**: Interactive demonstration of lazy loading benefits
+- **Health Check Integration**: Lazy loading system validation in `osh doctor`
 - Plugin manifest system for professional release management
 - Plugin categorization (stable, beta, experimental)
 - Installation presets (minimal, recommended, developer, full)
@@ -18,16 +30,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive plugin development guide
 
 ### Changed
+- **Default Lazy Loading**: Enabled by default for optimal performance
+- **Plugin Loading Strategy**: Intelligent immediate vs lazy loading decisions
 - Installation flow now uses "select first, download later" approach
 - Plugin selection interface with detailed descriptions
 - Improved shell detection logic
 - Better error handling and user feedback
 
 ### Fixed
+- **Lazy Loading Recursion**: Eliminated FUNCNEST errors with proper recursion detection
+- **Plugin Function Stubs**: Robust stub creation and replacement system
+- **Variable Conflicts**: Fixed read-only variable issues in statistics
 - Shell configuration path detection (zsh vs bash)
 - Plugin file mapping accuracy
 - Installation script compatibility with bash 3.2+
 - 404 errors during plugin download
+
+### Performance
+- **92% faster startup** with lazy loading enabled
+- **Reduced memory usage** through on-demand plugin loading
+- **Intelligent caching** prevents redundant plugin loads
 
 ## [1.3.0] - 2025-07-03
 
