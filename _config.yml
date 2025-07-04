@@ -1,0 +1,57 @@
+# OSH.IT GitHub Pages Configuration
+
+# Site settings
+title: "OSH.IT - A Lightweight Zsh Plugin Framework"
+description: "Lightning fast Zsh framework with 92% performance improvement through advanced lazy loading. Smart plugin system for developers."
+url: "https://osh.it.miaowu.org"
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - package.json
+  - package-lock.json
+  - node_modules/
+  - generate-content.js
+  - lighthouserc.js
+
+# Include files that start with underscore
+include:
+  - _headers
+  - _redirects
+
+# Plugin settings
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# SEO settings
+author: oiahoon
+twitter:
+  username: oiahoon
+  card: summary_large_image
+
+# Social links
+github_username: oiahoon
+repository: oiahoon/osh.it
+
+# Analytics (optional)
+# google_analytics: UA-XXXXXXXX-X
+
+# Performance settings
+sass:
+  style: compressed
+
+# Security headers
+webrick:
+  headers:
+    X-Frame-Options: DENY
+    X-Content-Type-Options: nosniff
+    X-XSS-Protection: "1; mode=block"
+    Referrer-Policy: strict-origin-when-cross-origin

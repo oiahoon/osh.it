@@ -1,0 +1,82 @@
+{
+  "generated": "2025-07-04T05:08:56.912Z",
+  "version": "1.4.0",
+  "plugins": {
+    "total": 7,
+    "by_category": {
+      "stable": 0,
+      "beta": 0,
+      "experimental": 7
+    },
+    "details": {
+      "stable": [],
+      "beta": [],
+      "experimental": [
+        {
+          "name": "acw",
+          "description": "Plugin description not available",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/acw"
+        },
+        {
+          "name": "example",
+          "description": "Example plugin demonstrating auto-update features",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/example"
+        },
+        {
+          "name": "fzf",
+          "description": "Plugin description not available",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/fzf"
+        },
+        {
+          "name": "greeting",
+          "description": "OSH.IT Greeting Plugin",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/greeting"
+        },
+        {
+          "name": "sysinfo",
+          "description": "🖥️ Sysinfo Plugin",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/sysinfo"
+        },
+        {
+          "name": "taskman",
+          "description": "OSH Taskman Plugin 🎨 VINTAGE EDITION",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/taskman"
+        },
+        {
+          "name": "weather",
+          "description": "OSH Weather Plugin",
+          "version": "1.0.0",
+          "path": "/Users/johuang/Work/osh/plugins/weather"
+        }
+      ]
+    }
+  },
+  "features": {
+    "count": 13,
+    "list": [
+      "🚀 **Lightning Fast**: Minimal overhead with smart plugin loading",
+      "⚡ **Advanced Lazy Loading**: 92% faster startup with on-demand plugin loading",
+      "🔌 **Smart Plugin System**: Intelligent plugin discovery and management",
+      "📋 **Plugin Manifest**: Professional plugin release management with categories",
+      "🛠️ **Built-in Utilities**: Comes with practical plugins for daily development",
+      "📦 **Easy Installation**: One-command setup with automatic configuration",
+      "🎯 **Developer Focused**: Built by developers, for developers",
+      "🔧 **Highly Customizable**: Flexible configuration without complexity",
+      "**GitHub Amazon Q Developer**: Native GitHub integration (no additional setup required)",
+      "**Enhanced Requirement Analysis**: Deep understanding with implementation strategies",
+      "**Interactive Analysis**: AI-driven requirement clarification",
+      "**Automatic Code Generation**: Complete implementations with tests and documentation",
+      "**Smart Permission Management**: Automatic diagnosis and fixing of permission issues"
+    ]
+  },
+  "changes": {
+    "count": 0,
+    "list": []
+  }
+}

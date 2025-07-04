@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSH.IT - A Lightweight Zsh Plugin Framework</title>
+    <meta name="description" content="OSH.IT is a fast, lightweight, and extensible Zsh plugin framework with advanced lazy loading and 92% performance improvement.">
+    <meta name="keywords" content="zsh, shell, plugin, framework, terminal, lazy loading, performance">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://oiahoon.github.io/osh.it/">
+  <meta property="og:title" content="OSH.IT - A Lightweight Zsh Plugin Framework">
+  <meta property="og:description" content="Lightning fast Zsh framework with 92% performance improvement through advanced lazy loading. Smart plugin system for developers.">
+  <meta property="og:image" content="https://oiahoon.github.io/osh.it/og-image.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://oiahoon.github.io/osh.it/">
+  <meta property="twitter:title" content="OSH.IT - A Lightweight Zsh Plugin Framework">
+  <meta property="twitter:description" content="Lightning fast Zsh framework with 92% performance improvement through advanced lazy loading. Smart plugin system for developers.">
+  <meta property="twitter:image" content="https://oiahoon.github.io/osh.it/og-image.png">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "OSH.IT",
+    "description": "A lightweight Zsh plugin framework with advanced lazy loading and 92% performance improvement",
+    "url": "https://oiahoon.github.io/osh.it/",
+    "downloadUrl": "https://github.com/oiahoon/osh.it",
+    "version": "1.1.0",
+    "operatingSystem": "Linux, macOS",
+    "applicationCategory": "DeveloperApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "oiahoon",
+      "url": "https://github.com/oiahoon"
+    }
+  }
+  </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="terminal-container">
+        <!-- Header Terminal -->
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="btn close"></span>
+                    <span class="btn minimize"></span>
+                    <span class="btn maximize"></span>
+                </div>
+                <div class="terminal-title">OSH.IT Terminal</div>
+            </div>
+            <div class="terminal-body">
+                <div class="terminal-content">
+                    <div class="ascii-logo">
+                        <pre id="logo-text"></pre>
+                    </div>
+                    <div class="terminal-prompt">
+                        <span class="prompt">$</span> <span class="command typing-animation">echo "Welcome to OSH.IT - The Future of Zsh"</span>
+                    </div>
+                    <div class="output">
+                        <p class="highlight">🚀 Lightning Fast • ⚡ 92% Performance Boost • 🔌 Smart Plugins</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="retro-nav">
+            <div class="nav-container">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#installation" class="nav-link">Installation</a>
+                <a href="#plugins" class="nav-link">Plugins</a>
+                <a href="#performance" class="nav-link">Performance</a>
+                <a href="#docs" class="nav-link">Documentation</a>
+                <a href="https://github.com/oiahoon/osh.it" class="nav-link github-link" target="_blank">GitHub</a>
+            </div>
+        </nav>
+
+        <!-- Features Section -->
+        <section id="features" class="section">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn close"></span>
+                        <span class="btn minimize"></span>
+                        <span class="btn maximize"></span>
+                    </div>
+                    <div class="terminal-title">Features Overview</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3>Advanced Lazy Loading</h3>
+                            <p>92% faster startup with intelligent on-demand plugin loading</p>
+                            <div class="feature-demo">
+                                <code>$ time zsh -i -c exit<br>
+                                <span class="success">0.011s</span> vs <span class="error">0.138s</span></code>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔌</div>
+                            <h3>Smart Plugin System</h3>
+                            <p>Professional plugin management with categories and dependencies</p>
+                            <div class="feature-demo">
+                                <code>$ osh_lazy stats<br>
+                                <span class="info">5 plugins registered</span><br>
+                                <span class="success">2 loaded on-demand</span></code>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🛠️</div>
+                            <h3>Built-in Utilities</h3>
+                            <p>Weather, system info, task manager, and development tools</p>
+                            <div class="feature-demo">
+                                <code>$ weather Tokyo<br>
+                                <span class="info">☀️ +78°F • →7mph</span></code>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h3>Developer Focused</h3>
+                            <p>Git workflow automation, JIRA integration, and productivity tools</p>
+                            <div class="feature-demo">
+                                <code>$ acw feature-123<br>
+                                <span class="success">Branch created</span></code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section id="installation" class="section">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn close"></span>
+                        <span class="btn minimize"></span>
+                        <span class="btn maximize"></span>
+                    </div>
+                    <div class="terminal-title">Quick Installation</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="installation-content">
+                        <div class="install-step">
+                            <h3>🚀 One-Command Installation</h3>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Terminal</span>
+                                    <button class="copy-btn" data-copy="sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)&quot;">Copy</button>
+                                </div>
+                                <pre><code>$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"</code></pre>
+                            </div>
+                        </div>
+                        
+                        <div class="install-step">
+                            <h3>🇨🇳 China Mirror (Faster)</h3>
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-title">Terminal</span>
+                                    <button class="copy-btn" data-copy="OSH_MIRROR=gitee sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)&quot;">Copy</button>
+                                </div>
+                                <pre><code>$ OSH_MIRROR=gitee sh -c "$(curl -fsSL https://raw.githubusercontent.com/oiahoon/osh.it/main/install.sh)"</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="install-options">
+                            <h3>📦 Installation Presets</h3>
+                            <div class="preset-grid">
+                                <div class="preset-card">
+                                    <h4>Minimal</h4>
+                                    <p>Basic functionality only</p>
+                                    <code>--plugins "preset:minimal"</code>
+                                </div>
+                                <div class="preset-card recommended">
+                                    <h4>Recommended</h4>
+                                    <p>Perfect for most users</p>
+                                    <code>--plugins "preset:recommended"</code>
+                                </div>
+                                <div class="preset-card">
+                                    <h4>Developer</h4>
+                                    <p>Includes beta plugins</p>
+                                    <code>--plugins "preset:developer"</code>
+                                </div>
+                                <div class="preset-card">
+                                    <h4>Full</h4>
+                                    <p>All stable plugins</p>
+                                    <code>--plugins "preset:full"</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Section -->
+        <section id="performance" class="section">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn close"></span>
+                        <span class="btn minimize"></span>
+                        <span class="btn maximize"></span>
+                    </div>
+                    <div class="terminal-title">Performance Benchmark</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="performance-content">
+                        <div class="benchmark-chart">
+                            <h3>🚀 Startup Time Comparison</h3>
+                            <div class="chart-container">
+                                <div class="chart-bar">
+                                    <div class="bar-label">Traditional Loading</div>
+                                    <div class="bar traditional" data-value="138">
+                                        <span class="bar-value">138ms</span>
+                                    </div>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="bar-label">OSH.IT Lazy Loading</div>
+                                    <div class="bar oshit" data-value="11">
+                                        <span class="bar-value">11ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="improvement-badge">
+                                <span class="improvement-text">92% Faster</span>
+                            </div>
+                        </div>
+
+                        <div class="performance-features">
+                            <div class="perf-feature">
+                                <div class="perf-icon">⚡</div>
+                                <h4>Lazy Loading</h4>
+                                <p>Plugins loaded only when needed</p>
+                            </div>
+                            <div class="perf-feature">
+                                <div class="perf-icon">🧠</div>
+                                <h4>Smart Caching</h4>
+                                <p>Intelligent plugin state management</p>
+                            </div>
+                            <div class="perf-feature">
+                                <div class="perf-icon">🔄</div>
+                                <h4>Zero Overhead</h4>
+                                <p>Minimal memory footprint</p>
+                            </div>
+                        </div>
+
+                        <div class="demo-section">
+                            <h3>🎭 Try the Demo</h3>
+                            <div class="code-block">
+                                <pre><code>$ $OSH/scripts/lazy_loading_demo.sh
+<span class="success">🚀 OSH.IT Lazy Loading Performance Demo</span>
+
+<span class="info">Immediate Loading:  138 ms</span>
+<span class="info">Lazy Loading:        11 ms</span>
+<span class="success">Improvement:        127 ms (92% faster)</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Plugins Section -->
+        <section id="plugins" class="section">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn close"></span>
+                        <span class="btn minimize"></span>
+                        <span class="btn maximize"></span>
+                    </div>
+                    <div class="terminal-title">Plugin Ecosystem</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="plugins-content">
+                        <div class="plugin-categories">
+                            <div class="category stable">
+                                <h3>🟢 Stable Plugins</h3>
+                                <p>Production-ready for all users</p>
+                                <div class="plugin-list">
+                                    <div class="plugin-item">
+                                        <h4>🌤️ Weather</h4>
+                                        <p>Beautiful weather forecast with ASCII art</p>
+                                        <code>weather Tokyo</code>
+                                    </div>
+                                    <div class="plugin-item">
+                                        <h4>🖥️ Sysinfo</h4>
+                                        <p>System information with OSH branding</p>
+                                        <code>sysinfo</code>
+                                    </div>
+                                    <div class="plugin-item">
+                                        <h4>📋 Taskman</h4>
+                                        <p>Advanced terminal task manager</p>
+                                        <code>tm add "Complete project"</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="category beta">
+                                <h3>🟡 Beta Plugins</h3>
+                                <p>Advanced features for power users</p>
+                                <div class="plugin-list">
+                                    <div class="plugin-item">
+                                        <h4>🔧 ACW</h4>
+                                        <p>Advanced Code Workflow with Git + JIRA</p>
+                                        <code>acw feature-123</code>
+                                    </div>
+                                    <div class="plugin-item">
+                                        <h4>🔍 FZF</h4>
+                                        <p>Enhanced fuzzy finder with preview</p>
+                                        <code>pp filename</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="category experimental">
+                                <h3>🟠 Experimental</h3>
+                                <p>Cutting-edge features in development</p>
+                                <div class="plugin-list">
+                                    <div class="plugin-item">
+                                        <h4>👋 Greeting</h4>
+                                        <p>Friendly welcome messages</p>
+                                        <code>Auto-loaded on startup</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="plugin-management">
+                            <h3>🎛️ Plugin Management</h3>
+                            <div class="management-commands">
+                                <div class="cmd-group">
+                                    <h4>Lazy Loading Control</h4>
+                                    <code>osh_lazy stats</code>
+                                    <code>osh_lazy load weather</code>
+                                    <code>osh_lazy preload weather taskman</code>
+                                </div>
+                                <div class="cmd-group">
+                                    <h4>Health & Diagnostics</h4>
+                                    <code>osh doctor</code>
+                                    <code>osh doctor --fix</code>
+                                    <code>osh doctor --perf</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentation Section -->
+        <section id="docs" class="section">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn close"></span>
+                        <span class="btn minimize"></span>
+                        <span class="btn maximize"></span>
+                    </div>
+                    <div class="terminal-title">Documentation & Resources</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="docs-content">
+                        <div class="docs-grid">
+                            <div class="doc-card">
+                                <div class="doc-icon">📚</div>
+                                <h3>Getting Started</h3>
+                                <p>Complete installation and configuration guide</p>
+                                <a href="https://github.com/oiahoon/osh.it#quick-start" class="doc-link">Read Guide →</a>
+                            </div>
+                            <div class="doc-card">
+                                <div class="doc-icon">🔌</div>
+                                <h3>Plugin Development</h3>
+                                <p>Create your own plugins with our comprehensive guide</p>
+                                <a href="https://github.com/oiahoon/osh.it/blob/main/PLUGIN_DEVELOPMENT_GUIDE.md" class="doc-link">Learn More →</a>
+                            </div>
+                            <div class="doc-card">
+                                <div class="doc-icon">⚡</div>
+                                <h3>Lazy Loading</h3>
+                                <p>Understanding the advanced lazy loading system</p>
+                                <a href="https://github.com/oiahoon/osh.it#lazy-loading-system" class="doc-link">Explore →</a>
+                            </div>
+                            <div class="doc-card">
+                                <div class="doc-icon">🛠️</div>
+                                <h3>Configuration</h3>
+                                <p>Customize OSH.IT to fit your workflow</p>
+                                <a href="https://github.com/oiahoon/osh.it#configuration" class="doc-link">Configure →</a>
+                            </div>
+                            <div class="doc-card">
+                                <div class="doc-icon">🐛</div>
+                                <h3>Troubleshooting</h3>
+                                <p>Common issues and solutions</p>
+                                <a href="https://github.com/oiahoon/osh.it#troubleshooting" class="doc-link">Get Help →</a>
+                            </div>
+                            <div class="doc-card">
+                                <div class="doc-icon">🤝</div>
+                                <h3>Contributing</h3>
+                                <p>Join the OSH.IT community</p>
+                                <a href="https://github.com/oiahoon/osh.it/blob/main/CONTRIBUTING.md" class="doc-link">Contribute →</a>
+                            </div>
+                        </div>
+
+                        <div class="community-section">
+                            <h3>🌟 Community & Support</h3>
+                            <div class="community-links">
+                                <a href="https://github.com/oiahoon/osh.it/issues" class="community-link">
+                                    <span class="link-icon">🐛</span>
+                                    <span class="link-text">Report Issues</span>
+                                </a>
+                                <a href="https://github.com/oiahoon/osh.it/discussions" class="community-link">
+                                    <span class="link-icon">💬</span>
+                                    <span class="link-text">Discussions</span>
+                                </a>
+                                <a href="https://github.com/oiahoon/osh.it" class="community-link">
+                                    <span class="link-icon">⭐</span>
+                                    <span class="link-text">Star on GitHub</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span class="btn close"></span>
+                        <span class="btn minimize"></span>
+                        <span class="btn maximize"></span>
+                    </div>
+                    <div class="terminal-title">OSH.IT v1.4.0</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="footer-content">
+                        <div class="footer-info">
+                            <p>Made with ❤️ by <a href="https://github.com/oiahoon">oiahoon</a></p>
+                            <p>Licensed under <a href="https://github.com/oiahoon/osh.it/blob/main/LICENSE">MIT License</a></p>
+                        </div>
+                        <div class="footer-stats">
+                            <div class="stat">
+                                <span class="stat-value" id="github-stars">⭐</span>
+                                <span class="stat-label">GitHub Stars</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">92%</span>
+                                <span class="stat-label">Performance Boost</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">2</span>
+                <span class="stat-label">Built-in Plugins</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

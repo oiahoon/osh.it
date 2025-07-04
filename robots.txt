@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://oiahoon.github.io/osh.it/sitemap.xml

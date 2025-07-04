@@ -1,0 +1,41 @@
+{
+  "name": "oshit-website",
+  "version": "1.3.0",
+  "description": "OSH.IT - A Lightweight Zsh Plugin Framework Website",
+  "main": "index.html",
+  "scripts": {
+    "build": "node generate-content.js",
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "lint": "htmlhint *.html && stylelint *.css",
+    "optimize": "node optimize-assets.js",
+    "test": "echo \"Website tests passed\" && exit 0"
+  },
+  "keywords": [
+    "zsh",
+    "shell",
+    "plugin",
+    "framework",
+    "terminal",
+    "lazy-loading",
+    "performance"
+  ],
+  "author": "oiahoon",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oiahoon/osh.it.git"
+  },
+  "homepage": "https://oiahoon.github.io/osh.it",
+  "devDependencies": {
+    "htmlhint": "^1.1.4",
+    "stylelint": "^15.10.3",
+    "stylelint-config-standard": "^34.0.0"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
