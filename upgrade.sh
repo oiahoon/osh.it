@@ -87,11 +87,6 @@ show_progress_bar() {
     printf "\n"
   fi
 }
-  else
-    log_error "Neither curl nor wget is available"
-    return 1
-  fi
-}
 
 # Essential files to update (same as installation)
 declare -a ESSENTIAL_FILES=(
@@ -217,30 +212,6 @@ update_files() {
   else
     log_success "✅ All files updated successfully!"
   fi
-    current=$((current + 1))
-    printf "\r${BLUE}[%d/%d]${NORMAL} Updating %s..." "$current" "$total_files" "$file"
-    
-    local url="${OSH_REPO_BASE}/${file}"
-    local output="${OSH_DIR}/${file}"
-    
-    # Create directory if it doesn't exist
-    mkdir -p "$(dirname "$output")"
-    
-    if ! download_file "$url" "$output"; then
-      failed_files+=("$file")
-    fi
-  done
-  
-  echo  # New line after progress
-  
-  if [[ ${#failed_files[@]} -gt 0 ]]; then
-    log_error "❌ Failed to update some files:"
-    printf '%s\n' "${failed_files[@]}"
-    exit 1
-  fi
-  
-  log_success "✅ All files updated successfully"
-  log_info "💡 Excluded: docs/, tools/, .github/ (not needed for users)"
 }
 
 # Set permissions
@@ -276,6 +247,11 @@ main() {
   log_success "📦 Updated to version: $LATEST_VERSION"
   echo
   log_info "💡 Restart your terminal or run: source ~/.zshrc"
+  echo
+  log_info "🌐 Resources:"
+  log_info "  • Official Website: https://oiahoon.github.io/osh.it/"
+  log_info "  • Documentation: https://github.com/oiahoon/osh.it/wiki"
+  log_info "  • Support: https://github.com/oiahoon/osh.it/issues"
   echo
   log_success "Happy shell customization! 🐚✨"
 }

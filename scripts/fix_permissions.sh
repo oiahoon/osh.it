@@ -80,3 +80,8 @@ fi
 
 echo ""
 log_success "Permission fix completed!"
+echo ""
+log_info "🌐 Resources:"
+echo "  • Official Website: https://oiahoon.github.io/osh.it/"
+echo "  • Documentation: https://github.com/oiahoon/osh.it/wiki"
+echo "  • Support: https://github.com/oiahoon/osh.it/issues"

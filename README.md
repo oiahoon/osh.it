@@ -9,6 +9,8 @@
 
 *A fast, lightweight, and extensible Zsh plugin framework designed for developers who want power without bloat.*
 
+🌐 **[Official Website](https://oiahoon.github.io/osh.it/)** | 📚 **[Documentation](https://github.com/oiahoon/osh.it/wiki)** | 🐛 **[Issues](https://github.com/oiahoon/osh.it/issues)**
+
 </div>
 
 ## ✨ Features
@@ -646,6 +648,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
+- 🌐 **Official Website**: [https://oiahoon.github.io/osh.it/](https://oiahoon.github.io/osh.it/)
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/oiahoon/osh.it/issues)
 - 💡 **Feature Requests**: [GitHub Discussions](https://github.com/oiahoon/osh.it/discussions)
 - 📖 **Documentation**: [Wiki](https://github.com/oiahoon/osh.it/wiki)

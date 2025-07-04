@@ -1087,6 +1087,11 @@ main() {
       echo "     ${CYAN}chsh -s \$(which zsh)${NORMAL}"
     fi
     echo
+    echo "${BOLD}${BLUE}🌐 Resources:${NORMAL}"
+    echo "  • Official Website: ${CYAN}https://oiahoon.github.io/osh.it/${NORMAL}"
+    echo "  • Documentation: ${CYAN}https://github.com/oiahoon/osh.it/wiki${NORMAL}"
+    echo "  • Support: ${CYAN}https://github.com/oiahoon/osh.it/issues${NORMAL}"
+    echo
   else
     echo
     log_success "Dry run completed successfully!"
