@@ -3,6 +3,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'plugins/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'VERSION'
+      - 'package.json'
   workflow_dispatch:
 
 permissions:
@@ -31,9 +38,12 @@ jobs:
         with:
           enablement: true
 
-      - name: Generate content
+      - name: Generate enhanced content
         run: |
           cd docs
+          echo "🔄 Running enhanced content generation..."
+          node enhanced-content-generator.js
+          echo "🔄 Running standard content generation..."
           node generate-content.js
 
       - name: Upload artifact
