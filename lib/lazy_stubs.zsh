@@ -54,8 +54,8 @@ newb() {
 }
 
 # Aliases
-alias tm="tasks"
-alias taskman="tasks"
+alias tm="TASKMAN_EXPLICIT_CALL=1 tasks ui"  # tm always launches UI explicitly
+alias taskman="TASKMAN_EXPLICIT_CALL=1 tasks"
 alias wtr="weather"
 alias forecast="weather -d"
 alias oshinfo="sysinfo"

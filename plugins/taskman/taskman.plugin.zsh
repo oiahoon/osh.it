@@ -90,12 +90,37 @@ _taskman_init() {
 
 # Main task manager function
 tasks() {
+    # Safety check: Don't auto-start if called without explicit user action
+    if [[ -z "${1:-}" && -z "${TASKMAN_EXPLICIT_CALL:-}" ]]; then
+        # Check if this is being called from a user terminal session
+        if [[ -z "${PS1:-}" ]]; then
+            # Not in interactive shell, don't auto-start
+            return 0
+        fi
+    fi
+    
     _taskman_main "$@"
 }
 
 # Main task manager function (internal)
 _taskman_main() {
     local action="${1:-}"
+
+    # CRITICAL: Prevent auto-start unless explicitly called
+    if [[ -z "$action" && -z "${TASKMAN_EXPLICIT_CALL:-}" ]]; then
+        # Show help instead of launching UI
+        osh_vintage_info "🎯 OSH Taskman - Terminal Task Manager"
+        osh_vintage_info "Usage:"
+        echo "  tasks ui       # Launch interactive UI"
+        echo "  tasks add      # Add a new task"
+        echo "  tasks list     # List all tasks"
+        echo "  tasks setup    # Run setup wizard"
+        echo "  tasks config   # Show configuration"
+        echo
+        osh_vintage_info "💡 Use 'tasks ui' to launch the full interface"
+        osh_vintage_info "💡 Use 'tm' for quick UI access"
+        return 0
+    fi
 
     # Only shift if there are arguments
     if [[ $# -gt 0 ]]; then
@@ -460,10 +485,10 @@ EOF
 }
 
 # Aliases for convenience
-alias taskman='tasks'
-alias tm='tasks'
-alias task='tasks'
-alias todo='tasks'
+alias taskman='TASKMAN_EXPLICIT_CALL=1 tasks'
+alias tm='TASKMAN_EXPLICIT_CALL=1 tasks ui'  # tm always launches UI explicitly
+alias task='TASKMAN_EXPLICIT_CALL=1 tasks'
+alias todo='TASKMAN_EXPLICIT_CALL=1 tasks'
 
 # Auto-completion for task actions
 if [[ -n "$ZSH_VERSION" ]] && command -v compdef >/dev/null 2>&1; then
@@ -511,6 +536,8 @@ task-sidebar() {
 # Uncomment the next line if you want to see task summary when opening terminal
 # _taskman_startup_summary
 
+# IMPORTANT: This function should NEVER be called automatically
+# It's only for manual invocation or when explicitly uncommented above
 _taskman_startup_summary() {
     local data_file="${TASKMAN_DATA_FILE:-$TASKMAN_DATA_DIR/tasks.json}"
     

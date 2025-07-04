@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# OSH.IT Command Wrapper
+# Provides the main 'osh' command
+
+# Find OSH installation directory
+if [[ -n "$OSH" ]]; then
+    OSH_DIR="$OSH"
+elif [[ -d "$HOME/.osh" ]]; then
+    OSH_DIR="$HOME/.osh"
+else
+    echo "Error: OSH.IT installation not found" >&2
+    exit 1
+fi
+
+# Execute the main CLI script
+exec "$OSH_DIR/scripts/osh_cli.sh" "$@"

@@ -3,7 +3,7 @@
 # 基于官方插件清单的管理系统
 
 # 配置
-MANIFEST_URL="${OSH_MANIFEST_URL:-https://raw.githubusercontent.com/oiahoon/osh/master/PLUGIN_MANIFEST.json}"
+MANIFEST_URL="${OSH_MANIFEST_URL:-https://raw.githubusercontent.com/oiahoon/osh.it/main/PLUGIN_MANIFEST.json}"
 MANIFEST_CACHE="/tmp/osh_plugin_manifest.json"
 MANIFEST_TTL=3600  # 1小时缓存
 
@@ -286,7 +286,7 @@ enhanced_plugin_selection_with_manifest() {
 # 验证插件可用性
 verify_plugin_availability() {
   local plugin="$1"
-  local base_url="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh/master}"
+  local base_url="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh.it/main}"
   
   # 从清单获取插件文件列表
   local plugin_files
