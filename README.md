@@ -656,7 +656,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔄 Version History
 
-### v1.4.0 (Latest)
+### v1.4.1 (Latest)
+- ✅ **Self-Updating Scripts**: Both `install.sh` and `upgrade.sh` now automatically update themselves before execution
+- ✅ **Smart Version Checking**: Upgrade command now checks if update is needed and exits gracefully if already up-to-date
+- ✅ **Enhanced User Experience**: Improved upgrade messages with helpful diagnostics suggestions
+- ✅ **Bug Fixes**: Fixed missing `show_progress_with_file` function in upgrade script
+- ✅ **Automatic Fallback**: Graceful handling of network issues during self-update
+
+### v1.4.0
 - ✅ **Modern CLI Interface**: New `osh` command with subcommand structure
 - ✅ **Enhanced Plugin Management**: `osh plugin add/remove/list/info` commands
 - ✅ **Improved User Experience**: Modern command style following industry standards
