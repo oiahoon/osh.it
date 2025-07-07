@@ -982,6 +982,41 @@ EOF
 }
 
 # Main function
+# Update installer script itself first
+update_installer_script() {
+  # Skip self-update in dry-run mode
+  if [[ "$DRY_RUN" == "true" ]]; then
+    return 0
+  fi
+  
+  log_info "🔄 Ensuring installer is up to date..."
+  local temp_installer="/tmp/osh_install_latest.sh"
+  
+  if download_file "${OSH_REPO_BASE}/install.sh" "$temp_installer"; then
+    # Verify downloaded file is valid
+    if [[ -s "$temp_installer" ]] && bash -n "$temp_installer" 2>/dev/null; then
+      # Check if current script is different from latest
+      if ! diff -q "$0" "$temp_installer" >/dev/null 2>&1; then
+        log_info "📥 Updating installer to latest version..."
+        log_success "✅ Installer updated, restarting with latest version..."
+        echo
+        
+        # Re-execute with updated script, preserving all arguments
+        exec bash "$temp_installer" "$@"
+      else
+        log_success "✅ Installer is already up to date"
+      fi
+    else
+      log_warning "⚠️  Downloaded installer appears invalid, continuing with current version"
+    fi
+    
+    # Clean up temp file
+    rm -f "$temp_installer" 2>/dev/null || true
+  else
+    log_warning "⚠️  Could not download latest installer, continuing with current version"
+  fi
+}
+
 main() {
   detect_environment
   setup_colors
@@ -1000,6 +1035,9 @@ main() {
   
   # Setup mirror source
   setup_mirror_source
+  
+  # Update installer script itself first
+  update_installer_script
   
   # Check network connectivity (skip in dry-run for faster testing)
   if [[ "$DRY_RUN" != "true" ]]; then

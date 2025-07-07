@@ -266,6 +266,44 @@ fix_permissions() {
   log_success "✅ Permissions fixed"
 }
 
+# Update upgrade script itself first
+update_upgrade_script() {
+  log_info "🔄 Ensuring upgrade script is up to date..."
+  local temp_upgrade="/tmp/osh_upgrade_latest.sh"
+  
+  if download_file "${OSH_REPO_BASE}/upgrade.sh" "$temp_upgrade"; then
+    # Verify downloaded file is valid
+    if [[ -s "$temp_upgrade" ]] && bash -n "$temp_upgrade" 2>/dev/null; then
+      # Check if current script is different from latest
+      if ! diff -q "$0" "$temp_upgrade" >/dev/null 2>&1; then
+        log_info "📥 Updating upgrade script to latest version..."
+        
+        # Backup current script
+        cp "$OSH_DIR/upgrade.sh" "$OSH_DIR/upgrade.sh.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+        
+        # Replace with latest version
+        cp "$temp_upgrade" "$OSH_DIR/upgrade.sh"
+        chmod +x "$OSH_DIR/upgrade.sh"
+        
+        log_success "✅ Upgrade script updated, restarting..."
+        echo
+        
+        # Re-execute with updated script
+        exec "$OSH_DIR/upgrade.sh" "$@"
+      else
+        log_success "✅ Upgrade script is already up to date"
+      fi
+    else
+      log_warning "⚠️  Downloaded upgrade script appears invalid, continuing with current version"
+    fi
+    
+    # Clean up temp file
+    rm -f "$temp_upgrade" 2>/dev/null || true
+  else
+    log_warning "⚠️  Could not download latest upgrade script, continuing with current version"
+  fi
+}
+
 # Main upgrade function
 main() {
   setup_colors
@@ -275,6 +313,7 @@ main() {
   echo
   
   check_installation
+  update_upgrade_script
   check_versions
   create_backup
   update_files

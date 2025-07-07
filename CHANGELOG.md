@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Self-Updating Scripts**: Both `install.sh` and `upgrade.sh` now automatically update themselves to the latest version before execution
+  - Eliminates "broken upgrade script" problems
+  - Ensures users always get the latest bug fixes and features
+  - Graceful fallback if self-update fails
+  - Preserves all command-line arguments during re-execution
+- **Self-Update Design Documentation**: Comprehensive guide explaining the self-update mechanism and its benefits
+
 ### Fixed
 - **Upgrade Script Function Missing**: Fixed missing `show_progress_with_file` function in `upgrade.sh` that caused `osh upgrade` to fail with "command not found" error
 - Added comprehensive upgrade script fix utility in `scripts/fix_upgrade_script.sh`
