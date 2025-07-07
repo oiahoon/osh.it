@@ -70,6 +70,20 @@ download_file() {
   fi
 }
 
+# Silent download function for version checking
+download_silent() {
+  local url="$1"
+  local output="$2"
+  
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$url" -o "$output" 2>/dev/null
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$url" -O "$output" 2>/dev/null
+  else
+    return 1
+  fi
+}
+
 # Progress bar function
 show_progress_bar() {
   local current=$1
@@ -174,23 +188,46 @@ check_versions() {
   
   # Get current version
   if [[ -f "$OSH_DIR/VERSION" ]]; then
-    CURRENT_VERSION=$(cat "$OSH_DIR/VERSION" 2>/dev/null || echo "unknown")
+    CURRENT_VERSION=$(cat "$OSH_DIR/VERSION" 2>/dev/null | tr -d '\n\r' || echo "unknown")
   else
     CURRENT_VERSION="unknown"
   fi
   
-  # Get latest version
-  if ! LATEST_VERSION=$(download_file "${OSH_REPO_BASE}/VERSION" /dev/stdout 2>/dev/null); then
-    log_error "Failed to check latest version"
+  # Get latest version using silent download
+  local temp_version="/tmp/osh_latest_version"
+  if download_silent "${OSH_REPO_BASE}/VERSION" "$temp_version"; then
+    LATEST_VERSION=$(cat "$temp_version" 2>/dev/null | tr -d '\n\r' || echo "unknown")
+    rm -f "$temp_version" 2>/dev/null || true
+  else
+    log_error "❌ Failed to check latest version from remote repository"
+    log_info "💡 Please check your internet connection and try again"
     exit 1
   fi
   
   log_info "📦 Current version: $CURRENT_VERSION"
   log_info "🆕 Latest version: $LATEST_VERSION"
   
-  if [[ "$CURRENT_VERSION" == "$LATEST_VERSION" ]]; then
-    log_success "✅ OSH is already up to date!"
+  # Compare versions
+  if [[ "$CURRENT_VERSION" == "$LATEST_VERSION" ]] && [[ "$CURRENT_VERSION" != "unknown" ]]; then
+    echo
+    log_success "🎉 OSH.IT is already up to date!"
+    log_info "📦 You are running the latest version: $CURRENT_VERSION"
+    echo
+    log_info "💡 If you're experiencing issues, try:"
+    log_info "  • osh doctor          - Run diagnostics"
+    log_info "  • osh doctor --fix     - Auto-fix common issues"
+    log_info "  • osh status           - Check system status"
+    echo
+    log_info "🌐 Resources:"
+    log_info "  • Official Website: https://oiahoon.github.io/osh.it/"
+    log_info "  • Documentation: https://github.com/oiahoon/osh.it/wiki"
+    log_info "  • Support: https://github.com/oiahoon/osh.it/issues"
+    echo
     exit 0
+  elif [[ "$CURRENT_VERSION" == "unknown" ]]; then
+    log_warning "⚠️  Could not determine current version, proceeding with upgrade..."
+  else
+    log_info "🚀 Update available: $CURRENT_VERSION → $LATEST_VERSION"
   fi
 }
 
@@ -271,7 +308,7 @@ update_upgrade_script() {
   log_info "🔄 Ensuring upgrade script is up to date..."
   local temp_upgrade="/tmp/osh_upgrade_latest.sh"
   
-  if download_file "${OSH_REPO_BASE}/upgrade.sh" "$temp_upgrade"; then
+  if download_silent "${OSH_REPO_BASE}/upgrade.sh" "$temp_upgrade"; then
     # Verify downloaded file is valid
     if [[ -s "$temp_upgrade" ]] && bash -n "$temp_upgrade" 2>/dev/null; then
       # Check if current script is different from latest
