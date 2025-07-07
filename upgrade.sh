@@ -88,6 +88,44 @@ show_progress_bar() {
   fi
 }
 
+# Progress bar function with file info
+show_progress_with_file() {
+  local current=$1
+  local total=$2
+  local filename="$3"
+  local status="$4"  # "downloading", "success", "failed"
+  local width=30
+  local percentage=$((current * 100 / total))
+  local filled=$((current * width / total))
+  
+  # Clear the line and show progress
+  printf "\r\033[K"  # Clear entire line
+  
+  # Show progress bar
+  printf "${BLUE}["
+  printf "%*s" $filled | tr ' ' '█'
+  printf "%*s" $((width - filled)) | tr ' ' '░'
+  printf "] %3d%% (%d/%d)${NORMAL} " $percentage $current $total
+  
+  # Show current file and status
+  case "$status" in
+    "downloading")
+      printf "Downloading %s..." "$filename"
+      ;;
+    "success")
+      printf "Downloaded %s ${GREEN}✓${NORMAL}" "$filename"
+      ;;
+    "failed")
+      printf "Failed %s ${RED}✗${NORMAL}" "$filename"
+      ;;
+  esac
+  
+  # If completed, add newline
+  if [[ $current -eq $total ]]; then
+    printf "\n"
+  fi
+}
+
 # Essential files to update (same as installation)
 declare -a ESSENTIAL_FILES=(
   "osh.sh"

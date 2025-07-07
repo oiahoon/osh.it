@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Upgrade Script Function Missing**: Fixed missing `show_progress_with_file` function in `upgrade.sh` that caused `osh upgrade` to fail with "command not found" error
+- Added comprehensive upgrade script fix utility in `scripts/fix_upgrade_script.sh`
+
 ### Added
 - **Advanced Lazy Loading System**: Complete rewrite with 92% performance improvement
   - Recursive-safe plugin loading with intelligent error handling
