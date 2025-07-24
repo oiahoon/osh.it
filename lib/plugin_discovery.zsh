@@ -393,5 +393,61 @@ osh_plugin_get_category() {
   fi
 }
 
+# Enhanced plugin list function with fallback
+osh_plugin_list_all() {
+    local manifest_file="${OSH_DIR}/PLUGIN_MANIFEST.json"
+    local plugins_dir="${OSH_DIR}/plugins"
+    
+    # Method 1: Try to read from manifest
+    if [[ -f "$manifest_file" ]]; then
+        if command -v jq >/dev/null 2>&1; then
+            # Use jq if available
+            jq -r '.categories[] | .plugins[] | "\(.name)|\(.category // "unknown")|\(.description // "No description")"' "$manifest_file" 2>/dev/null && return 0
+        else
+            # Fallback parsing without jq
+            grep -E '"name":|"description":|"category":' "$manifest_file" 2>/dev/null | \
+            sed -E 's/.*"name"[[:space:]]*:[[:space:]]*"([^"]+)".*/NAME:\1/; s/.*"description"[[:space:]]*:[[:space:]]*"([^"]+)".*/DESC:\1/; s/.*"category"[[:space:]]*:[[:space:]]*"([^"]+)".*/CAT:\1/' | \
+            awk '
+                /^NAME:/ { name = substr($0, 6) }
+                /^DESC:/ { desc = substr($0, 6) }
+                /^CAT:/ { cat = substr($0, 5); if (name && desc) print name "|" cat "|" desc; name=""; desc=""; cat="" }
+            ' 2>/dev/null && return 0
+        fi
+    fi
+    
+    # Method 2: Scan plugins directory
+    if [[ -d "$plugins_dir" ]]; then
+        for plugin_dir in "$plugins_dir"/*; do
+            if [[ -d "$plugin_dir" ]]; then
+                local plugin_name=$(basename "$plugin_dir")
+                local plugin_file="$plugin_dir/${plugin_name}.plugin.zsh"
+                local description="Plugin for $plugin_name"
+                local category="unknown"
+                
+                # Try to extract description from plugin file
+                if [[ -f "$plugin_file" ]]; then
+                    local desc_line=$(grep -E '^#.*[Dd]escription' "$plugin_file" 2>/dev/null | head -1)
+                    if [[ -n "$desc_line" ]]; then
+                        description=$(echo "$desc_line" | sed -E 's/^#[[:space:]]*[Dd]escription[[:space:]]*:?[[:space:]]*//')
+                    fi
+                fi
+                
+                echo "${plugin_name}|${category}|${description}"
+            fi
+        done
+        return 0
+    fi
+    
+    # Method 3: Hardcoded fallback list
+    cat << 'EOF'
+sysinfo|stable|System information display with OSH branding
+weather|stable|Beautiful weather forecast with ASCII art
+taskman|stable|Advanced terminal task manager with productivity features
+acw|beta|Advanced Code Workflow - Git + JIRA integration
+fzf|beta|Enhanced fuzzy finder with preview capabilities
+greeting|experimental|Friendly welcome message for OSH users
+EOF
+}
+
 # Mark as loaded
 export OSH_PLUGIN_DISCOVERY_LOADED=1

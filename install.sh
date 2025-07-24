@@ -368,18 +368,58 @@ show_progress_with_file() {
   fi
 }
 
+# Load plugin discovery system
+load_plugin_discovery() {
+  if [[ -f "$OSH_DIR/lib/plugin_discovery.zsh" ]]; then
+    source "$OSH_DIR/lib/plugin_discovery.zsh" 2>/dev/null || true
+    source "$OSH_DIR/lib/cyberpunk.zsh" 2>/dev/null || true
+    osh_plugin_init_db 2>/dev/null || true
+  fi
+}
+
 # Interactive plugin selection
 interactive_plugin_selection() {
   echo >&2
   log_info "🔌 Plugin Selection" >&2
   echo >&2
-  echo "Available plugins:" >&2
-  echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding" >&2
-  echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art" >&2
-  echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager" >&2
-  echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
-  echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview" >&2
-  echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message" >&2
+  
+  # Load plugin discovery system
+  load_plugin_discovery
+  
+  # Display available plugins dynamically
+  if command -v osh_plugin_list_all >/dev/null 2>&1; then
+    echo "Available plugins:" >&2
+    local plugin_count=1
+    local plugin_list=()
+    
+    # Get plugins from discovery system
+    while IFS='|' read -r name category description; do
+      if [[ -n "$name" ]]; then
+        echo "  ${BOLD}${plugin_count}.${NORMAL} ${name}  - ${description}" >&2
+        plugin_list+=("$name")
+        ((plugin_count++))
+      fi
+    done < <(osh_plugin_list_all 2>/dev/null | grep -v "^$" | head -10)
+    
+    # Fallback to static list if discovery system fails
+    if [[ ${#plugin_list[@]} -eq 0 ]]; then
+      echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding" >&2
+      echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art" >&2
+      echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager" >&2
+      echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
+      echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview" >&2
+      echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message" >&2
+    fi
+  else
+    # Static fallback list
+    echo "Available plugins:" >&2
+    echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding" >&2
+    echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art" >&2
+    echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager" >&2
+    echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
+    echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview" >&2
+    echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message" >&2
+  fi
   echo >&2
   echo "Installation presets:" >&2
   echo "  ${CYAN}preset:minimal${NORMAL}     - sysinfo only" >&2
