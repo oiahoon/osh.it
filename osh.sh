@@ -45,8 +45,14 @@ if [[ -f "$OSH/lib/cache.zsh" ]]; then
   source "$OSH/lib/cache.zsh"
 fi
 
-# Load vintage design system
-if [[ -f "$OSH/lib/vintage.zsh" ]]; then
+# Load cyberpunk design system (preferred) or fallback to vintage
+if [[ -f "$OSH/lib/cyberpunk.zsh" ]]; then
+  source "$OSH/lib/cyberpunk.zsh"
+  # Load ASCII art system
+  if [[ -f "$OSH/lib/cyberpunk_ascii.zsh" ]]; then
+    source "$OSH/lib/cyberpunk_ascii.zsh"
+  fi
+elif [[ -f "$OSH/lib/vintage.zsh" ]]; then
   source "$OSH/lib/vintage.zsh"
 fi
 
