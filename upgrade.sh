@@ -10,61 +10,77 @@ set -e  # Exit on any error
 OSH_REPO_BASE="${OSH_REPO_BASE:-https://raw.githubusercontent.com/oiahoon/osh.it/main}"
 OSH_DIR="${OSH:-$HOME/.osh}"
 
-# Color definitions
+# Cyberpunk color system for upgrade
 setup_colors() {
-  if [[ -t 1 ]] && command -v tput >/dev/null 2>&1; then
-    local ncolors
-    ncolors=$(tput colors 2>/dev/null || echo 0)
-    if [[ $ncolors -ge 8 ]]; then
-      RED="$(tput setaf 1)"
-      GREEN="$(tput setaf 2)"
-      YELLOW="$(tput setaf 3)"
-      BLUE="$(tput setaf 4)"
-      BOLD="$(tput bold)"
-      NORMAL="$(tput sgr0)"
-    fi
+  if [[ -t 1 ]] && [[ "${TERM:-}" != "dumb" ]]; then
+    # Cyberpunk color palette
+    CYBER_NEON_BLUE=$'\033[38;2;0;255;255m'     # Electric blue
+    CYBER_MATRIX_GREEN=$'\033[38;2;0;255;65m'   # Matrix green  
+    CYBER_ALERT_RED=$'\033[38;2;255;0;64m'      # Alert red
+    CYBER_PURPLE=$'\033[38;2;138;43;226m'       # UV purple
+    CYBER_ORANGE=$'\033[38;2;255;165;0m'        # Neon orange
+    CYBER_PINK=$'\033[38;2;255;20;147m'         # Hot pink
+    CYBER_WHITE=$'\033[38;2;255;255;255m'       # Pure white
+    CYBER_DARK_GRAY=$'\033[38;2;64;64;64m'      # Dark gray
+    CYBER_BOLD=$'\033[1m'
+    CYBER_DIM=$'\033[2m'
+    CYBER_RESET=$'\033[0m'
+  else
+    # Fallback to empty strings for non-color terminals
+    CYBER_NEON_BLUE=""
+    CYBER_MATRIX_GREEN=""
+    CYBER_ALERT_RED=""
+    CYBER_PURPLE=""
+    CYBER_ORANGE=""
+    CYBER_PINK=""
+    CYBER_WHITE=""
+    CYBER_DARK_GRAY=""
+    CYBER_BOLD=""
+    CYBER_DIM=""
+    CYBER_RESET=""
   fi
-
-  RED="${RED:-}"
-  GREEN="${GREEN:-}"
-  YELLOW="${YELLOW:-}"
-  BLUE="${BLUE:-}"
-  BOLD="${BOLD:-}"
-  NORMAL="${NORMAL:-}"
 }
 
-# Logging functions
-log_info() { printf "${BLUE}%s${NORMAL}\n" "$*"; }
-log_success() { printf "${GREEN}%s${NORMAL}\n" "$*"; }
-log_warning() { printf "${YELLOW}%s${NORMAL}\n" "$*"; }
-log_error() { printf "${RED}%s${NORMAL}\n" "$*" >&2; }
+# Cyberpunk logging functions
+log_info() { 
+  printf "%b[%bINFO%b] %s%b\n" "${CYBER_NEON_BLUE}${CYBER_BOLD}" "${CYBER_NEON_BLUE}" "${CYBER_RESET}${CYBER_NEON_BLUE}" "$*" "${CYBER_RESET}"
+}
+log_success() { 
+  printf "%b[%bOK%b] %s%b\n" "${CYBER_MATRIX_GREEN}${CYBER_BOLD}" "${CYBER_MATRIX_GREEN}" "${CYBER_RESET}${CYBER_MATRIX_GREEN}" "$*" "${CYBER_RESET}"
+}
+log_warning() { 
+  printf "%b[%bWARN%b] %s%b\n" "${CYBER_ORANGE}${CYBER_BOLD}" "${CYBER_ORANGE}" "${CYBER_RESET}${CYBER_ORANGE}" "$*" "${CYBER_RESET}"
+}
+log_error() { 
+  printf "%b[%bERROR%b] %s%b\n" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_ALERT_RED}" "${CYBER_RESET}${CYBER_ALERT_RED}" "$*" "${CYBER_RESET}" >&2
+}
 
-# Download function with progress
+# Cyberpunk download function with progress
 download_file() {
   local url="$1"
   local output="$2"
   local filename=$(basename "$output")
   
-  printf "Updating %s... " "$filename"
+  printf "%bUPDATE%b %s... " "${CYBER_PURPLE}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
   
   if command -v curl >/dev/null 2>&1; then
     if curl -fsSL "$url" -o "$output" 2>/dev/null; then
-      printf "${GREEN}✓${NORMAL}\n"
+      printf "%b[DONE]%b\n" "${CYBER_MATRIX_GREEN}${CYBER_BOLD}" "${CYBER_RESET}"
       return 0
     else
-      printf "${RED}✗${NORMAL}\n"
+      printf "%b[FAIL]%b\n" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_RESET}"
       return 1
     fi
   elif command -v wget >/dev/null 2>&1; then
     if wget -q "$url" -O "$output" 2>/dev/null; then
-      printf "${GREEN}✓${NORMAL}\n"
+      printf "%b[DONE]%b\n" "${CYBER_MATRIX_GREEN}${CYBER_BOLD}" "${CYBER_RESET}"
       return 0
     else
-      printf "${RED}✗${NORMAL}\n"
+      printf "%b[FAIL]%b\n" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_RESET}"
       return 1
     fi
   else
-    printf "${RED}✗${NORMAL}\n"
+    printf "%b[ERROR]%b\n" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_RESET}"
     log_error "Neither curl nor wget is available"
     return 1
   fi
@@ -84,7 +100,7 @@ download_silent() {
   fi
 }
 
-# Progress bar function
+# Cyberpunk progress bar function
 show_progress_bar() {
   local current=$1
   local total=$2
@@ -92,17 +108,17 @@ show_progress_bar() {
   local percentage=$((current * 100 / total))
   local filled=$((current * width / total))
   
-  printf "\r${BLUE}["
+  printf "\r%bPROGRESS%b [" "${CYBER_NEON_BLUE}${CYBER_BOLD}" "${CYBER_RESET}${CYBER_NEON_BLUE}"
   printf "%*s" $filled | tr ' ' '█'
   printf "%*s" $((width - filled)) | tr ' ' '░'
-  printf "] %d%% (%d/%d)${NORMAL}" $percentage $current $total
+  printf "] %d%% (%d/%d)%b" $percentage $current $total "${CYBER_RESET}"
   
   if [[ $current -eq $total ]]; then
     printf "\n"
   fi
 }
 
-# Progress bar function with file info
+# Cyberpunk progress bar function with file info
 show_progress_with_file() {
   local current=$1
   local total=$2
@@ -115,22 +131,22 @@ show_progress_with_file() {
   # Clear the line and show progress
   printf "\r\033[K"  # Clear entire line
   
-  # Show progress bar
-  printf "${BLUE}["
+  # Show cyberpunk progress bar
+  printf "%bSYNC%b [" "${CYBER_NEON_BLUE}${CYBER_BOLD}" "${CYBER_RESET}${CYBER_NEON_BLUE}"
   printf "%*s" $filled | tr ' ' '█'
   printf "%*s" $((width - filled)) | tr ' ' '░'
-  printf "] %3d%% (%d/%d)${NORMAL} " $percentage $current $total
+  printf "] %3d%% (%d/%d)%b " $percentage $current $total "${CYBER_RESET}"
   
-  # Show current file and status
+  # Show current file and status with cyberpunk styling
   case "$status" in
     "downloading")
-      printf "Downloading %s..." "$filename"
+      printf "%bDL%b %s..." "${CYBER_PURPLE}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
       ;;
     "success")
-      printf "Downloaded %s ${GREEN}✓${NORMAL}" "$filename"
+      printf "%bOK%b %s" "${CYBER_MATRIX_GREEN}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
       ;;
     "failed")
-      printf "Failed %s ${RED}✗${NORMAL}" "$filename"
+      printf "%bFAIL%b %s" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
       ;;
   esac
   
@@ -184,7 +200,7 @@ check_installation() {
 
 # Get current and latest versions
 check_versions() {
-  log_info "🔍 Checking versions..."
+  log_info "VERSION CHECK - Scanning remote repository..."
   
   # Get current version
   if [[ -f "$OSH_DIR/VERSION" ]]; then
@@ -199,54 +215,54 @@ check_versions() {
     LATEST_VERSION=$(cat "$temp_version" 2>/dev/null | tr -d '\n\r' || echo "unknown")
     rm -f "$temp_version" 2>/dev/null || true
   else
-    log_error "❌ Failed to check latest version from remote repository"
-    log_info "💡 Please check your internet connection and try again"
+    log_error "NETWORK ERROR - Failed to check latest version from remote repository"
+    log_info "HINT - Please check your internet connection and try again"
     exit 1
   fi
   
-  log_info "📦 Current version: $CURRENT_VERSION"
-  log_info "🆕 Latest version: $LATEST_VERSION"
+  log_info "CURRENT - Version: $CURRENT_VERSION"
+  log_info "REMOTE  - Version: $LATEST_VERSION"
   
   # Compare versions
   if [[ "$CURRENT_VERSION" == "$LATEST_VERSION" ]] && [[ "$CURRENT_VERSION" != "unknown" ]]; then
     echo
-    log_success "🎉 OSH.IT is already up to date!"
-    log_info "📦 You are running the latest version: $CURRENT_VERSION"
+    log_success "SYSTEM STATUS - OSH.IT is already up to date!"
+    log_info "CURRENT BUILD - You are running the latest version: $CURRENT_VERSION"
     echo
-    log_info "💡 If you're experiencing issues, try:"
-    log_info "  • osh doctor          - Run diagnostics"
-    log_info "  • osh doctor --fix     - Auto-fix common issues"
-    log_info "  • osh status           - Check system status"
+    log_info "TROUBLESHOOTING - If you're experiencing issues, try:"
+    log_info "  >> osh doctor          - Run diagnostics"
+    log_info "  >> osh doctor --fix     - Auto-fix common issues"
+    log_info "  >> osh status           - Check system status"
     echo
-    log_info "🌐 Resources:"
-    log_info "  • Official Website: https://oiahoon.github.io/osh.it/"
-    log_info "  • Documentation: https://github.com/oiahoon/osh.it/wiki"
-    log_info "  • Support: https://github.com/oiahoon/osh.it/issues"
+    log_info "NETWORK RESOURCES:"
+    log_info "  >> Official Website: https://oiahoon.github.io/osh.it/"
+    log_info "  >> Documentation: https://github.com/oiahoon/osh.it/wiki"
+    log_info "  >> Support: https://github.com/oiahoon/osh.it/issues"
     echo
     exit 0
   elif [[ "$CURRENT_VERSION" == "unknown" ]]; then
-    log_warning "⚠️  Could not determine current version, proceeding with upgrade..."
+    log_warning "VERSION UNKNOWN - Could not determine current version, proceeding with upgrade..."
   else
-    log_info "🚀 Update available: $CURRENT_VERSION → $LATEST_VERSION"
+    log_info "UPDATE AVAILABLE - $CURRENT_VERSION >> $LATEST_VERSION"
   fi
 }
 
 # Create backup
 create_backup() {
   local backup_dir="${OSH_DIR}.backup.$(date +%Y%m%d_%H%M%S)"
-  log_info "📦 Creating backup: $backup_dir"
+  log_info "BACKUP INIT - Creating backup: $backup_dir"
   
   if ! cp -r "$OSH_DIR" "$backup_dir"; then
     log_error "Failed to create backup"
     exit 1
   fi
   
-  log_success "✅ Backup created successfully"
+  log_success "BACKUP COMPLETE - Backup created successfully"
 }
 
 # Update essential files
 update_files() {
-  log_info "📥 Updating OSH essential files..."
+  log_info "FILE SYNC - Updating OSH essential files..."
   
   local failed_files=()
   local total_files=${#ESSENTIAL_FILES[@]}
@@ -279,19 +295,19 @@ update_files() {
   echo
   
   if [[ ${#failed_files[@]} -gt 0 ]]; then
-    log_warning "⚠️  Some files failed to update:"
+    log_warning "SYNC ERROR - Some files failed to update:"
     for file in "${failed_files[@]}"; do
       log_warning "  - $file"
     done
-    log_info "💡 You can try running the upgrade again"
+    log_info "RETRY - You can try running the upgrade again"
   else
-    log_success "✅ All files updated successfully!"
+    log_success "SYNC COMPLETE - All files updated successfully!"
   fi
 }
 
 # Set permissions
 fix_permissions() {
-  log_info "🔧 Fixing permissions..."
+  log_info "PERMISSIONS - Fixing file permissions..."
   
   chmod +x "$OSH_DIR/osh.sh" 2>/dev/null || true
   chmod +x "$OSH_DIR/upgrade.sh" 2>/dev/null || true
@@ -300,12 +316,12 @@ fix_permissions() {
   
   find "$OSH_DIR" -name "*.zsh" -exec chmod 644 {} \; 2>/dev/null || true
   
-  log_success "✅ Permissions fixed"
+  log_success "PERMISSIONS OK - File permissions fixed"
 }
 
 # Update upgrade script itself first
 update_upgrade_script() {
-  log_info "🔄 Ensuring upgrade script is up to date..."
+  log_info "SELF UPDATE - Ensuring upgrade script is up to date..."
   local temp_upgrade="/tmp/osh_upgrade_latest.sh"
   
   if download_silent "${OSH_REPO_BASE}/upgrade.sh" "$temp_upgrade"; then
@@ -322,22 +338,22 @@ update_upgrade_script() {
         cp "$temp_upgrade" "$OSH_DIR/upgrade.sh"
         chmod +x "$OSH_DIR/upgrade.sh"
         
-        log_success "✅ Upgrade script updated, restarting..."
+        log_success "SCRIPT UPDATED - Upgrade script updated, restarting..."
         echo
         
         # Re-execute with updated script
         exec "$OSH_DIR/upgrade.sh" "$@"
       else
-        log_success "✅ Upgrade script is already up to date"
+        log_success "SCRIPT OK - Upgrade script is already up to date"
       fi
     else
-      log_warning "⚠️  Downloaded upgrade script appears invalid, continuing with current version"
+      log_warning "SCRIPT ERROR - Downloaded upgrade script appears invalid, continuing with current version"
     fi
     
     # Clean up temp file
     rm -f "$temp_upgrade" 2>/dev/null || true
   else
-    log_warning "⚠️  Could not download latest upgrade script, continuing with current version"
+    log_warning "DOWNLOAD ERROR - Could not download latest upgrade script, continuing with current version"
   fi
 }
 
@@ -345,8 +361,8 @@ update_upgrade_script() {
 main() {
   setup_colors
   
-  log_info "🚀 OSH Upgrade Starting..."
-  log_info "📁 OSH directory: $OSH_DIR"
+  log_info "UPGRADE INIT - OSH Upgrade System Starting..."
+  log_info "TARGET PATH - OSH directory: $OSH_DIR"
   echo
   
   check_installation
@@ -357,17 +373,17 @@ main() {
   fix_permissions
   
   echo
-  log_success "🎉 OSH upgrade completed successfully!"
-  log_success "📦 Updated to version: $LATEST_VERSION"
+  log_success "UPGRADE COMPLETE - OSH upgrade completed successfully!"
+  log_success "NEW VERSION - Updated to version: $LATEST_VERSION"
   echo
-  log_info "💡 Restart your terminal or run: source ~/.zshrc"
+  log_info "NEXT STEP - Restart your terminal or run: source ~/.zshrc"
   echo
-  log_info "🌐 Resources:"
+  log_info "NETWORK RESOURCES:"
   log_info "  • Official Website: https://oiahoon.github.io/osh.it/"
   log_info "  • Documentation: https://github.com/oiahoon/osh.it/wiki"
   log_info "  • Support: https://github.com/oiahoon/osh.it/issues"
   echo
-  log_success "Happy shell customization! 🐚✨"
+  log_success "SYSTEM READY - Happy shell customization!"
 }
 
 # Export upgrade function for global access

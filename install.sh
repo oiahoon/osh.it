@@ -27,12 +27,12 @@ setup_mirror_source() {
       ;;
   esac
   
-  log_info "Using mirror: $OSH_MIRROR ($OSH_REPO_BASE)"
+  log_info "MIRROR CONFIG - Using mirror: $OSH_MIRROR ($OSH_REPO_BASE)"
 }
 
 # Network connectivity check
 check_network_connectivity() {
-  log_info "🌐 Checking network connectivity..."
+  log_info "NETWORK SCAN - Checking network connectivity..."
   
   local test_urls=(
     "https://github.com"
@@ -56,7 +56,7 @@ check_network_connectivity() {
       local end_time=$(date +%s)
       local response_time=$((end_time - start_time))
       
-      log_success "✅ Connected to $url (${response_time}s)"
+      log_success "NETWORK OK - Connected to $url (${response_time}s)"
       connected=true
       
       # Track fastest mirror
@@ -69,12 +69,12 @@ check_network_connectivity() {
         fi
       fi
     else
-      log_warning "❌ Failed to connect to $url"
+      log_warning "NETWORK FAIL - Failed to connect to $url"
     fi
   done
   
   if [[ "$connected" == "false" ]]; then
-    log_error "❌ Network connectivity check failed"
+    log_error "NETWORK ERROR - Network connectivity check failed"
     echo
     echo "${BOLD}${YELLOW}Network Troubleshooting:${NORMAL}"
     echo "1. Check your internet connection"
@@ -89,7 +89,7 @@ check_network_connectivity() {
   # Auto-select fastest mirror
   if [[ -n "$fastest_mirror" ]] && [[ "$OSH_MIRROR" == "github" ]]; then
     if [[ "$fastest_mirror" == "gitee" ]] && [[ $best_time -lt 3 ]]; then
-      log_info "🚀 Auto-selecting faster mirror: $fastest_mirror"
+      log_info "MIRROR AUTO - Auto-selecting faster mirror: $fastest_mirror"
       OSH_MIRROR="$fastest_mirror"
     fi
   fi
@@ -99,7 +99,7 @@ check_network_connectivity() {
 
 # Dependency check with OS-specific guidance
 check_dependencies() {
-  log_info "🔍 Checking system dependencies..."
+  log_info "DEPENDENCY SCAN - Checking system dependencies..."
   
   local essential_deps=("curl" "git")
   local recommended_deps=("zsh" "python3")
@@ -110,9 +110,9 @@ check_dependencies() {
   for dep in "${essential_deps[@]}"; do
     if ! command -v "$dep" >/dev/null 2>&1; then
       missing_essential+=("$dep")
-      log_error "❌ Missing essential dependency: $dep"
+      log_error "DEPENDENCY MISSING - Missing essential dependency: $dep"
     else
-      log_success "✅ Found: $dep"
+      log_success "DEPENDENCY OK - Found: $dep"
     fi
   done
   
@@ -120,16 +120,16 @@ check_dependencies() {
   for dep in "${recommended_deps[@]}"; do
     if ! command -v "$dep" >/dev/null 2>&1; then
       missing_recommended+=("$dep")
-      log_warning "⚠️  Missing recommended dependency: $dep"
+      log_warning "DEPENDENCY WARN - Missing recommended dependency: $dep"
     else
-      log_success "✅ Found: $dep"
+      log_success "DEPENDENCY OK - Found: $dep"
     fi
   done
   
   # Provide installation guidance
   if [[ ${#missing_essential[@]} -gt 0 ]] || [[ ${#missing_recommended[@]} -gt 0 ]]; then
     echo
-    echo "${BOLD}${BLUE}📦 Dependency Installation Guide:${NORMAL}"
+    echo "${CYBER_NEON_BLUE}${CYBER_BOLD}DEPENDENCY INSTALL GUIDE:${CYBER_RESET}"
     
     # Detect OS and provide specific instructions
     local os_type=""
@@ -253,32 +253,56 @@ detect_environment() {
   fi
 }
 
-# Color setup
+# Cyberpunk color setup for installation
 setup_colors() {
   if [[ "$SUPPORTS_COLOR" == "true" ]]; then
-    RED="$(tput setaf 1)"
-    GREEN="$(tput setaf 2)"
-    YELLOW="$(tput setaf 3)"
-    BLUE="$(tput setaf 4)"
-    MAGENTA="$(tput setaf 5)"
-    CYAN="$(tput setaf 6)"
-    WHITE="$(tput setaf 7)"
-    BOLD="$(tput bold)"
-    DIM="$(tput dim)"
-    NORMAL="$(tput sgr0)"
+    # Cyberpunk color palette
+    CYBER_NEON_BLUE=$'\033[38;2;0;255;255m'     # Electric blue
+    CYBER_MATRIX_GREEN=$'\033[38;2;0;255;65m'   # Matrix green  
+    CYBER_ALERT_RED=$'\033[38;2;255;0;64m'      # Alert red
+    CYBER_PURPLE=$'\033[38;2;138;43;226m'       # UV purple
+    CYBER_ORANGE=$'\033[38;2;255;165;0m'        # Neon orange
+    CYBER_PINK=$'\033[38;2;255;20;147m'         # Hot pink
+    CYBER_WHITE=$'\033[38;2;255;255;255m'       # Pure white
+    CYBER_DARK_GRAY=$'\033[38;2;64;64;64m'      # Dark gray
+    CYBER_BOLD=$'\033[1m'
+    CYBER_DIM=$'\033[2m'
+    CYBER_RESET=$'\033[0m'
   else
-    RED="" GREEN="" YELLOW="" BLUE="" MAGENTA="" CYAN="" WHITE=""
-    BOLD="" DIM="" NORMAL=""
+    # Fallback to empty strings for non-color terminals
+    CYBER_NEON_BLUE=""
+    CYBER_MATRIX_GREEN=""
+    CYBER_ALERT_RED=""
+    CYBER_PURPLE=""
+    CYBER_ORANGE=""
+    CYBER_PINK=""
+    CYBER_WHITE=""
+    CYBER_DARK_GRAY=""
+    CYBER_BOLD=""
+    CYBER_DIM=""
+    CYBER_RESET=""
   fi
 }
 
-# Logging functions
-log_info() { printf "${BLUE}ℹ️  %s${NORMAL}\n" "$*"; }
-log_success() { printf "${GREEN}✅ %s${NORMAL}\n" "$*"; }
-log_warning() { printf "${YELLOW}⚠️  %s${NORMAL}\n" "$*"; }
-log_error() { printf "${RED}❌ %s${NORMAL}\n" "$*" >&2; }
-log_dry_run() { printf "${CYAN}🔍${NORMAL} ${DIM}[DRY RUN]${NORMAL} %s\n" "$*"; }
-log_progress() { printf "${MAGENTA}📥 %s${NORMAL}" "$*"; }
+# Cyberpunk logging functions
+log_info() { 
+  printf "%b[%bINFO%b] %s%b\n" "${CYBER_NEON_BLUE}${CYBER_BOLD}" "${CYBER_NEON_BLUE}" "${CYBER_RESET}${CYBER_NEON_BLUE}" "$*" "${CYBER_RESET}"
+}
+log_success() { 
+  printf "%b[%bOK%b] %s%b\n" "${CYBER_MATRIX_GREEN}${CYBER_BOLD}" "${CYBER_MATRIX_GREEN}" "${CYBER_RESET}${CYBER_MATRIX_GREEN}" "$*" "${CYBER_RESET}"
+}
+log_warning() { 
+  printf "%b[%bWARN%b] %s%b\n" "${CYBER_ORANGE}${CYBER_BOLD}" "${CYBER_ORANGE}" "${CYBER_RESET}${CYBER_ORANGE}" "$*" "${CYBER_RESET}"
+}
+log_error() { 
+  printf "%b[%bERROR%b] %s%b\n" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_ALERT_RED}" "${CYBER_RESET}${CYBER_ALERT_RED}" "$*" "${CYBER_RESET}" >&2
+}
+log_dry_run() { 
+  printf "%b[%bDRY-RUN%b] %s%b\n" "${CYBER_PURPLE}${CYBER_BOLD}" "${CYBER_PURPLE}" "${CYBER_RESET}${CYBER_DIM}" "$*" "${CYBER_RESET}"
+}
+log_progress() { 
+  printf "%bDOWNLOAD%b %s" "${CYBER_PINK}${CYBER_BOLD}" "${CYBER_RESET}" "$*"
+}
 
 # Vintage gradient colors for logo (with fallback)
 vintage_color() {
@@ -380,7 +404,7 @@ load_plugin_discovery() {
 # Interactive plugin selection
 interactive_plugin_selection() {
   echo >&2
-  log_info "🔌 Plugin Selection" >&2
+  log_info "PLUGIN SELECT - Plugin Selection" >&2
   echo >&2
   
   # Load plugin discovery system
@@ -672,7 +696,7 @@ configure_shell() {
   fi
   
   echo
-  log_info "🔧 Configuring shell integration..."
+  log_info "SHELL CONFIG - Configuring shell integration..."
   
   # Check if OSH is already configured
   if [[ -f "$SHELL_CONFIG_FILE" ]] && grep -q "source.*osh.sh" "$SHELL_CONFIG_FILE"; then
@@ -812,7 +836,7 @@ install_osh() {
   
   # Download essential files with progress
   echo
-  log_info "📦 Downloading OSH core files..."
+  log_info "CORE DOWNLOAD - Downloading OSH core files..."
   local total_files=${#ESSENTIAL_FILES[@]}
   local current=0
   
@@ -846,13 +870,13 @@ install_osh() {
   
   if [[ "$DRY_RUN" != "true" ]]; then
     echo
-    log_success "✅ Core files downloaded successfully!"
+    log_success "CORE COMPLETE - Core files downloaded successfully!"
   fi
   
   # Download plugin files with progress
   if [[ ${#selected_plugins[@]} -gt 0 ]]; then
     echo
-    log_info "🔌 Downloading selected plugins..."
+    log_info "PLUGIN DOWNLOAD - Downloading selected plugins..."
     
     local plugin_count=0
     local total_plugins=${#selected_plugins[@]}
@@ -908,7 +932,7 @@ install_osh() {
         
         if [[ "$DRY_RUN" != "true" ]]; then
           echo
-          log_success "  ✅ Plugin $plugin installed successfully!"
+          log_success "  PLUGIN OK - Plugin $plugin installed successfully!"
         fi
       else
         log_warning "Plugin '$plugin' not found or invalid"
@@ -917,13 +941,13 @@ install_osh() {
     
     if [[ "$DRY_RUN" != "true" ]]; then
       echo
-      log_success "✅ All plugins downloaded successfully!"
+      log_success "PLUGIN COMPLETE - All plugins downloaded successfully!"
     fi
   fi
   
   # Set permissions
   echo
-  log_info "🔧 Setting up file permissions..."
+  log_info "PERMISSIONS - Setting up file permissions..."
   if [[ "$DRY_RUN" != "true" ]]; then
     chmod +x "$OSH_DIR/osh.sh" 2>/dev/null || true
     chmod +x "$OSH_DIR/upgrade.sh" 2>/dev/null || true
@@ -1037,23 +1061,23 @@ update_installer_script() {
     if [[ -s "$temp_installer" ]] && bash -n "$temp_installer" 2>/dev/null; then
       # Check if current script is different from latest
       if ! diff -q "$0" "$temp_installer" >/dev/null 2>&1; then
-        log_info "📥 Updating installer to latest version..."
-        log_success "✅ Installer updated, restarting with latest version..."
+        log_info "INSTALLER UPDATE - Updating installer to latest version..."
+        log_success "INSTALLER UPDATED - Installer updated, restarting with latest version..."
         echo
         
         # Re-execute with updated script, preserving all arguments
         exec bash "$temp_installer" "$@"
       else
-        log_success "✅ Installer is already up to date"
+        log_success "INSTALLER OK - Installer is already up to date"
       fi
     else
-      log_warning "⚠️  Downloaded installer appears invalid, continuing with current version"
+      log_warning "INSTALLER ERROR - Downloaded installer appears invalid, continuing with current version"
     fi
     
     # Clean up temp file
     rm -f "$temp_installer" 2>/dev/null || true
   else
-    log_warning "⚠️  Could not download latest installer, continuing with current version"
+    log_warning "DOWNLOAD ERROR - Could not download latest installer, continuing with current version"
   fi
 }
 
@@ -1068,7 +1092,7 @@ main() {
   echo
   
   if [[ "$DRY_RUN" == "true" ]]; then
-    echo "${BOLD}${MAGENTA}🔍 Running in Dry-Run Mode${NORMAL}"
+    echo "${CYBER_PURPLE}${CYBER_BOLD}DRY-RUN MODE - Running in Dry-Run Mode${CYBER_RESET}"
     echo "${DIM}No changes will be made to your system${NORMAL}"
     echo
   fi
@@ -1094,7 +1118,7 @@ main() {
   echo
   
   # Show environment info
-  echo "${BOLD}${BLUE}🔍 Environment Information${NORMAL}"
+  echo "${CYBER_NEON_BLUE}${CYBER_BOLD}ENVIRONMENT INFO:${CYBER_RESET}"
   echo "  Default Shell: $SHELL"
   echo "  Target Shell: $CURRENT_SHELL"
   echo "  Config File: $SHELL_CONFIG_FILE"
@@ -1138,7 +1162,7 @@ main() {
   # Show completion message
   if [[ "$DRY_RUN" != "true" ]]; then
     echo
-    echo "${BOLD}${GREEN}🎉 Installation Complete!${NORMAL}"
+    echo "${CYBER_MATRIX_GREEN}${CYBER_BOLD}INSTALLATION COMPLETE!${CYBER_RESET}"
     echo
     echo "${BOLD}${BLUE}📋 Next Steps:${NORMAL}"
     echo "  1. Restart your terminal or run: ${CYAN}source $SHELL_CONFIG_FILE${NORMAL}"
@@ -1165,7 +1189,7 @@ main() {
       echo "     ${CYAN}chsh -s \$(which zsh)${NORMAL}"
     fi
     echo
-    echo "${BOLD}${BLUE}🌐 Resources:${NORMAL}"
+    echo "${CYBER_NEON_BLUE}${CYBER_BOLD}NETWORK RESOURCES:${CYBER_RESET}"
     echo "  • Official Website: ${CYAN}https://oiahoon.github.io/osh.it/${NORMAL}"
     echo "  • Documentation: ${CYAN}https://github.com/oiahoon/osh.it/wiki${NORMAL}"
     echo "  • Support: ${CYAN}https://github.com/oiahoon/osh.it/issues${NORMAL}"
