@@ -46,7 +46,7 @@ osh_error_report() {
   fi
   
   # Provide solution if available
-  for pattern in "${(@k)OSH_ERROR_SOLUTIONS}"; do
+  for pattern in ${(k)OSH_ERROR_SOLUTIONS}; do
     if [[ "$error_message" =~ "$pattern" ]]; then
       echo -e "${color_yellow}💡 Suggestion: ${OSH_ERROR_SOLUTIONS[$pattern]}${color_reset}" >&2
       break
