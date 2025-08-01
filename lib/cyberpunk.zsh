@@ -52,6 +52,11 @@ export OSH_CYBER_INFO="$OSH_CYBER_NEON_BLUE"
 export OSH_CYBER_ACCENT="$OSH_CYBER_PURPLE"
 export OSH_CYBER_HIGHLIGHT="$OSH_CYBER_PINK"
 
+# ASCII art elements
+export OSH_CYBER_BORDER_TOP="========================================================================"
+export OSH_CYBER_SEPARATOR="------------------------------------------------------------------------"
+export OSH_CYBER_BORDER_BOTTOM="========================================================================"
+
 # ============================================================================
 # TERMINAL CAPABILITY DETECTION
 # ============================================================================

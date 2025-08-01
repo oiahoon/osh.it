@@ -3,9 +3,31 @@
 # ASCII art, icons, and visual elements for cyberpunk aesthetic
 # Version: 1.0.0
 
-# Ensure cyberpunk colors are loaded
-if [[ -z "${OSH_CYBERPUNK_LOADED:-}" ]]; then
-  source "${OSH}/lib/cyberpunk.zsh"
+# Ensure cyberpunk functions are available
+if ! declare -f osh_cyber_get_color >/dev/null 2>&1; then
+  # Try to load cyberpunk.zsh
+  if [[ -f "${OSH}/lib/cyberpunk.zsh" ]]; then
+    source "${OSH}/lib/cyberpunk.zsh"
+  else
+    # Try relative path
+    local script_dir="${${(%):-%x}:A:h}"
+    if [[ -f "${script_dir}/cyberpunk.zsh" ]]; then
+      source "${script_dir}/cyberpunk.zsh"
+    fi
+  fi
+fi
+
+# If still not available, define fallback functions
+if ! declare -f osh_cyber_get_color >/dev/null 2>&1; then
+  # Define complete fallback functions to prevent errors
+  osh_cyber_get_color() { echo ""; }
+  osh_cyber_colors_enabled() { return 1; }
+  OSH_CYBER_BOLD=""
+  OSH_CYBER_RESET=""
+  OSH_CYBER_BORDER_TOP="========================================================================"
+  OSH_CYBER_SEPARATOR="------------------------------------------------------------------------"
+  OSH_CYBER_BORDER_BOTTOM="========================================================================"
+  OSH_CYBERPUNK_LOADED=1
 fi
 
 # ============================================================================

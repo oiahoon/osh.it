@@ -9,12 +9,26 @@ set -e
 OSH_DIR="${OSH:-$HOME/.osh}"
 ZSHRC_FILE="$HOME/.zshrc"
 
+# Load error handler if available
+if [[ -f "$OSH_DIR/lib/error_handler.zsh" ]]; then
+    source "$OSH_DIR/lib/error_handler.zsh"
+fi
+
 # Load cyberpunk styling if available
 if [[ -f "$OSH_DIR/lib/cyberpunk.zsh" ]]; then
     source "$OSH_DIR/lib/cyberpunk.zsh"
-    CYBERPUNK_ENABLED=1
+    # Check if cyberpunk functions are actually available
+    if declare -f osh_cyber_accent >/dev/null 2>&1; then
+        CYBERPUNK_ENABLED=1
+    else
+        CYBERPUNK_ENABLED=0
+    fi
 else
     CYBERPUNK_ENABLED=0
+fi
+
+# Always define fallback functions to prevent errors
+if [[ $CYBERPUNK_ENABLED -eq 0 ]]; then
     # Fallback colors
     RED='\033[0;31m'
     GREEN='\033[0;32m'
@@ -22,6 +36,14 @@ else
     BLUE='\033[0;34m'
     CYAN='\033[0;36m'
     NC='\033[0m'
+    
+    # Define fallback functions
+    osh_cyber_accent() { echo -e "${CYAN}$*${NC}"; }
+    osh_cyber_success() { echo -e "${GREEN}✅ $*${NC}"; }
+    osh_cyber_error() { echo -e "${RED}❌ $*${NC}" >&2; }
+    osh_cyber_warning() { echo -e "${YELLOW}⚠️  $*${NC}"; }
+    osh_cyber_info() { echo -e "${BLUE}ℹ️  $*${NC}"; }
+    osh_cyber_highlight() { echo -e "${CYAN}$*${NC}"; }
 fi
 
 # Load ASCII art if available
@@ -133,7 +155,12 @@ update_plugins_config() {
         mv "$temp_file" "$ZSHRC_FILE"
         log_success "Plugin configuration updated"
     else
-        log_error "Could not find $ZSHRC_FILE"
+        if declare -f osh_config_error >/dev/null 2>&1; then
+            osh_config_error "$ZSHRC_FILE" "File not found"
+        else
+            log_error "Could not find $ZSHRC_FILE"
+            echo "💡 Quick fix: Create ~/.zshrc with: touch ~/.zshrc && echo 'source ~/.osh/osh.sh' >> ~/.zshrc"
+        fi
         return 1
     fi
 }
@@ -237,8 +264,13 @@ cmd_plugin_add() {
     local plugin_name="$1"
     
     if [[ -z "$plugin_name" ]]; then
-        log_error "Please specify a plugin name"
-        echo "Usage: osh plugin add <name>"
+        if declare -f osh_error_report >/dev/null 2>&1; then
+            osh_error_report "missing argument" "Please specify a plugin name" "Usage: osh plugin add <name>"
+        else
+            log_error "Please specify a plugin name"
+            echo "Usage: osh plugin add <name>"
+            echo "💡 See available plugins: osh plugin list"
+        fi
         return 1
     fi
     
@@ -805,7 +837,12 @@ main() {
             cmd_help
             ;;
         *)
-            log_error "Unknown command: $command"
+            if declare -f osh_error_report >/dev/null 2>&1; then
+                osh_error_report "command not found" "Unknown command: $command" "Use 'osh help' to see available commands"
+            else
+                log_error "Unknown command: $command"
+                echo "💡 Available commands: plugin, preset, status, reload, upgrade, doctor, help"
+            fi
             echo ""
             cmd_help
             exit 1
