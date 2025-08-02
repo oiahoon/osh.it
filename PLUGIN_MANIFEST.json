@@ -52,6 +52,39 @@
             "tasks",
             "management"
           ]
+        },
+        {
+          "name": "git-heatmap",
+          "version": "1.0.0",
+          "description": "GitHub-style contribution heatmap for git repositories",
+          "files": [
+            "plugins/git-heatmap/git-heatmap.plugin.zsh"
+          ],
+          "dependencies": [
+            "git"
+          ],
+          "tags": [
+            "git",
+            "visualization",
+            "heatmap",
+            "cyberpunk"
+          ]
+        },
+        {
+          "name": "ascii-text",
+          "version": "1.0.0",
+          "description": "Cyberpunk ASCII art text generator with multiple styles",
+          "files": [
+            "plugins/ascii-text/ascii-text.plugin.zsh"
+          ],
+          "dependencies": [],
+          "tags": [
+            "ascii",
+            "art",
+            "text",
+            "cyberpunk",
+            "generator"
+          ]
         }
       ]
     },
@@ -127,6 +160,8 @@
       "sysinfo",
       "weather",
       "taskman",
+      "git-heatmap",
+      "ascii-text",
       "acw",
       "fzf"
     ],
@@ -134,6 +169,8 @@
       "sysinfo",
       "weather",
       "taskman",
+      "git-heatmap",
+      "ascii-text",
       "acw",
       "fzf",
       "greeting"

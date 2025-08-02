@@ -5,6 +5,27 @@ All notable changes to OSH.IT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🔌 Added - New Plugins
+- **git-heatmap Plugin**: GitHub-style contribution heatmap display for git repositories
+  - Visual contribution patterns with cyberpunk colors
+  - Multiple view options (year/month) and customizable time ranges
+  - Streak tracking with current and longest commit streaks
+  - Performance optimized with efficient git log parsing
+  - Aliases: `ghm`, `git-heat`
+- **ascii-text Plugin**: Cyberpunk ASCII art text generator 
+  - Multiple styles: Matrix, Circuit, and Neon ASCII fonts
+  - 8 cyberpunk color options matching OSH.IT theme
+  - Preview mode to see all styles at once
+  - Full character set support (A-Z, 0-9, special characters)
+  - Aliases: `ascii`, `asciit`
+
+### 🎯 Improved - Plugin Ecosystem
+- Enhanced stable plugin collection with visual and development tools
+- Better integration between plugins using consistent cyberpunk theming
+- Expanded use cases for terminal customization and git workflow visualization
+
 ## [1.5.0] - 2025-07-24
 
 ### 🎨 Added - Cyberpunk UI System

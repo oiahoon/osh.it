@@ -76,7 +76,7 @@ check_network_connectivity() {
   if [[ "$connected" == "false" ]]; then
     log_error "NETWORK ERROR - Network connectivity check failed"
     echo
-    echo "${BOLD}${YELLOW}Network Troubleshooting:${NORMAL}"
+    echo "${CYBER_BOLD}${CYBER_NEON_YELLOW}Network Troubleshooting:${CYBER_RESET}"
     echo "1. Check your internet connection"
     echo "2. Verify DNS settings"
     echo "3. Check firewall/proxy settings"
@@ -135,16 +135,16 @@ check_dependencies() {
     local os_type=""
     if [[ "$OSTYPE" =~ darwin ]]; then
       os_type="macOS"
-      echo "${BOLD}macOS (Homebrew):${NORMAL}"
+      echo "${CYBER_BOLD}macOS (Homebrew):${CYBER_RESET}"
       [[ ${#missing_essential[@]} -gt 0 ]] && echo "  brew install ${missing_essential[*]}"
       [[ ${#missing_recommended[@]} -gt 0 ]] && echo "  brew install ${missing_recommended[*]}"
     elif [[ "$OSTYPE" =~ linux ]]; then
       os_type="Linux"
-      echo "${BOLD}Ubuntu/Debian:${NORMAL}"
+      echo "${CYBER_BOLD}Ubuntu/Debian:${CYBER_RESET}"
       [[ ${#missing_essential[@]} -gt 0 ]] && echo "  sudo apt update && sudo apt install ${missing_essential[*]}"
       [[ ${#missing_recommended[@]} -gt 0 ]] && echo "  sudo apt install ${missing_recommended[*]}"
       echo
-      echo "${BOLD}CentOS/RHEL/Fedora:${NORMAL}"
+      echo "${CYBER_BOLD}CentOS/RHEL/Fedora:${CYBER_RESET}"
       [[ ${#missing_essential[@]} -gt 0 ]] && echo "  sudo yum install ${missing_essential[*]} # or dnf"
       [[ ${#missing_recommended[@]} -gt 0 ]] && echo "  sudo yum install ${missing_recommended[*]}"
     fi
@@ -163,7 +163,7 @@ check_dependencies() {
     log_info "OSH.IT will work but some features may be limited"
     
     if [[ "$INTERACTIVE" == "true" ]]; then
-      printf "${YELLOW}Continue anyway? [y/N]: ${NORMAL}"
+      printf "${CYBER_NEON_YELLOW}Continue anyway? [y/N]: ${CYBER_RESET}"
       local confirm
       read -r confirm
       case "$confirm" in
@@ -258,10 +258,12 @@ setup_colors() {
   if [[ "$SUPPORTS_COLOR" == "true" ]]; then
     # Cyberpunk color palette
     CYBER_NEON_BLUE=$'\033[38;2;0;255;255m'     # Electric blue
+    CYBER_NEON_CYAN=$'\033[38;2;0;255;255m'     # Same as blue for consistency
     CYBER_MATRIX_GREEN=$'\033[38;2;0;255;65m'   # Matrix green  
     CYBER_ALERT_RED=$'\033[38;2;255;0;64m'      # Alert red
     CYBER_PURPLE=$'\033[38;2;138;43;226m'       # UV purple
     CYBER_ORANGE=$'\033[38;2;255;165;0m'        # Neon orange
+    CYBER_NEON_YELLOW=$'\033[38;2;255;255;0m'   # Neon yellow
     CYBER_PINK=$'\033[38;2;255;20;147m'         # Hot pink
     CYBER_WHITE=$'\033[38;2;255;255;255m'       # Pure white
     CYBER_DARK_GRAY=$'\033[38;2;64;64;64m'      # Dark gray
@@ -271,10 +273,12 @@ setup_colors() {
   else
     # Fallback to empty strings for non-color terminals
     CYBER_NEON_BLUE=""
+    CYBER_NEON_CYAN=""
     CYBER_MATRIX_GREEN=""
     CYBER_ALERT_RED=""
     CYBER_PURPLE=""
     CYBER_ORANGE=""
+    CYBER_NEON_YELLOW=""
     CYBER_PINK=""
     CYBER_WHITE=""
     CYBER_DARK_GRAY=""
@@ -335,8 +339,8 @@ show_logo() {
   echo "${pad_str}$(vintage_color 64 '       ╚██████╔╝███████║██║  ██║██╗██║   ██║   ')"
   echo "${pad_str}$(vintage_color 66 '        ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝╚═╝   ╚═╝   ')"
   echo
-  echo "${pad_str}${BOLD}${CYAN}      A Modern Zsh Framework${NORMAL}"
-  echo "${pad_str}${DIM}      Lightweight Alternative to Oh My Zsh${NORMAL}"
+  echo "${pad_str}${CYBER_NEON_BLUE}${CYBER_BOLD}      A Modern Zsh Framework${CYBER_RESET}"
+  echo "${pad_str}${CYBER_DARK_GRAY}      Lightweight Alternative to Oh My Zsh${CYBER_RESET}"
   echo
 }
 
@@ -367,22 +371,22 @@ show_progress_with_file() {
   # Clear the line and show progress
   printf "\r\033[K"  # Clear entire line
   
-  # Show progress bar
-  printf "${BLUE}["
+  # Show cyberpunk progress bar
+  printf "%bSYNC%b [" "${CYBER_NEON_BLUE}${CYBER_BOLD}" "${CYBER_RESET}${CYBER_NEON_BLUE}"
   printf "%*s" $filled | tr ' ' '█'
   printf "%*s" $((width - filled)) | tr ' ' '░'
-  printf "] %3d%% (%d/%d)${NORMAL} " $percentage $current $total
+  printf "] %3d%% (%d/%d)%b " $percentage $current $total "${CYBER_RESET}"
   
-  # Show current file and status
+  # Show current file and status with cyberpunk styling
   case "$status" in
     "downloading")
-      printf "Downloading %s..." "$filename"
+      printf "%bDL%b %s..." "${CYBER_PURPLE}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
       ;;
     "success")
-      printf "Downloaded %s ${GREEN}✓${NORMAL}" "$filename"
+      printf "%bOK%b %s" "${CYBER_MATRIX_GREEN}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
       ;;
     "failed")
-      printf "Failed %s ${RED}✗${NORMAL}" "$filename"
+      printf "%bFAIL%b %s" "${CYBER_ALERT_RED}${CYBER_BOLD}" "${CYBER_RESET}" "$filename"
       ;;
   esac
   
@@ -419,7 +423,7 @@ interactive_plugin_selection() {
     # Get plugins from discovery system
     while IFS='|' read -r name category description; do
       if [[ -n "$name" ]]; then
-        echo "  ${BOLD}${plugin_count}.${NORMAL} ${name}  - ${description}" >&2
+        echo "  ${CYBER_BOLD}${plugin_count}.${CYBER_RESET} ${name}  - ${description}" >&2
         plugin_list+=("$name")
         ((plugin_count++))
       fi
@@ -427,39 +431,39 @@ interactive_plugin_selection() {
     
     # Fallback to static list if discovery system fails
     if [[ ${#plugin_list[@]} -eq 0 ]]; then
-      echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding" >&2
-      echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art" >&2
-      echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager" >&2
-      echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
-      echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview" >&2
-      echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message" >&2
+      echo "  ${CYBER_BOLD}1.${CYBER_RESET} sysinfo  - System information display with OSH.IT branding" >&2
+      echo "  ${CYBER_BOLD}2.${CYBER_RESET} weather  - Beautiful weather forecast with ASCII art" >&2
+      echo "  ${CYBER_BOLD}3.${CYBER_RESET} taskman  - Advanced terminal task manager" >&2
+      echo "  ${CYBER_BOLD}4.${CYBER_RESET} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
+      echo "  ${CYBER_BOLD}5.${CYBER_RESET} fzf      - Enhanced fuzzy finder with preview" >&2
+      echo "  ${CYBER_BOLD}6.${CYBER_RESET} greeting - Friendly welcome message" >&2
     fi
   else
     # Static fallback list
     echo "Available plugins:" >&2
-    echo "  ${BOLD}1.${NORMAL} sysinfo  - System information display with OSH.IT branding" >&2
-    echo "  ${BOLD}2.${NORMAL} weather  - Beautiful weather forecast with ASCII art" >&2
-    echo "  ${BOLD}3.${NORMAL} taskman  - Advanced terminal task manager" >&2
-    echo "  ${BOLD}4.${NORMAL} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
-    echo "  ${BOLD}5.${NORMAL} fzf      - Enhanced fuzzy finder with preview" >&2
-    echo "  ${BOLD}6.${NORMAL} greeting - Friendly welcome message" >&2
+    echo "  ${CYBER_BOLD}1.${CYBER_RESET} sysinfo  - System information display with OSH.IT branding" >&2
+    echo "  ${CYBER_BOLD}2.${CYBER_RESET} weather  - Beautiful weather forecast with ASCII art" >&2
+    echo "  ${CYBER_BOLD}3.${CYBER_RESET} taskman  - Advanced terminal task manager" >&2
+    echo "  ${CYBER_BOLD}4.${CYBER_RESET} acw      - Advanced Code Workflow (Git + JIRA integration)" >&2
+    echo "  ${CYBER_BOLD}5.${CYBER_RESET} fzf      - Enhanced fuzzy finder with preview" >&2
+    echo "  ${CYBER_BOLD}6.${CYBER_RESET} greeting - Friendly welcome message" >&2
   fi
   echo >&2
   echo "Installation presets:" >&2
-  echo "  ${CYAN}preset:minimal${NORMAL}     - sysinfo only" >&2
-  echo "  ${CYAN}preset:recommended${NORMAL} - sysinfo, weather, taskman (default)" >&2
-  echo "  ${CYAN}preset:developer${NORMAL}   - recommended + acw, fzf" >&2
-  echo "  ${CYAN}preset:full${NORMAL}        - All plugins including experimental" >&2
+  echo "  ${CYBER_NEON_CYAN}preset:minimal${CYBER_RESET}     - sysinfo only" >&2
+  echo "  ${CYBER_NEON_CYAN}preset:recommended${CYBER_RESET} - sysinfo, weather, taskman (default)" >&2
+  echo "  ${CYBER_NEON_CYAN}preset:developer${CYBER_RESET}   - recommended + acw, fzf" >&2
+  echo "  ${CYBER_NEON_CYAN}preset:full${CYBER_RESET}        - All plugins including experimental" >&2
   echo >&2
   echo "Selection options:" >&2
-  echo "  • Enter numbers: ${YELLOW}1 2 3${NORMAL} (space-separated)" >&2
-  echo "  • Use presets: ${YELLOW}preset:recommended${NORMAL}" >&2
-  echo "  • Install all: ${YELLOW}all${NORMAL} or ${YELLOW}a${NORMAL}" >&2
-  echo "  • Default: Press ${YELLOW}Enter${NORMAL} for recommended preset" >&2
+  echo "  • Enter numbers: ${CYBER_NEON_YELLOW}1 2 3${CYBER_RESET} (space-separated)" >&2
+  echo "  • Use presets: ${CYBER_NEON_YELLOW}preset:recommended${CYBER_RESET}" >&2
+  echo "  • Install all: ${CYBER_NEON_YELLOW}all${CYBER_RESET} or ${CYBER_NEON_YELLOW}a${CYBER_RESET}" >&2
+  echo "  • Default: Press ${CYBER_NEON_YELLOW}Enter${CYBER_RESET} for recommended preset" >&2
   echo >&2
   
   local selection
-  printf "${BLUE}Your choice: ${NORMAL}" >&2
+  printf "${CYBER_NEON_BLUE}Your choice: ${CYBER_RESET}" >&2
   read -r selection
   
   # Handle empty input (default)
@@ -510,23 +514,23 @@ show_installation_summary() {
   echo
   log_info "📋 Installation Summary"
   echo
-  echo "${BOLD}What will be installed:${NORMAL}"
+  echo "${CYBER_BOLD}What will be installed:${CYBER_RESET}"
   echo "  • OSH.IT core framework"
   echo "  • Essential libraries and utilities"
   
   if [[ ${#selected_plugins[@]} -gt 0 ]]; then
-    echo "  • Selected plugins: ${CYAN}${selected_plugins[*]}${NORMAL}"
+    echo "  • Selected plugins: ${CYBER_NEON_CYAN}${selected_plugins[*]}${CYBER_RESET}"
   else
-    echo "  • ${DIM}No plugins selected${NORMAL}"
+    echo "  • ${CYBER_DIM}No plugins selected${CYBER_RESET}"
   fi
   
   echo
-  echo "${BOLD}Installation location:${NORMAL} $OSH_DIR"
-  echo "${BOLD}Shell configuration:${NORMAL} $SHELL_CONFIG_FILE"
+  echo "${CYBER_BOLD}Installation location:${CYBER_RESET} $OSH_DIR"
+  echo "${CYBER_BOLD}Shell configuration:${CYBER_RESET} $SHELL_CONFIG_FILE"
   echo
   
   if [[ "$INTERACTIVE" == "true" ]]; then
-    printf "${YELLOW}Continue with installation? [Y/n]: ${NORMAL}"
+    printf "${CYBER_NEON_YELLOW}Continue with installation? [Y/n]: ${CYBER_RESET}"
     local confirm
     read -r confirm
     
@@ -728,7 +732,7 @@ configure_shell() {
       # Update plugin configuration
       if [[ "$INTERACTIVE" == "true" ]]; then
         echo
-        printf "${YELLOW}Update plugin configuration to: ${selected_plugins[*]}? [Y/n]: ${NORMAL}"
+        printf "${CYBER_NEON_YELLOW}Update plugin configuration to: ${selected_plugins[*]}? [Y/n]: ${CYBER_RESET}"
         local confirm
         read -r confirm
         
@@ -777,13 +781,13 @@ configure_shell() {
   # Ask for confirmation in interactive mode
   if [[ "$INTERACTIVE" == "true" ]]; then
     echo
-    echo "${BOLD}Shell Configuration:${NORMAL}"
+    echo "${CYBER_BOLD}Shell Configuration:${CYBER_RESET}"
     echo "The installer can automatically add OSH.IT configuration to your $SHELL_CONFIG_FILE"
     echo
     echo "Configuration to be added:"
-    printf "${DIM}%b${NORMAL}\n" "$config_block"
+    printf "${CYBER_DIM}%b${CYBER_RESET}\n" "$config_block"
     
-    printf "${YELLOW}Add OSH.IT configuration to $SHELL_CONFIG_FILE? [Y/n]: ${NORMAL}"
+    printf "${CYBER_NEON_YELLOW}Add OSH.IT configuration to $SHELL_CONFIG_FILE? [Y/n]: ${CYBER_RESET}"
     local confirm
     read -r confirm
     
@@ -791,10 +795,10 @@ configure_shell() {
       [nN]|[nN][oO])
         log_info "Skipping automatic shell configuration"
         echo
-        echo "${BOLD}${BLUE}Manual Configuration Required:${NORMAL}"
+        echo "${CYBER_BOLD}${CYBER_NEON_BLUE}Manual Configuration Required:${CYBER_RESET}"
         echo "Add the following to your $SHELL_CONFIG_FILE:"
         echo
-        printf "${CYAN}%b${NORMAL}\n" "$config_block"
+        printf "${CYBER_NEON_CYAN}%b${CYBER_RESET}\n" "$config_block"
         return 0
         ;;
     esac
@@ -889,7 +893,7 @@ install_osh() {
       
       plugin_count=$((plugin_count + 1))
       echo
-      printf "${CYAN}[%d/%d]${NORMAL} Installing plugin: ${BOLD}%s${NORMAL}\n" "$plugin_count" "$total_plugins" "$plugin"
+      printf "${CYBER_NEON_CYAN}[%d/%d]${CYBER_RESET} Installing plugin: ${CYBER_BOLD}%s${CYBER_RESET}\n" "$plugin_count" "$total_plugins" "$plugin"
       
       local plugin_files
       plugin_files=$(get_plugin_files "$plugin" 2>/dev/null)
@@ -1004,23 +1008,23 @@ show_help() {
   show_logo
   
   cat << EOF
-${BOLD}OSH Installation Script${NORMAL}
+${CYBER_BOLD}OSH Installation Script${CYBER_RESET}
 
-${BOLD}DESCRIPTION:${NORMAL}
+${CYBER_BOLD}DESCRIPTION:${CYBER_RESET}
   OSH is a lightweight, high-performance Zsh plugin framework designed as a
   modern alternative to Oh My Zsh with 99.8% faster startup times.
 
-${BOLD}USAGE:${NORMAL}
+${CYBER_BOLD}USAGE:${CYBER_RESET}
   $0 [OPTIONS]
 
-${BOLD}OPTIONS:${NORMAL}
+${CYBER_BOLD}OPTIONS:${CYBER_RESET}
   --dry-run              Preview installation without making changes
   --yes                  Non-interactive installation with defaults
   --skip-shell-config    Skip automatic shell configuration
   --plugins PLUGINS      Comma-separated list of plugins to install
   --help                 Show this help message
 
-${BOLD}EXAMPLES:${NORMAL}
+${CYBER_BOLD}EXAMPLES:${CYBER_RESET}
   # Interactive installation (recommended)
   $0
 
@@ -1033,7 +1037,7 @@ ${BOLD}EXAMPLES:${NORMAL}
   # Preview installation
   $0 --dry-run
 
-${BOLD}AVAILABLE PLUGINS:${NORMAL}
+${CYBER_BOLD}AVAILABLE PLUGINS:${CYBER_RESET}
   • 
   • sysinfo  - System information display
   • weather  - Beautiful weather forecast
@@ -1088,12 +1092,12 @@ main() {
   
   # Show logo and welcome
   show_logo
-  echo "${BOLD}${GREEN}Welcome to OSH.IT Installation!${NORMAL}"
+  echo "${CYBER_BOLD}${CYBER_MATRIX_GREEN}Welcome to OSH.IT Installation!${CYBER_RESET}"
   echo
   
   if [[ "$DRY_RUN" == "true" ]]; then
     echo "${CYBER_PURPLE}${CYBER_BOLD}DRY-RUN MODE - Running in Dry-Run Mode${CYBER_RESET}"
-    echo "${DIM}No changes will be made to your system${NORMAL}"
+    echo "${CYBER_DIM}No changes will be made to your system${CYBER_RESET}"
     echo
   fi
   
@@ -1122,7 +1126,7 @@ main() {
   echo "  Default Shell: $SHELL"
   echo "  Target Shell: $CURRENT_SHELL"
   echo "  Config File: $SHELL_CONFIG_FILE"
-  echo "  Color Support: $([ "$SUPPORTS_COLOR" == "true" ] && echo "${GREEN}Yes${NORMAL}" || echo "${YELLOW}No${NORMAL}")"
+  echo "  Color Support: $([ "$SUPPORTS_COLOR" == "true" ] && echo "${CYBER_MATRIX_GREEN}Yes${CYBER_RESET}" || echo "${CYBER_NEON_YELLOW}No${CYBER_RESET}")"
   echo
   
   # Get selected plugins BEFORE starting installation
@@ -1164,41 +1168,41 @@ main() {
     echo
     echo "${CYBER_MATRIX_GREEN}${CYBER_BOLD}INSTALLATION COMPLETE!${CYBER_RESET}"
     echo
-    echo "${BOLD}${BLUE}📋 Next Steps:${NORMAL}"
-    echo "  1. Restart your terminal or run: ${CYAN}source $SHELL_CONFIG_FILE${NORMAL}"
+    echo "${CYBER_BOLD}${CYBER_NEON_BLUE}📋 Next Steps:${CYBER_RESET}"
+    echo "  1. Restart your terminal or run: ${CYBER_NEON_CYAN}source $SHELL_CONFIG_FILE${CYBER_RESET}"
     if [[ "$CURRENT_SHELL" == "zsh" ]]; then
       echo "  2. Try these OSH commands:"
-      echo "     ${CYAN}osh status${NORMAL}           # Check OSH.IT status"
-      echo "     ${CYAN}osh plugin list${NORMAL}      # List available plugins"
+      echo "     ${CYBER_NEON_CYAN}osh status${CYBER_RESET}           # Check OSH.IT status"
+      echo "     ${CYBER_NEON_CYAN}osh plugin list${CYBER_RESET}      # List available plugins"
       if [[ " ${selected_plugins[*]} " =~ " weather " ]]; then
-        echo "     ${CYAN}weather${NORMAL}              # Beautiful weather display"
+        echo "     ${CYBER_NEON_CYAN}weather${CYBER_RESET}              # Beautiful weather display"
       fi
       if [[ " ${selected_plugins[*]} " =~ " sysinfo " ]]; then
-        echo "     ${CYAN}sysinfo${NORMAL}             # System info with OSH branding"
+        echo "     ${CYBER_NEON_CYAN}sysinfo${CYBER_RESET}             # System info with OSH branding"
       fi
       if [[ " ${selected_plugins[*]} " =~ " taskman " ]]; then
-        echo "     ${CYAN}tm${NORMAL}                  # Advanced task manager"
+        echo "     ${CYBER_NEON_CYAN}tm${CYBER_RESET}                  # Advanced task manager"
       fi
 
       echo "  3. Manage OSH:"
-      echo "     ${CYAN}osh plugin add <name>${NORMAL} # Add a plugin"
-      echo "     ${CYAN}osh upgrade${NORMAL}          # Update OSH.IT"
-      echo "     ${CYAN}osh help${NORMAL}             # Show all commands"
+      echo "     ${CYBER_NEON_CYAN}osh plugin add <name>${CYBER_RESET} # Add a plugin"
+      echo "     ${CYBER_NEON_CYAN}osh upgrade${CYBER_RESET}          # Update OSH.IT"
+      echo "     ${CYBER_NEON_CYAN}osh help${CYBER_RESET}             # Show all commands"
     else
       echo "  2. For best experience, consider switching to Zsh:"
-      echo "     ${CYAN}chsh -s \$(which zsh)${NORMAL}"
+      echo "     ${CYBER_NEON_CYAN}chsh -s \$(which zsh)${CYBER_RESET}"
     fi
     echo
     echo "${CYBER_NEON_BLUE}${CYBER_BOLD}NETWORK RESOURCES:${CYBER_RESET}"
-    echo "  • Official Website: ${CYAN}https://oiahoon.github.io/osh.it/${NORMAL}"
-    echo "  • Documentation: ${CYAN}https://github.com/oiahoon/osh.it/wiki${NORMAL}"
-    echo "  • Support: ${CYAN}https://github.com/oiahoon/osh.it/issues${NORMAL}"
+    echo "  • Official Website: ${CYBER_NEON_CYAN}https://oiahoon.github.io/osh.it/${CYBER_RESET}"
+    echo "  • Documentation: ${CYBER_NEON_CYAN}https://github.com/oiahoon/osh.it/wiki${CYBER_RESET}"
+    echo "  • Support: ${CYBER_NEON_CYAN}https://github.com/oiahoon/osh.it/issues${CYBER_RESET}"
     echo
   else
     echo
     log_success "Dry run completed successfully!"
     echo
-    echo "${BOLD}${BLUE}What would happen:${NORMAL}"
+    echo "${CYBER_BOLD}${CYBER_NEON_BLUE}What would happen:${CYBER_RESET}"
     echo "  1. Download OSH framework files with progress indication"
     echo "  2. Download selected plugin files"
     echo "  3. Set up file permissions"

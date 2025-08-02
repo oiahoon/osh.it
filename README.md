@@ -207,6 +207,8 @@ osh upgrade              # Upgrade OSH.IT
 - **sysinfo** - System information display with OSH branding
 - **weather** - Beautiful weather forecast with ASCII art  
 - **taskman** - Advanced terminal task manager
+- **git-heatmap** - GitHub-style contribution heatmap for git repositories
+- **ascii-text** - Cyberpunk ASCII art text generator
 
 #### 🟡 **Beta Plugins** (Advanced users)
 - **acw** - Advanced Code Workflow (Git + JIRA integration)
@@ -281,6 +283,36 @@ Advanced terminal task manager with smart productivity assistant:
 tm                    # Launch task manager (auto-setup on first run)
 tasks setup          # Run setup wizard anytime
 tasks config         # View current configuration
+```
+
+### 📊 Git Heatmap
+GitHub-style contribution heatmap for your git repositories:
+- **📊 Visual Contribution Patterns** - GitHub-like heatmap display in terminal
+- **🎨 Cyberpunk Aesthetic** - Matches OSH.IT's color scheme
+- **📅 Multiple Views** - Year and month view options
+- **🔥 Streak Tracking** - Shows current and longest commit streaks
+- **⚡ Performance Optimized** - Efficient git log parsing
+
+#### Quick Start
+```bash
+git-heatmap           # Show contribution heatmap for last year
+ghm --days 90        # Show last 90 days (alias)
+git-heatmap --view month  # Show current month
+```
+
+### 🎨 ASCII Text
+Cyberpunk ASCII art text generator with multiple styles:
+- **🎨 Multiple Styles** - Matrix, Circuit, and Neon ASCII fonts
+- **🌈 Cyberpunk Colors** - 8 color options matching OSH.IT theme
+- **⚡ Fast Generation** - Optimized text rendering
+- **👀 Preview Mode** - See all styles at once
+- **🎯 CLI Friendly** - Perfect for terminal banners and headers
+
+#### Quick Start
+```bash
+ascii-text "HELLO"    # Generate ASCII art
+ascii "CYBER" --style circuit  # Custom style (alias)
+ascii-text "OSH" --preview     # Preview all styles
 ```
 
 ### 🔧 ACW (Advanced Code Workflow)

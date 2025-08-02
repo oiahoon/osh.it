@@ -15,12 +15,28 @@ fi
 # Plugin database with enhanced metadata (shell compatible)
 declare -A OSH_PLUGIN_DB
 
+# Get all plugin names (shell-compatible)
+osh_plugin_get_all_names() {
+  cat << 'EOF'
+sysinfo
+weather
+taskman
+git-heatmap
+ascii-text
+acw
+fzf
+greeting
+EOF
+}
+
 # Initialize plugin database
 osh_plugin_init_db() {
   # Stable plugins
   OSH_PLUGIN_DB[sysinfo]="stable|1.1.0|System information display with OSH branding|sysinfo,oshinfo,neofetch-osh||system,info,display"
   OSH_PLUGIN_DB[weather]="stable|1.3.0|Beautiful weather forecast with ASCII art|weather,forecast|curl|weather,forecast,utility"
   OSH_PLUGIN_DB[taskman]="stable|2.0.0|Advanced terminal task manager with productivity features|tm,tasks|python3|productivity,tasks,management"
+  OSH_PLUGIN_DB[git-heatmap]="stable|1.0.0|GitHub-style contribution heatmap for git repositories|git-heatmap,ghm,git-heat|git|git,visualization,heatmap,cyberpunk"
+  OSH_PLUGIN_DB[ascii-text]="stable|1.0.0|Cyberpunk ASCII art text generator with multiple styles|ascii-text,ascii,asciit||ascii,art,text,cyberpunk,generator"
   
   # Beta plugins
   OSH_PLUGIN_DB[acw]="beta|0.9.0|Advanced Code Workflow - Git + JIRA integration|acw,ggco,newb|git,curl|git,jira,workflow,development"
@@ -74,8 +90,8 @@ osh_plugin_search() {
   local found_plugins=()
   local search_lower=$(echo "$search_term" | tr '[:upper:]' '[:lower:]')
   
-  # Shell compatible iteration over associative array keys
-  for plugin in "${!OSH_PLUGIN_DB[@]}"; do
+  # Simple iteration over plugin names using explicit list
+  for plugin in sysinfo weather taskman git-heatmap ascii-text acw fzf greeting; do
     local metadata="${OSH_PLUGIN_DB[$plugin]}"
     local IFS='|'
     local parts=($metadata)
@@ -176,8 +192,10 @@ osh_plugin_list_by_category() {
   
   local plugins=()
   
-  for plugin in "${!OSH_PLUGIN_DB[@]}"; do
+  # Simple iteration over plugin names using explicit list
+  for plugin in sysinfo weather taskman git-heatmap ascii-text acw fzf greeting; do
     local metadata="${OSH_PLUGIN_DB[$plugin]}"
+    [[ -z "$metadata" ]] && continue
     local IFS='|'
     local parts=($metadata)
     local plugin_category="${parts[0]}"
@@ -327,8 +345,7 @@ osh_plugin_is_installed() {
 
 # Get all available plugins
 osh_plugin_get_all() {
-  osh_plugin_init_db
-  echo "${!OSH_PLUGIN_DB[@]}"
+  osh_plugin_get_all_names
 }
 
 # Get plugins by category
@@ -338,8 +355,9 @@ osh_plugin_get_by_category() {
   osh_plugin_init_db
   
   local plugins=()
-  for plugin in "${!OSH_PLUGIN_DB[@]}"; do
+  for plugin in sysinfo weather taskman git-heatmap ascii-text acw fzf greeting; do
     local metadata="${OSH_PLUGIN_DB[$plugin]}"
+    [[ -z "$metadata" ]] && continue
     local IFS='|'
     local parts=($metadata)
     local plugin_category="${parts[0]}"
@@ -443,6 +461,8 @@ osh_plugin_list_all() {
 sysinfo|stable|System information display with OSH branding
 weather|stable|Beautiful weather forecast with ASCII art
 taskman|stable|Advanced terminal task manager with productivity features
+git-heatmap|stable|GitHub-style contribution heatmap for git repositories
+ascii-text|stable|Cyberpunk ASCII art text generator with multiple styles
 acw|beta|Advanced Code Workflow - Git + JIRA integration
 fzf|beta|Enhanced fuzzy finder with preview capabilities
 greeting|experimental|Friendly welcome message for OSH users
