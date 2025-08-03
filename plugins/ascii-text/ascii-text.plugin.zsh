@@ -204,6 +204,13 @@ _get_ascii_char() {
 
 # Main ascii_text function
 ascii_text() {
+    # Save current xtrace setting and disable it
+    local xtrace_save=""
+    if [[ -o xtrace ]]; then
+        xtrace_save="on"
+        set +x
+    fi
+    
     local text=""
     local style="matrix"
     local color="cyan"
@@ -243,26 +250,37 @@ ascii_text() {
     
     if [[ "$help" == "true" ]]; then
         _ascii_text_help
+        # Restore xtrace if it was on
+        [[ "$xtrace_save" == "on" ]] && set -x
         return 0
     fi
     
     if [[ "$list_styles" == "true" ]]; then
         _ascii_text_list_styles
+        # Restore xtrace if it was on
+        [[ "$xtrace_save" == "on" ]] && set -x
         return 0
     fi
     
     if [[ "$preview" == "true" ]]; then
         _ascii_text_preview "$text"
+        # Restore xtrace if it was on
+        [[ "$xtrace_save" == "on" ]] && set -x
         return 0
     fi
     
     if [[ -z "$text" ]]; then
         echo "${ASCII_RED}[ERROR]${ASCII_RESET} Please provide text to convert" >&2
         echo "Usage: ascii-text \"YOUR TEXT\" [OPTIONS]" >&2
+        # Restore xtrace if it was on
+        [[ "$xtrace_save" == "on" ]] && set -x
         return 1
     fi
     
     _generate_ascii_text "$text" "$style" "$color"
+    
+    # Restore xtrace if it was on
+    [[ "$xtrace_save" == "on" ]] && set -x
 }
 
 # Show help
@@ -331,6 +349,13 @@ _generate_ascii_text() {
     local style="$2"
     local color="$3"
     
+    # Temporarily disable xtrace for this function
+    local xtrace_was_on=false
+    if [[ -o xtrace ]]; then
+        xtrace_was_on=true
+        set +x
+    fi
+    
     # Get color code
     local color_code
     color_code=$(_get_ascii_color "$color")
@@ -347,25 +372,29 @@ _generate_ascii_text() {
     local line1="" line2="" line3=""
     
     for char in "${chars[@]}"; do
-        local char_ascii
-        char_ascii=$(_get_ascii_char "$style" "$char")
+        local ascii_data
+        # Capture output without triggering xtrace
+        ascii_data=$(set +x; _get_ascii_char "$style" "$char")
         
-        # Split into lines
-        local char_line1 char_line2 char_line3
-        char_line1=$(echo "$char_ascii" | sed -n '1p')
-        char_line2=$(echo "$char_ascii" | sed -n '2p')
-        char_line3=$(echo "$char_ascii" | sed -n '3p')
+        # Split into lines using here-doc to avoid subshell
+        local line1_data line2_data line3_data
+        { IFS=$'\n' read -r line1_data; IFS=$'\n' read -r line2_data; IFS=$'\n' read -r line3_data; } <<< "$ascii_data"
         
         # Append to lines with spacing
-        line1+="$char_line1 "
-        line2+="$char_line2 "
-        line3+="$char_line3 "
+        line1+="$line1_data "
+        line2+="$line2_data "
+        line3+="$line3_data "
     done
     
     # Output the lines with color
     echo "${color_code}${line1}${ASCII_RESET}"
     echo "${color_code}${line2}${ASCII_RESET}"
     echo "${color_code}${line3}${ASCII_RESET}"
+    
+    # Restore xtrace if it was on
+    if [[ "$xtrace_was_on" == "true" ]]; then
+        set -x
+    fi
 }
 
 # Aliases
