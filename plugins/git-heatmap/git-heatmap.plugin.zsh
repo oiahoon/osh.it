@@ -178,74 +178,80 @@ _display_github_heatmap() {
     local t1="$3" t2="$4" t3="$5" t4="$6"
     local temp_file="$7"
     
-    echo
-    echo "${HEATMAP_CYAN}${HEATMAP_BOLD}Contribution Graph - Last $days days${HEATMAP_RESET}"
-    
-    # Month headers
-    printf "     "
-    local months=("Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec")
-    for month in "${months[@]}"; do
-        printf "%s%-4s%s" "${HEATMAP_DIM}" "$month" "${HEATMAP_RESET}"
-    done
-    echo
-    
-    # Week days
-    local weekdays=("" "Mon" "" "Wed" "" "Fri" "")
-    
-    # Calculate starting Sunday
-    local current_date="$start_date"
-    local day_of_week
-    if date --version >/dev/null 2>&1; then
-        day_of_week=$(date -d "$current_date" +%w)
-        if [[ $day_of_week -ne 0 ]]; then
-            current_date=$(date -d "$current_date - $day_of_week days" +%Y-%m-%d)
-        fi
-    else
-        day_of_week=$(date -j -f "%Y-%m-%d" "$current_date" +%w)
-        if [[ $day_of_week -ne 0 ]]; then
-            current_date=$(date -v-${day_of_week}d -j -f "%Y-%m-%d" "$current_date" +%Y-%m-%d)
-        fi
-    fi
-    
-    # Display 7 rows (for each day of week)
-    for ((row=0; row<7; row++)); do
-        # Print weekday label
-        printf "%s%-3s%s " "${HEATMAP_DIM}" "${weekdays[$row]}" "${HEATMAP_RESET}"
+    # Completely suppress xtrace for this function
+    {
+        echo
+        echo "${HEATMAP_CYAN}${HEATMAP_BOLD}Contribution Graph - Last $days days${HEATMAP_RESET}"
         
-        # Generate 53 weeks
-        for ((week=0; week<53; week++)); do
-            # Calculate the date for this cell
-            local days_offset=$((week * 7 + row))
-            local cell_date
-            
-            if date --version >/dev/null 2>&1; then
-                cell_date=$(date -d "$current_date + $days_offset days" +%Y-%m-%d 2>/dev/null)
-            else
-                cell_date=$(date -v+${days_offset}d -j -f "%Y-%m-%d" "$current_date" +%Y-%m-%d 2>/dev/null)
-            fi
-            
-            # Check if date is within our range
-            if [[ -z "$cell_date" ]] || [[ "$cell_date" < "$start_date" ]] || [[ "$cell_date" > "$end_date" ]]; then
-                printf " "
-            else
-                local commits=$(_get_commit_count "$cell_date" "$temp_file")
-                local intensity=0
-                
-                if [[ $commits -ge $t4 ]]; then
-                    intensity=4
-                elif [[ $commits -ge $t3 ]]; then
-                    intensity=3
-                elif [[ $commits -ge $t2 ]]; then
-                    intensity=2
-                elif [[ $commits -ge $t1 ]]; then
-                    intensity=1
-                fi
-                
-                printf "%s%s%s" "$(_get_heatmap_color $intensity)" "$HEATMAP_SQUARE" "$HEATMAP_RESET"
-            fi
+        # Month headers
+        printf "     "
+        local months=("Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec")
+        for month in "${months[@]}"; do
+            printf "%s%-4s%s" "${HEATMAP_DIM}" "$month" "${HEATMAP_RESET}"
         done
         echo
-    done
+        
+        # Week days
+        local weekdays=("" "Mon" "" "Wed" "" "Fri" "")
+        
+        # Calculate starting Sunday
+        local current_date="$start_date"
+        local day_of_week
+        if date --version >/dev/null 2>&1; then
+            day_of_week=$(date -d "$current_date" +%w)
+            if [[ $day_of_week -ne 0 ]]; then
+                current_date=$(date -d "$current_date - $day_of_week days" +%Y-%m-%d)
+            fi
+        else
+            day_of_week=$(date -j -f "%Y-%m-%d" "$current_date" +%w)
+            if [[ $day_of_week -ne 0 ]]; then
+                current_date=$(date -v-${day_of_week}d -j -f "%Y-%m-%d" "$current_date" +%Y-%m-%d)
+            fi
+        fi
+        
+        # Display 7 rows (for each day of week)
+        for ((row=0; row<7; row++)); do
+            # Print weekday label
+            printf "%s%-3s%s " "${HEATMAP_DIM}" "${weekdays[$row]}" "${HEATMAP_RESET}"
+            
+            # Generate 53 weeks
+            for ((week=0; week<53; week++)); do
+                # Calculate the date for this cell
+                local days_offset=$((week * 7 + row))
+                local cell_date
+                
+                # Suppress xtrace for variable assignments
+                set +x 2>/dev/null
+                if date --version >/dev/null 2>&1; then
+                    cell_date=$(date -d "$current_date + $days_offset days" +%Y-%m-%d 2>/dev/null)
+                else
+                    cell_date=$(date -v+${days_offset}d -j -f "%Y-%m-%d" "$current_date" +%Y-%m-%d 2>/dev/null)
+                fi
+                [[ "$xtrace_was_on" == "true" ]] && set -x 2>/dev/null
+                
+                # Check if date is within our range
+                if [[ -z "$cell_date" ]] || [[ "$cell_date" < "$start_date" ]] || [[ "$cell_date" > "$end_date" ]]; then
+                    printf " "
+                else
+                    local commits=$(_get_commit_count "$cell_date" "$temp_file")
+                    local intensity=0
+                    
+                    if [[ $commits -ge $t4 ]]; then
+                        intensity=4
+                    elif [[ $commits -ge $t3 ]]; then
+                        intensity=3
+                    elif [[ $commits -ge $t2 ]]; then
+                        intensity=2
+                    elif [[ $commits -ge $t1 ]]; then
+                        intensity=1
+                    fi
+                    
+                    printf "%s%s%s" "$(_get_heatmap_color $intensity)" "$HEATMAP_SQUARE" "$HEATMAP_RESET"
+                fi
+            done
+            echo
+        done
+    } 2>/dev/null
 }
 
 # Display compact heatmap
