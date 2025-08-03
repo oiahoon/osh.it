@@ -202,19 +202,105 @@ _get_ascii_char() {
     esac
 }
 
-# Main ascii_text function with complete xtrace isolation
+# Wrapper function to run ascii art generation in clean environment
+_run_ascii_clean() {
+    # Create a completely isolated environment using a separate zsh instance
+    /usr/bin/env zsh -c "
+        setopt no_xtrace
+        
+        # Source color functions directly
+        ASCII_CYAN=\$'\\033[38;2;0;255;255m'
+        ASCII_GREEN=\$'\\033[38;2;0;255;65m'
+        ASCII_YELLOW=\$'\\033[38;2;255;255;0m'
+        ASCII_RED=\$'\\033[38;2;255;0;64m'
+        ASCII_PURPLE=\$'\\033[38;2;138;43;226m'
+        ASCII_ORANGE=\$'\\033[38;2;255;165;0m'
+        ASCII_PINK=\$'\\033[38;2;255;20;147m'
+        ASCII_WHITE=\$'\\033[38;2;255;255;255m'
+        ASCII_RESET=\$'\\033[0m'
+        
+        _get_color() {
+            case \$1 in
+                cyan|blue) echo \"\$ASCII_CYAN\" ;;
+                green) echo \"\$ASCII_GREEN\" ;;
+                yellow) echo \"\$ASCII_YELLOW\" ;;
+                red) echo \"\$ASCII_RED\" ;;
+                purple) echo \"\$ASCII_PURPLE\" ;;
+                orange) echo \"\$ASCII_ORANGE\" ;;
+                pink) echo \"\$ASCII_PINK\" ;;
+                white) echo \"\$ASCII_WHITE\" ;;
+                *) echo \"\$ASCII_CYAN\" ;;
+            esac
+        }
+        
+        # Inline character definitions to avoid external calls
+        _matrix_chars() {
+            case \$1 in
+                o) echo -e \"╔═╗\\n║ ║\\n╚═╝\" ;;
+                n) echo -e \"╔╗╔\\n║║║\\n╝╚╝\" ;;
+                c) echo -e \"╔═╗\\n║  \\n╚═╝\" ;;
+                e) echo -e \"╔═╗\\n║╣ \\n╚═╝\" ;;
+                *) echo -e \"   \\n   \\n   \" ;;
+            esac
+        }
+        
+        _circuit_chars() {
+            case \$1 in
+                o) echo -e \"┏━┓\\n┃ ┃\\n┗━┛\" ;;
+                n) echo -e \"┏┓ \\n┃┃┃\\n┛ ┗\" ;;
+                c) echo -e \"┏━┓\\n┃  \\n┗━┛\" ;;
+                e) echo -e \"┏━┓\\n┣━ \\n┗━┛\" ;;
+                *) echo -e \"   \\n   \\n   \" ;;
+            esac
+        }
+        
+        _neon_chars() {
+            case \$1 in
+                o) echo -e \"▄▀█\\n█ █\\n▀▀▀\" ;;
+                n) echo -e \"▄▀▄\\n█ █\\n▀ ▀\" ;;
+                c) echo -e \"▄▀█\\n█▄▄\\n▀▀▀\" ;;
+                e) echo -e \"█▀▀\\n█▀▀\\n▀▀▀\" ;;
+                *) echo -e \"   \\n   \\n   \" ;;
+            esac
+        }
+        
+        text=\"$1\"
+        style=\"$2\"
+        color=\"$3\"
+        
+        color_code=\$(_get_color \"\$color\")
+        
+        line1=\"\"
+        line2=\"\"
+        line3=\"\"
+        
+        for (( i=0; i<\${#text}; i++ )); do
+            char=\${text:\$i:1}
+            char=\$(echo \"\$char\" | tr '[:upper:]' '[:lower:]')
+            
+            case \"\$style\" in
+                circuit) ascii_data=\$(_circuit_chars \"\$char\") ;;
+                neon) ascii_data=\$(_neon_chars \"\$char\") ;;
+                *) ascii_data=\$(_matrix_chars \"\$char\") ;;
+            esac
+            
+            l1=\$(echo \"\$ascii_data\" | sed -n '1p')
+            l2=\$(echo \"\$ascii_data\" | sed -n '2p')
+            l3=\$(echo \"\$ascii_data\" | sed -n '3p')
+            
+            line1+=\"\$l1 \"
+            line2+=\"\$l2 \"
+            line3+=\"\$l3 \"
+        done
+        
+        echo \"\${color_code}\${line1}\${ASCII_RESET}\"
+        echo \"\${color_code}\${line2}\${ASCII_RESET}\"
+        echo \"\${color_code}\${line3}\${ASCII_RESET}\"
+    " 2>/dev/null
+}
+
+# Main ascii_text function
 ascii_text() {
-    # Complete isolation using exec redirect approach
-    exec 3>&2  # Save stderr
-    exec 2>/dev/null  # Redirect stderr to null
-    local original_xtrace=""
-    if [[ -o xtrace ]]; then
-        original_xtrace="on"
-        set +x  # Disable xtrace
-    fi
-    exec 2>&3  # Restore stderr
-    exec 3>&-  # Close fd 3
-    
     local text=""
     local style="matrix"
     local color="cyan"
@@ -252,7 +338,6 @@ ascii_text() {
         esac
     done
     
-    # Execute commands with clean environment
     if [[ "$help" == "true" ]]; then
         _ascii_text_help
     elif [[ "$list_styles" == "true" ]]; then
@@ -262,15 +347,10 @@ ascii_text() {
     elif [[ -z "$text" ]]; then
         echo "${ASCII_RED}[ERROR]${ASCII_RESET} Please provide text to convert" >&2
         echo "Usage: ascii-text \"YOUR TEXT\" [OPTIONS]" >&2
-        # Restore xtrace if needed
-        [[ "$original_xtrace" == "on" ]] && set -x
         return 1
     else
-        _generate_ascii_text "$text" "$style" "$color"
+        _run_ascii_clean "$text" "$style" "$color"
     fi
-    
-    # Restore xtrace if it was originally on
-    [[ "$original_xtrace" == "on" ]] && set -x
 }
 
 # Show help
@@ -328,57 +408,9 @@ _ascii_text_preview() {
     local styles=("matrix" "circuit" "neon")
     for style in "${styles[@]}"; do
         echo "${ASCII_YELLOW}Style: $style${ASCII_RESET}"
-        _generate_ascii_text "$text" "$style" "cyan"
+        _run_ascii_clean "$text" "$style" "cyan"
         echo
     done
-}
-
-# Generate ASCII text with complete debug suppression
-_generate_ascii_text() {
-    # This function is called with xtrace already disabled from main function
-    local text="$1"
-    local style="$2" 
-    local color="$3"
-    
-    # Process in a completely clean environment
-    {
-        # Get color code
-        local color_code
-        color_code=$(_get_ascii_color "$color")
-        
-        # Convert text to individual characters
-        local chars=()
-        local i=0
-        while [[ $i -lt ${#text} ]]; do
-            chars+=("${text:$i:1}")
-            ((i++))
-        done
-        
-        # Generate ASCII art lines
-        local line1="" line2="" line3=""
-        
-        for char in "${chars[@]}"; do
-            # Get ASCII representation
-            local ascii_data
-            ascii_data=$(_get_ascii_char "$style" "$char")
-            
-            # Extract three lines
-            local l1 l2 l3
-            l1=$(echo "$ascii_data" | sed -n '1p')
-            l2=$(echo "$ascii_data" | sed -n '2p') 
-            l3=$(echo "$ascii_data" | sed -n '3p')
-            
-            # Append with spacing
-            line1+="$l1 "
-            line2+="$l2 "
-            line3+="$l3 "
-        done
-        
-        # Output colored lines
-        echo "${color_code}${line1}${ASCII_RESET}"
-        echo "${color_code}${line2}${ASCII_RESET}"
-        echo "${color_code}${line3}${ASCII_RESET}"
-    } 2>/dev/null
 }
 
 # Aliases

@@ -44,8 +44,15 @@ _get_heatmap_color() {
 # GitHub-style squares using Unicode
 HEATMAP_SQUARE="■"
 
-# Main git_heatmap function
+# Main git_heatmap function with xtrace suppression
 git_heatmap() {
+    # Disable xtrace for clean output
+    local xtrace_was_on=false
+    if [[ -o xtrace ]]; then
+        xtrace_was_on=true
+        set +x
+    fi
+    
     local days=365
     local style="default"
     local help=false
@@ -67,6 +74,8 @@ git_heatmap() {
                 ;;
             *)
                 echo "${HEATMAP_COLOR_1}${HEATMAP_BOLD}[ERROR]${HEATMAP_RESET} Unknown option: $1" >&2
+                # Restore xtrace if needed
+                [[ "$xtrace_was_on" == "true" ]] && set -x
                 return 1
                 ;;
         esac
@@ -74,12 +83,16 @@ git_heatmap() {
     
     if [[ "$help" == "true" ]]; then
         _git_heatmap_help
+        # Restore xtrace if needed
+        [[ "$xtrace_was_on" == "true" ]] && set -x
         return 0
     fi
     
     # Check if we're in a git repository
     if ! git rev-parse --git-dir >/dev/null 2>&1; then
         echo "${HEATMAP_COLOR_1}${HEATMAP_BOLD}[ERROR]${HEATMAP_RESET} Not a git repository" >&2
+        # Restore xtrace if needed
+        [[ "$xtrace_was_on" == "true" ]] && set -x
         return 1
     fi
     
@@ -94,27 +107,27 @@ git_heatmap() {
         start_date=$(date -v-${days}d +%Y-%m-%d)
     fi
     
-    # Get git log data
-    local git_log_data
-    git_log_data=$(git log --since="$start_date" --until="$end_date" --format="%ad" --date=short | sort | uniq -c | awk '{print $2 ":" $1}')
+    # Create temporary file for commit data
+    local temp_file=$(mktemp)
     
-    # Process commit data into associative array
-    declare -A commit_counts
+    # Get git log data and process it
+    {
+        git log --since="$start_date" --until="$end_date" --format="%ad" --date=short 2>/dev/null | sort | uniq -c | awk '{print $2 ":" $1}' > "$temp_file"
+    } 2>/dev/null
+    
+    # Calculate statistics
     local total_commits=0
     local active_days=0
+    local max_commits=0
     
     while IFS=':' read -r date count; do
-        commit_counts["$date"]=$count
+        [[ -n "$date" ]] || continue
         total_commits=$((total_commits + count))
         active_days=$((active_days + 1))
-    done <<< "$git_log_data"
+        [[ $count -gt $max_commits ]] && max_commits=$count
+    done < "$temp_file"
     
     # Calculate intensity thresholds based on data
-    local max_commits=0
-    for count in "${commit_counts[@]}"; do
-        [[ $count -gt $max_commits ]] && max_commits=$count
-    done
-    
     local threshold1=$((max_commits > 0 ? 1 : 0))
     local threshold2=$((max_commits > 4 ? max_commits / 4 : 1))
     local threshold3=$((max_commits > 2 ? max_commits / 2 : 2))
@@ -122,9 +135,9 @@ git_heatmap() {
     
     # Display heatmap
     if [[ "$style" == "compact" ]]; then
-        _display_compact_heatmap "$start_date" "$end_date" "$threshold1" "$threshold2" "$threshold3" "$threshold4" commit_counts
+        _display_compact_heatmap "$start_date" "$end_date" "$threshold1" "$threshold2" "$threshold3" "$threshold4" "$temp_file"
     else
-        _display_github_heatmap "$start_date" "$end_date" "$threshold1" "$threshold2" "$threshold3" "$threshold4" commit_counts
+        _display_github_heatmap "$start_date" "$end_date" "$threshold1" "$threshold2" "$threshold3" "$threshold4" "$temp_file"
     fi
     
     # Display legend and statistics
@@ -142,6 +155,20 @@ git_heatmap() {
         "${HEATMAP_CYAN}" "${HEATMAP_RESET}" "$active_days" "$days" \
         "${HEATMAP_CYAN}" "${HEATMAP_RESET}" \
         "${HEATMAP_CYAN}" "${HEATMAP_RESET}" "$total_commits"
+    
+    # Clean up
+    rm -f "$temp_file"
+    
+    # Restore xtrace if it was originally on
+    [[ "$xtrace_was_on" == "true" ]] && set -x
+}
+
+# Get commit count for specific date from file
+_get_commit_count() {
+    local date="$1"
+    local temp_file="$2"
+    
+    grep "^$date:" "$temp_file" 2>/dev/null | cut -d: -f2 || echo "0"
 }
 
 # Display GitHub-style heatmap
@@ -149,10 +176,10 @@ _display_github_heatmap() {
     local start_date="$1"
     local end_date="$2"
     local t1="$3" t2="$4" t3="$5" t4="$6"
-    local -n commit_data="$7"
+    local temp_file="$7"
     
     echo
-    echo "${HEATMAP_CYAN}${HEATMAP_BOLD}Contribution Graph - Last $(( ($(date +%s) - $(date -d "$start_date" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$start_date" +%s)) / 86400 + 1 )) days${HEATMAP_RESET}"
+    echo "${HEATMAP_CYAN}${HEATMAP_BOLD}Contribution Graph - Last $days days${HEATMAP_RESET}"
     
     # Month headers
     printf "     "
@@ -162,31 +189,20 @@ _display_github_heatmap() {
     done
     echo
     
-    # Week days (just show a few chars)
+    # Week days
     local weekdays=("" "Mon" "" "Wed" "" "Fri" "")
     
-    # Calculate starting point (ensure we start on a Sunday)
+    # Calculate starting Sunday
     local current_date="$start_date"
-    local current_timestamp
-    if date --version >/dev/null 2>&1; then
-        current_timestamp=$(date -d "$current_date" +%s)
-    else
-        current_timestamp=$(date -j -f "%Y-%m-%d" "$current_date" +%s)
-    fi
-    
-    # Adjust to start on Sunday
     local day_of_week
     if date --version >/dev/null 2>&1; then
         day_of_week=$(date -d "$current_date" +%w)
+        if [[ $day_of_week -ne 0 ]]; then
+            current_date=$(date -d "$current_date - $day_of_week days" +%Y-%m-%d)
+        fi
     else
         day_of_week=$(date -j -f "%Y-%m-%d" "$current_date" +%w)
-    fi
-    
-    if [[ $day_of_week -ne 0 ]]; then
-        local adjust_days=$((7 - day_of_week))
-        if date --version >/dev/null 2>&1; then
-            current_date=$(date -d "$current_date - $day_of_week days" +%Y-%m-%d)
-        else
+        if [[ $day_of_week -ne 0 ]]; then
             current_date=$(date -v-${day_of_week}d -j -f "%Y-%m-%d" "$current_date" +%Y-%m-%d)
         fi
     fi
@@ -196,27 +212,23 @@ _display_github_heatmap() {
         # Print weekday label
         printf "%s%-3s%s " "${HEATMAP_DIM}" "${weekdays[$row]}" "${HEATMAP_RESET}"
         
-        local check_date="$current_date"
-        local col=0
-        
         # Generate 53 weeks
         for ((week=0; week<53; week++)); do
             # Calculate the date for this cell
-            local cell_timestamp
+            local days_offset=$((week * 7 + row))
+            local cell_date
+            
             if date --version >/dev/null 2>&1; then
-                cell_timestamp=$(date -d "$check_date + $((week * 7 + row)) days" +%s 2>/dev/null)
-                local cell_date=$(date -d "@$cell_timestamp" +%Y-%m-%d 2>/dev/null)
+                cell_date=$(date -d "$current_date + $days_offset days" +%Y-%m-%d 2>/dev/null)
             else
-                local days_offset=$((week * 7 + row))
-                cell_date=$(date -v+${days_offset}d -j -f "%Y-%m-%d" "$check_date" +%Y-%m-%d 2>/dev/null)
-                cell_timestamp=$(date -j -f "%Y-%m-%d" "$cell_date" +%s 2>/dev/null)
+                cell_date=$(date -v+${days_offset}d -j -f "%Y-%m-%d" "$current_date" +%Y-%m-%d 2>/dev/null)
             fi
             
             # Check if date is within our range
             if [[ -z "$cell_date" ]] || [[ "$cell_date" < "$start_date" ]] || [[ "$cell_date" > "$end_date" ]]; then
                 printf " "
             else
-                local commits=${commit_data[$cell_date]:-0}
+                local commits=$(_get_commit_count "$cell_date" "$temp_file")
                 local intensity=0
                 
                 if [[ $commits -ge $t4 ]]; then
@@ -241,7 +253,7 @@ _display_compact_heatmap() {
     local start_date="$1"
     local end_date="$2"
     local t1="$3" t2="$4" t3="$5" t4="$6"
-    local -n commit_data="$7"
+    local temp_file="$7"
     
     echo
     echo "${HEATMAP_CYAN}${HEATMAP_BOLD}$(date +%Y) Contribution Activity${HEATMAP_RESET}"
@@ -253,7 +265,7 @@ _display_compact_heatmap() {
     # Generate 52 weeks of data
     local current_date="$start_date"
     for ((week=0; week<52; week++)); do
-        local commits=${commit_data[$current_date]:-0}
+        local commits=$(_get_commit_count "$current_date" "$temp_file")
         local intensity=0
         
         if [[ $commits -ge $t4 ]]; then
