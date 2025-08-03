@@ -202,14 +202,18 @@ _get_ascii_char() {
     esac
 }
 
-# Main ascii_text function
+# Main ascii_text function with complete xtrace isolation
 ascii_text() {
-    # Save current xtrace setting and disable it
-    local xtrace_save=""
+    # Complete isolation using exec redirect approach
+    exec 3>&2  # Save stderr
+    exec 2>/dev/null  # Redirect stderr to null
+    local original_xtrace=""
     if [[ -o xtrace ]]; then
-        xtrace_save="on"
-        set +x
+        original_xtrace="on"
+        set +x  # Disable xtrace
     fi
+    exec 2>&3  # Restore stderr
+    exec 3>&-  # Close fd 3
     
     local text=""
     local style="matrix"
@@ -248,39 +252,25 @@ ascii_text() {
         esac
     done
     
+    # Execute commands with clean environment
     if [[ "$help" == "true" ]]; then
         _ascii_text_help
-        # Restore xtrace if it was on
-        [[ "$xtrace_save" == "on" ]] && set -x
-        return 0
-    fi
-    
-    if [[ "$list_styles" == "true" ]]; then
+    elif [[ "$list_styles" == "true" ]]; then
         _ascii_text_list_styles
-        # Restore xtrace if it was on
-        [[ "$xtrace_save" == "on" ]] && set -x
-        return 0
-    fi
-    
-    if [[ "$preview" == "true" ]]; then
+    elif [[ "$preview" == "true" ]]; then
         _ascii_text_preview "$text"
-        # Restore xtrace if it was on
-        [[ "$xtrace_save" == "on" ]] && set -x
-        return 0
-    fi
-    
-    if [[ -z "$text" ]]; then
+    elif [[ -z "$text" ]]; then
         echo "${ASCII_RED}[ERROR]${ASCII_RESET} Please provide text to convert" >&2
         echo "Usage: ascii-text \"YOUR TEXT\" [OPTIONS]" >&2
-        # Restore xtrace if it was on
-        [[ "$xtrace_save" == "on" ]] && set -x
+        # Restore xtrace if needed
+        [[ "$original_xtrace" == "on" ]] && set -x
         return 1
+    else
+        _generate_ascii_text "$text" "$style" "$color"
     fi
     
-    _generate_ascii_text "$text" "$style" "$color"
-    
-    # Restore xtrace if it was on
-    [[ "$xtrace_save" == "on" ]] && set -x
+    # Restore xtrace if it was originally on
+    [[ "$original_xtrace" == "on" ]] && set -x
 }
 
 # Show help
@@ -343,58 +333,52 @@ _ascii_text_preview() {
     done
 }
 
-# Generate ASCII text
+# Generate ASCII text with complete debug suppression
 _generate_ascii_text() {
+    # This function is called with xtrace already disabled from main function
     local text="$1"
-    local style="$2"
+    local style="$2" 
     local color="$3"
     
-    # Temporarily disable xtrace for this function
-    local xtrace_was_on=false
-    if [[ -o xtrace ]]; then
-        xtrace_was_on=true
-        set +x
-    fi
-    
-    # Get color code
-    local color_code
-    color_code=$(_get_ascii_color "$color")
-    
-    # Convert text to array of characters
-    local chars=()
-    local i=0
-    while [[ $i -lt ${#text} ]]; do
-        chars+=("${text:$i:1}")
-        ((i++))
-    done
-    
-    # Generate lines for each character (3 lines total)
-    local line1="" line2="" line3=""
-    
-    for char in "${chars[@]}"; do
-        local ascii_data
-        # Capture output without triggering xtrace
-        ascii_data=$(set +x; _get_ascii_char "$style" "$char")
+    # Process in a completely clean environment
+    {
+        # Get color code
+        local color_code
+        color_code=$(_get_ascii_color "$color")
         
-        # Split into lines using here-doc to avoid subshell
-        local line1_data line2_data line3_data
-        { IFS=$'\n' read -r line1_data; IFS=$'\n' read -r line2_data; IFS=$'\n' read -r line3_data; } <<< "$ascii_data"
+        # Convert text to individual characters
+        local chars=()
+        local i=0
+        while [[ $i -lt ${#text} ]]; do
+            chars+=("${text:$i:1}")
+            ((i++))
+        done
         
-        # Append to lines with spacing
-        line1+="$line1_data "
-        line2+="$line2_data "
-        line3+="$line3_data "
-    done
-    
-    # Output the lines with color
-    echo "${color_code}${line1}${ASCII_RESET}"
-    echo "${color_code}${line2}${ASCII_RESET}"
-    echo "${color_code}${line3}${ASCII_RESET}"
-    
-    # Restore xtrace if it was on
-    if [[ "$xtrace_was_on" == "true" ]]; then
-        set -x
-    fi
+        # Generate ASCII art lines
+        local line1="" line2="" line3=""
+        
+        for char in "${chars[@]}"; do
+            # Get ASCII representation
+            local ascii_data
+            ascii_data=$(_get_ascii_char "$style" "$char")
+            
+            # Extract three lines
+            local l1 l2 l3
+            l1=$(echo "$ascii_data" | sed -n '1p')
+            l2=$(echo "$ascii_data" | sed -n '2p') 
+            l3=$(echo "$ascii_data" | sed -n '3p')
+            
+            # Append with spacing
+            line1+="$l1 "
+            line2+="$l2 "
+            line3+="$l3 "
+        done
+        
+        # Output colored lines
+        echo "${color_code}${line1}${ASCII_RESET}"
+        echo "${color_code}${line2}${ASCII_RESET}"
+        echo "${color_code}${line3}${ASCII_RESET}"
+    } 2>/dev/null
 }
 
 # Aliases
