@@ -369,5 +369,4 @@ alias ascii-text='ascii_text'
 alias ascii='ascii_text'
 alias asciit='ascii_text'
 
-# Plugin info
-echo "${ASCII_GREEN}[INFO]${ASCII_RESET} ASCII Text plugin loaded. Use 'ascii-text' or 'ascii' command."
+# Plugin loaded silently - no startup messages needed

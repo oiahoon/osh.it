@@ -419,5 +419,4 @@ _git_heatmap_help() {
 alias git-heatmap='git_heatmap'
 alias gheatmap='git_heatmap'
 
-# Plugin info
-echo "${HEATMAP_COLOR_3}[INFO]${HEATMAP_RESET} Git Heatmap plugin loaded. Use 'git-heatmap' command."
+# Plugin loaded silently - no startup messages needed
